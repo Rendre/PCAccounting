@@ -179,6 +179,7 @@
             this.button2.TabIndex = 1;
             this.button2.Text = "Просмотреть устройство";
             this.button2.UseVisualStyleBackColor = false;
+            this.button2.Click += new System.EventHandler(this.ShowTechClick);
             // 
             // button1
             // 

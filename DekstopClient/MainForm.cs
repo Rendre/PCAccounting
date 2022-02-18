@@ -29,11 +29,15 @@ namespace DekstopClient
         {
             //на кнопку просмотр
             var newTechForm = new NewTechForm();
+            newTechForm.ShowDialog();
+        }
+
+        private void ShowTechClick(object sender, EventArgs e)
+        {
+            var newTechForm = new NewTechForm();
             var currentRow = dataGridView3.CurrentCell.RowIndex;
             newTechForm.ComputerID = (int)dataGridView3[0, currentRow].Value;
             newTechForm.ShowDialog();
-
-
         }
     }
 }
