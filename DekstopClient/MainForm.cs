@@ -13,32 +13,37 @@ namespace DekstopClient
 
         private void RefreshDbClick(object sender, EventArgs e)
         {
-            var str = string.Format("server={0}; database={1}; charset=utf8; user id={2}; password={3}; pooling=false;", "127.0.0.1", "retraincorp", "root", "root");
-            using var connection = new MySqlConnection(str);
-            const string sqlExpression = "SELECT * FROM technick";
-            connection.Open();
-            var command = new MySqlCommand(sqlExpression, connection);
-            var reader = command.ExecuteReader();
-            var table = new DataTable();
-            table.Load(reader);
-
-            dataGridView3.DataSource = table;
-            reader.Close();
+            RefreshDB();
         }
 
         private void AddNewTechClick(object sender, EventArgs e)
         {
             //на кнопку просмотр
             var newTechForm = new NewTechForm();
-            newTechForm.ShowDialog();
+            var result = newTechForm.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                RefreshDB();
+            }
         }
 
         private void ShowTechClick(object sender, EventArgs e)
         {
             var newTechForm = new NewTechForm();
-            var currentRow = dataGridView3.CurrentCell.RowIndex;
-            newTechForm.ComputerID = (int)dataGridView3[0, currentRow].Value;
-            newTechForm.ShowDialog();
+            try
+            {
+                var currentRow = dataGridView3.CurrentCell.RowIndex;
+                newTechForm.ComputerID = (int)dataGridView3[0, currentRow].Value;
+                var result = newTechForm.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    RefreshDB();
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Обновите состояние базы данных и выбереите устройство для просмотра!");
+            }
         }
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
@@ -96,7 +101,6 @@ namespace DekstopClient
             {
                 var currentRow = dataGridView2.CurrentCell.RowIndex;
                 var currentColumn = dataGridView2.CurrentCell.ColumnIndex;
-                var currentCell = dataGridView2.CurrentCell;
                 var id = (int)dataGridView2[0, currentRow].Value;
                 var name = textBox1.Text;
                 var job = textBox2.Text;
@@ -121,9 +125,7 @@ namespace DekstopClient
                 dataGridView2.DataSource = table;
                 reader.Close();
                 //курсор возвр на прежнее место
-                //dataGridView2.ClearSelection();
-                //dataGridView2.Rows[currentRow].Cells[currentColumn].Selected = true;
-                //dataGridView2.CurrentCell = currentCell;
+                dataGridView2.CurrentCell = dataGridView2.Rows[currentRow].Cells[currentColumn];
 
             }
         }
@@ -136,12 +138,15 @@ namespace DekstopClient
             textBox2.Text = (string)dataGridView2[2, currentRow].Value;
             textBox3.Text = (string)dataGridView2[3, currentRow].Value;
         }
-        private void dataGridView2_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void DataGridView2_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            var currentRow = dataGridView2.CurrentCell.RowIndex;
-            textBox1.Text = (string)dataGridView2[1, currentRow].Value;
-            textBox2.Text = (string)dataGridView2[2, currentRow].Value;
-            textBox3.Text = (string)dataGridView2[3, currentRow].Value;
+            if (radioButton2.Checked)
+            {
+                var currentRow = dataGridView2.CurrentCell.RowIndex;
+                textBox1.Text = (string)dataGridView2[1, currentRow].Value;
+                textBox2.Text = (string)dataGridView2[2, currentRow].Value;
+                textBox3.Text = (string)dataGridView2[3, currentRow].Value;
+            }
 
         }
 
@@ -151,6 +156,63 @@ namespace DekstopClient
             textBox1.Clear();
             textBox2.Clear();
             textBox3.Clear();
+        }
+
+        private void DeleteTechClick(object sender, EventArgs e)
+        {
+            try
+            {
+                var currentRow = dataGridView3.CurrentCell.RowIndex;
+                var Id = (int)dataGridView3[0, currentRow].Value;
+                var str = string.Format(
+                    "server={0}; database={1}; charset=utf8; user id={2}; password={3}; pooling=false;", "127.0.0.1",
+                    "retraincorp", "root", "root");
+                using var connection = new MySqlConnection(str);
+                string sqlExpression = $"DELETE FROM technick WHERE ID = {Id}";
+                connection.Open();
+                var command = new MySqlCommand(sqlExpression, connection);
+
+                DialogResult result = MessageBox.Show(
+                    "Вы действительно хотите удалить устройсво?",
+                    "Внимание",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Exclamation,
+                    MessageBoxDefaultButton.Button2,
+                    MessageBoxOptions.DefaultDesktopOnly);
+
+                if (result == DialogResult.Yes)
+                {
+                    command.ExecuteNonQuery();
+
+                    sqlExpression = "SELECT * FROM technick";
+                    command = new MySqlCommand(sqlExpression, connection);
+                    var reader = command.ExecuteReader();
+                    var table = new DataTable();
+                    table.Load(reader);
+
+                    dataGridView3.DataSource = table;
+                    reader.Close();
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Обновите состояние базы данных и выбереите устройство для удаления!");
+            }
+        }
+
+        private void RefreshDB()
+        {
+            var str = string.Format("server={0}; database={1}; charset=utf8; user id={2}; password={3}; pooling=false;", "127.0.0.1", "retraincorp", "root", "root");
+            using var connection = new MySqlConnection(str);
+            const string sqlExpression = "SELECT * FROM technick";
+            connection.Open();
+            var command = new MySqlCommand(sqlExpression, connection);
+            var reader = command.ExecuteReader();
+            var table = new DataTable();
+            table.Load(reader);
+
+            dataGridView3.DataSource = table;
+            reader.Close();
         }
     }
 }

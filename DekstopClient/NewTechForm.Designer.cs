@@ -43,6 +43,7 @@
             this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -125,7 +126,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(431, 41);
+            this.button1.Location = new System.Drawing.Point(451, 316);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(101, 58);
             this.button1.TabIndex = 12;
@@ -175,12 +176,24 @@
             this.comboBox2.Size = new System.Drawing.Size(200, 23);
             this.comboBox2.TabIndex = 17;
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(396, 45);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(156, 19);
+            this.checkBox1.TabIndex = 18;
+            this.checkBox1.Text = "Режим редактирования";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // NewTechForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.ClientSize = new System.Drawing.Size(564, 407);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.dateTimePicker1);
@@ -221,5 +234,6 @@
         private DateTimePicker dateTimePicker1;
         private ComboBox comboBox1;
         private ComboBox comboBox2;
+        private CheckBox checkBox1;
     }
 }

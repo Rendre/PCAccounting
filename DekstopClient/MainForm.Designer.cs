@@ -138,6 +138,7 @@
             this.button6.TabIndex = 5;
             this.button6.Text = "Удалить устройство";
             this.button6.UseVisualStyleBackColor = false;
+            this.button6.Click += new System.EventHandler(this.DeleteTechClick);
             // 
             // button4
             // 
@@ -247,7 +248,7 @@
             this.dataGridView2.RowTemplate.Height = 25;
             this.dataGridView2.Size = new System.Drawing.Size(848, 128);
             this.dataGridView2.TabIndex = 29;
-            this.dataGridView2.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellClick);
+            this.dataGridView2.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView2_CellClick);
             // 
             // button9
             // 
