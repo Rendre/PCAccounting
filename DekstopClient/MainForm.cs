@@ -1,14 +1,23 @@
 using System.Data;
+using DekstopClient.Entities;
 using MySql.Data.MySqlClient;
 
 namespace DekstopClient
 {
     public partial class MainForm : Form
     {
+        public User User { get; set; }
+        public LoginForm LoginForm { get; set; }
+
         public MainForm()
         {
             InitializeComponent();
             radioButton1.Checked = true;
+        }
+
+        private void MainForm_Shown(object sender, EventArgs e)
+        {
+            this.Text = $"Добро пожаловать, {User.Login}";
         }
 
         private void RefreshDbClick(object sender, EventArgs e)
@@ -213,6 +222,11 @@ namespace DekstopClient
 
             dataGridView3.DataSource = table;
             reader.Close();
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            LoginForm.Close();
         }
     }
 }
