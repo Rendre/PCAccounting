@@ -1,6 +1,7 @@
 using System.Data;
 using DekstopClient.Entities;
 using DekstopClient.Repositories;
+using DekstopClient.Utils;
 using MySql.Data.MySqlClient;
 
 namespace DekstopClient
@@ -19,6 +20,8 @@ namespace DekstopClient
         private void MainForm_Shown(object sender, EventArgs e)
         {
             this.Text = $"Добро пожаловать, {User.Login}";
+            textBox3.MaxLength = 12;
+            textBox3.TextAlign = HorizontalAlignment.Center;
         }
 
         private void RefreshDbClick(object sender, EventArgs e)
@@ -59,24 +62,30 @@ namespace DekstopClient
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (tabControl1.SelectedIndex != 1) return;
+
             var employerRepository = new EmployerRepository();
             var employers =  employerRepository.GetItems();
             dataGridView2.DataSource = employers;
+            dataGridView2.Columns["Id"]!.DisplayIndex = 0;
 
         }
 
         private void AddOrChangeClick(object sender, EventArgs e)
         {
+            var name = textBox1.Text;
+            var job = textBox2.Text;
+            var tel = Util.CheckTelNumber(textBox3.Text);
+            if (name.Length == 0 ||
+                job.Length == 0 ||
+                tel.Length == 0)
+            {
+                MessageBox.Show("dfgf");
+                return;
+            }
+
             if (radioButton1.Checked)
             {
-                var name = textBox1.Text;
-                var job = textBox2.Text;
-                var tel = textBox3.Text;
-                if (name.Length > 0 &&
-                    job.Length > 0 &&
-                    tel.Length > 0)
-                {
-                    var str = string.Format(
+                var str = string.Format(
                         "server={0}; database={1}; charset=utf8; user id={2}; password={3}; pooling=false;", "127.0.0.1",
                         "retraincorp", "root", "root");
                     using var connection = new MySqlConnection(str);
@@ -93,16 +102,13 @@ namespace DekstopClient
 
                     dataGridView2.DataSource = table;
                     reader.Close();
-                }
             }
             else if (radioButton2.Checked)
             {
+
                 var currentRow = dataGridView2.CurrentCell.RowIndex;
                 var currentColumn = dataGridView2.CurrentCell.ColumnIndex;
-                var id = (int)dataGridView2[0, currentRow].Value;
-                var name = textBox1.Text;
-                var job = textBox2.Text;
-                var tel = textBox3.Text;
+                var id = (int)dataGridView2["Id", currentRow].Value;
                 var str = string.Format(
                     "server={0}; database={1}; charset=utf8; user id={2}; password={3}; pooling=false;", "127.0.0.1",
                     "retraincorp", "root", "root");
@@ -132,18 +138,18 @@ namespace DekstopClient
         {
             button7.Text = "Изменить";
             var currentRow = dataGridView2.CurrentCell.RowIndex;
-            textBox1.Text = (string)dataGridView2[1, currentRow].Value;
-            textBox2.Text = (string)dataGridView2[2, currentRow].Value;
-            textBox3.Text = (string)dataGridView2[3, currentRow].Value;
+            textBox1.Text = (string)dataGridView2["Name", currentRow].Value;
+            textBox2.Text = (string)dataGridView2["Position", currentRow].Value;
+            textBox3.Text = (string)dataGridView2["Tel", currentRow].Value;
         }
         private void DataGridView2_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (radioButton2.Checked)
             {
                 var currentRow = dataGridView2.CurrentCell.RowIndex;
-                textBox1.Text = (string)dataGridView2[1, currentRow].Value;
-                textBox2.Text = (string)dataGridView2[2, currentRow].Value;
-                textBox3.Text = (string)dataGridView2[3, currentRow].Value;
+                textBox1.Text = (string)dataGridView2["Name", currentRow].Value;
+                textBox2.Text = (string)dataGridView2["Position", currentRow].Value;
+                textBox3.Text = (string)dataGridView2["Tel", currentRow].Value;
             }
 
         }
