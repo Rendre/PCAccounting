@@ -1,6 +1,4 @@
-﻿using System.Data;
-using System.Globalization;
-using System.Windows.Forms.VisualStyles;
+﻿using System.Globalization;
 using DekstopClient.Entities;
 using MySql.Data.MySqlClient;
 

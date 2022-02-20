@@ -1,10 +1,6 @@
-﻿using System.Data;
-using System.Drawing.Text;
-using DekstopClient.Entities;
-using DekstopClient.Services;
-using DekstopClient.Services.LoginService;
+﻿using DekstopClient.Services.LoginService;
 using DekstopClient.Services.RegistrationService;
-using MySql.Data.MySqlClient;
+using DekstopClient.Utils;
 
 namespace DekstopClient
 {
@@ -13,6 +9,9 @@ namespace DekstopClient
         public LoginForm()
         {
             InitializeComponent();
+            textBox2.PasswordChar = '*';
+            textBox1.TextAlign = HorizontalAlignment.Center;
+            textBox2.TextAlign = HorizontalAlignment.Center;
             textBox1.Text = "rendre";
             textBox2.Text = "1234";
         }
@@ -31,9 +30,10 @@ namespace DekstopClient
         private void Login(ILoginService service)
         {
             var login = textBox1.Text;
-            var password = textBox2.Text;
-            var user = service.Login(login, password);
-            if (user != null)
+            var password = Util.Encode(textBox2.Text);
+            var user = service.Login(login);
+            if (user != null &&
+                (user.Password.Equals(password)))
             {
                 var mainForm = new MainForm();
                 mainForm.User = user;
@@ -41,10 +41,20 @@ namespace DekstopClient
                 mainForm.Show();
                 this.Hide();
             }
+            else if (user == null)
+            {
+                MessageBox.Show(
+                    "Введен неверный логин!",
+                    "Внимание",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information,
+                    MessageBoxDefaultButton.Button1,
+                    MessageBoxOptions.DefaultDesktopOnly);
+            }
             else
             {
                 MessageBox.Show(
-                    "Введен неверный логин или пароль!",
+                    "Введен неверный пароль!",
                     "Внимание",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information,
@@ -63,7 +73,7 @@ namespace DekstopClient
         private void Registration(IRegistrationService registrationService)
         {
             var login = textBox1.Text;
-            var password = textBox2.Text;
+            var password = Util.Encode(textBox2.Text);
             var isSuccess = registrationService.Registration(login, password);
 
             if (isSuccess)
@@ -90,6 +100,8 @@ namespace DekstopClient
         }
     }
 }
+
+
 
 
 

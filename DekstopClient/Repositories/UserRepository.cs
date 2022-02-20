@@ -20,10 +20,9 @@ public class UserRepository : IDisposable
             return user;
     }
 
-    public User? GetItem(string login, string password)
+    public User? GetItem(string login)
     {
-        var sqlExpression = $"SELECT * FROM Users WHERE Login = '{login}' " +
-                            $"AND Pass = '{password}' LIMIT 1";
+        var sqlExpression = $"SELECT * FROM Users WHERE Login = '{login}' LIMIT 1";
         var user = _databaseContext.GetUser(sqlExpression);
         return user;
     }

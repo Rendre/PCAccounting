@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using DekstopClient.Entities;
+﻿using DekstopClient.Entities;
 
 namespace DekstopClient.Repositories;
 
