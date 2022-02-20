@@ -1,8 +1,7 @@
 ﻿namespace DekstopClient.Entities
 {
-    internal class Employer
+    public class Employer : BaseEntity
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Position { get; set; }
         public string Tel { get; set; }

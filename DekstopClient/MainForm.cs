@@ -1,5 +1,6 @@
 using System.Data;
 using DekstopClient.Entities;
+using DekstopClient.Repositories;
 using MySql.Data.MySqlClient;
 
 namespace DekstopClient
@@ -57,22 +58,10 @@ namespace DekstopClient
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (tabControl1.SelectedIndex == 1)
-            {
-                var str = string.Format(
-                    "server={0}; database={1}; charset=utf8; user id={2}; password={3}; pooling=false;", "127.0.0.1",
-                    "retraincorp", "root", "root");
-                using var connection = new MySqlConnection(str);
-                const string sqlExpression = "SELECT * FROM employers";
-                connection.Open();
-                var command = new MySqlCommand(sqlExpression, connection);
-                var reader = command.ExecuteReader();
-                var table = new DataTable();
-                table.Load(reader);
-
-                dataGridView2.DataSource = table;
-                reader.Close();
-            }
+            if (tabControl1.SelectedIndex != 1) return;
+            var employerRepository = new EmployerRepository();
+            var employers =  employerRepository.GetItems();
+            dataGridView2.DataSource = employers;
 
         }
 
