@@ -1,6 +1,6 @@
-﻿namespace DekstopClient.Entities
+﻿namespace DB.Entities
 {
-    internal class Computer : BaseEntity
+    public class Computer : BaseEntity
     {
         public string Name { get; set; }
         public int Status { get; set; }

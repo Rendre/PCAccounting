@@ -1,6 +1,6 @@
-﻿using DekstopClient.Entities;
+﻿using DB.Entities;
 
-namespace DekstopClient.Repositories;
+namespace DB.Repositories;
 
 public class UserRepository : IDisposable
 {

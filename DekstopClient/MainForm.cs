@@ -1,7 +1,7 @@
 using System.Data;
-using DekstopClient.Entities;
-using DekstopClient.Repositories;
-using DekstopClient.Utils;
+using DB.Entities;
+using DB.Repositories;
+using DB.Utils;
 using MySql.Data.MySqlClient;
 
 namespace DekstopClient
@@ -19,7 +19,7 @@ namespace DekstopClient
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            this.Text = $"Добро пожаловать, {User.Login}";
+            Text = $"Добро пожаловать, {User.Login}";
             textBox3.MaxLength = 12;
             textBox3.TextAlign = HorizontalAlignment.Center;
         }

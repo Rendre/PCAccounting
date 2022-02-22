@@ -1,7 +1,7 @@
-﻿using DekstopClient.Entities;
+﻿using DB.Entities;
 using MySql.Data.MySqlClient;
 
-namespace DekstopClient.Repositories;
+namespace DB.Repositories;
 
 public class MySQLDatabaseContext : IDisposable
 {

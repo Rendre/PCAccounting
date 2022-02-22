@@ -1,4 +1,4 @@
-﻿using DekstopClient.Entities;
+﻿using DB.Entities;
 
 namespace DekstopClient.Services.LoginService
 {

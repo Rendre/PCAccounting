@@ -1,6 +1,6 @@
-﻿namespace DekstopClient.Entities
+﻿namespace DB.Entities
 {
-    internal enum StatusEnum
+    public enum StatusEnum
     {
         UnderRepair = 1,
         Properly = 2,

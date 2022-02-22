@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace DekstopClient.Utils;
+namespace DB.Utils;
 
 public class Util
 {

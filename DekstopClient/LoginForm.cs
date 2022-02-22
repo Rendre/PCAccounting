@@ -1,6 +1,6 @@
-﻿using DekstopClient.Services.LoginService;
+﻿using DB.Utils;
+using DekstopClient.Services.LoginService;
 using DekstopClient.Services.RegistrationService;
-using DekstopClient.Utils;
 
 namespace DekstopClient
 {
@@ -39,7 +39,7 @@ namespace DekstopClient
                 mainForm.User = user;
                 mainForm.LoginForm = this;
                 mainForm.Show();
-                this.Hide();
+                Hide();
             }
             else if (user == null)
             {

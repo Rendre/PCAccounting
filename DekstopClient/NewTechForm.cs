@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using DekstopClient.Entities;
+using DB.Entities;
 using MySql.Data.MySqlClient;
 
 namespace DekstopClient
@@ -62,7 +62,7 @@ namespace DekstopClient
                         //reader.Close();
                     }
 
-                    this.DialogResult = DialogResult.OK;
+                    DialogResult = DialogResult.OK;
                     MessageBox.Show("Данные успешно добавлены.");
                     Close();
                 }
@@ -94,13 +94,13 @@ namespace DekstopClient
                 command = new MySqlCommand(sqlExpression, connection);
                 command.ExecuteNonQuery();
             }
-            this.DialogResult = DialogResult.OK;
+            DialogResult = DialogResult.OK;
             Close();
         }
 
         private void ExitClick(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
+            DialogResult = DialogResult.Cancel;
             Close();
         }
 

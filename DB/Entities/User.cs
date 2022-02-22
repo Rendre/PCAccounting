@@ -1,4 +1,4 @@
-﻿namespace DekstopClient.Entities
+﻿namespace DB.Entities
 {
     public class User : BaseEntity
     {
