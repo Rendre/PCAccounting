@@ -25,6 +25,12 @@ public class EmployerRepository : IDisposable
         return employers;
     }
 
+    public int DeleteItem(int id)
+    {
+        var sqlExpression = $"DELETE FROM employers WHERE ID = {id}";
+        return _databaseContext.DeleteEmployer(sqlExpression);
+    }
+
 
     public void Dispose()
     {

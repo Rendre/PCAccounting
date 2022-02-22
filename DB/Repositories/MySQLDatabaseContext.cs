@@ -30,6 +30,12 @@ public class MySQLDatabaseContext : IDisposable
         return user;
     }
 
+    public int DeleteEmployer(string sqlExpression)
+    {
+        var command = new MySqlCommand(sqlExpression, _connection);
+        return command.ExecuteNonQuery();
+    }
+
     public Employer? GetEmployer(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
