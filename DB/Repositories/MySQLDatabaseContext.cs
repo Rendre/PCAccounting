@@ -14,6 +14,8 @@ public class MySQLDatabaseContext : IDisposable
         _connection.Open();
     }
 
+
+
     public User? GetUser(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
@@ -30,11 +32,19 @@ public class MySQLDatabaseContext : IDisposable
         return user;
     }
 
-    public int DeleteEmployer(string sqlExpression)
+    public int ExecuteExp(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
         return command.ExecuteNonQuery();
     }
+
+    public int ExecuteScalar(string sqlExpression)
+    {
+        var command = new MySqlCommand(sqlExpression, _connection);
+        return Convert.ToInt32(command.ExecuteScalar());
+    }
+
+    
 
     public Employer? GetEmployer(string sqlExpression)
     {

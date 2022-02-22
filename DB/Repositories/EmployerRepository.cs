@@ -28,7 +28,26 @@ public class EmployerRepository : IDisposable
     public int DeleteItem(int id)
     {
         var sqlExpression = $"DELETE FROM employers WHERE ID = {id}";
-        return _databaseContext.DeleteEmployer(sqlExpression);
+        return _databaseContext.ExecuteExp(sqlExpression);
+    }
+
+    public int CreateEmployer(string? name, string? position, string? tel)
+    {
+        var sqlExpression = $"INSERT INTO employers (Name, Position, Tel)" +
+                            $"VALUES ('{name}', '{position}', '{tel}')";
+        var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
+        _databaseContext.ExecuteExp(sqlExpression);
+        var id = _databaseContext.ExecuteScalar(sqlExpressionForId);
+        return id;
+
+    }
+
+    public int СhangeEmployer(int id, string? name, string? position, string? tel)
+    {
+        var sqlExpression = $"UPDATE employers SET Name = '{name}', Position = '{position}', Tel = '{tel}' WHERE ID = {id}";
+        var success = _databaseContext.ExecuteExp(sqlExpression);
+        return success;
+
     }
 
 
@@ -36,5 +55,10 @@ public class EmployerRepository : IDisposable
     {
         _databaseContext.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    public object СhangeEmployer(string? name, string? position, string? tel)
+    {
+        throw new NotImplementedException();
     }
 }

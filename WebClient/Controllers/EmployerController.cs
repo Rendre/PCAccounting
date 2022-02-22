@@ -6,11 +6,10 @@ using EmployerRepository = DB.Repositories.EmployerRepository;
 
 namespace WebClient.Controllers
 {
-   // [ApiController]
-    [Route("Computer")]
-    public class ComputerController : ControllerBase
+    [Route("[controller]")]
+    public class EmployerController : ControllerBase
     {
-        public IResult Index()
+        /*public IResult Index()
         {
             var computer = new Computer() { Name = "comp1", Status = 1 };
             var json = Results.Json(computer);
@@ -43,22 +42,78 @@ namespace WebClient.Controllers
             var json = JsonSerializer.Serialize(userMap);
 
             return json;
+        }*/
+
+        [HttpPost]
+        public dynamic Employer([FromBody] JsonElement emp)
+        {
+            var name = emp.GetProperty("name").GetString();
+            var position = emp.GetProperty("position").GetString();
+            var tel = emp.GetProperty("tel").GetString();
+            var employerRepository = new EmployerRepository();
+            var empId = employerRepository.CreateEmployer(name, position, tel);
+            if (empId <= 0)
+            {
+                var responceObj = new
+                {
+                    success = 0
+                };
+                return JsonSerializer.Serialize(responceObj);
+
+            }
+            else
+            {
+                var responceObj = new
+                {
+                    success = 1,
+                    id = empId
+                };
+                return JsonSerializer.Serialize(responceObj);
+
+            }
         }
-        //метод для всех эмплоеры
-        public dynamic DeleteEmployerById(int id)
+        //чо ругается на сигнатуру если разные типы запросов на методах?
+        [HttpPut]
+        public dynamic PutEmployer([FromBody] JsonElement emp)
+        {
+            var id = emp.GetProperty("id").GetInt32();
+            var name = emp.GetProperty("name").GetString();
+            var position = emp.GetProperty("position").GetString();
+            var tel = emp.GetProperty("tel").GetString();
+            var employerRepository = new EmployerRepository();
+            var success = employerRepository.СhangeEmployer(id, name, position, tel);
+            if (success > 0)
+            {
+                var resultObj = new
+                {
+                    Success = success,
+                    Id = id,
+                };
+                return JsonSerializer.Serialize(resultObj);
+            }
+            else
+            {
+                var resultObj = new
+                {
+                    Success = success,
+                    Id = id,
+                };
+                return JsonSerializer.Serialize(resultObj);
+            }
+        }
+
+        [HttpDelete("{id:int}")]
+        public dynamic Employer(int id)
         {
             var employerRepository = new EmployerRepository();
             var objCounts = employerRepository.DeleteItem(id);
-            return $"удалено объектов - {objCounts}";
+            var responceObj = new
+            {
+                success = objCounts
+            };
+            return JsonSerializer.Serialize(responceObj);
         }
 
-        //public dynamic GetEmployer(int? id = null)
-        //{
-        //    if (id != null)
-        //    {
-
-        //    }
-        //}
         [HttpGet]
         public dynamic GetEmployer()
         {
@@ -81,7 +136,7 @@ namespace WebClient.Controllers
                 };
                 return JsonSerializer.Serialize(responceObj);
             }
-            
+
         }
 
         [HttpGet("{id:int}")]
@@ -111,5 +166,4 @@ namespace WebClient.Controllers
         }
 
     }
-
 }
