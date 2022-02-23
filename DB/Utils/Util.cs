@@ -5,7 +5,7 @@ namespace DB.Utils;
 
 public class Util
 {
-    public static string Encode(string text)
+    public static string? Encode(string? text)
     {
         if (string.IsNullOrWhiteSpace(text)) return null;
 

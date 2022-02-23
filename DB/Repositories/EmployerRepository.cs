@@ -44,7 +44,8 @@ public class EmployerRepository : IDisposable
    
     public int СhangeEmployer(int id, string? name, string? position, string? tel)
     {
-        var sqlExpression = $"UPDATE employers SET Name = '{name}', Position = '{position}', Tel = '{tel}' WHERE ID = {id}";
+        var sqlExpression = $"UPDATE employers SET Name = '{name}', Position = '{position}', Tel = '{tel}'" +
+                            $" WHERE ID = {id}";
         var success = _databaseContext.ExecuteExp(sqlExpression);
         return success;
 

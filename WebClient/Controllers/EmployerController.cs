@@ -7,6 +7,13 @@ namespace WebClient.Controllers
     [Route("[controller]")]
     public class EmployerController : ControllerBase
     {
+        EmployerRepository employerRepository;
+
+        public EmployerController()
+        {
+            employerRepository = new EmployerRepository();
+        }
+
         /*public IResult Index()
         {
             var computer = new Computer() { Name = "comp1", Status = 1 };
@@ -48,7 +55,6 @@ namespace WebClient.Controllers
             var name = emp.GetProperty("name").GetString();
             var position = emp.GetProperty("position").GetString();
             var tel = emp.GetProperty("tel").GetString();
-            var employerRepository = new EmployerRepository();
             var empId = employerRepository.CreateEmployer(name, position, tel);
             if (empId <= 0)
             {
@@ -78,7 +84,6 @@ namespace WebClient.Controllers
             var name = emp.GetProperty("name").GetString();
             var position = emp.GetProperty("position").GetString();
             var tel = emp.GetProperty("tel").GetString();
-            var employerRepository = new EmployerRepository();
             var success = employerRepository.СhangeEmployer(id, name, position, tel);
             if (success > 0)
             {
@@ -103,11 +108,10 @@ namespace WebClient.Controllers
         [HttpDelete("{id:int}")]
         public dynamic Employer(int id)
         {
-            var employerRepository = new EmployerRepository();
-            var objCounts = employerRepository.DeleteItem(id);
+            var deleteObjCounts = employerRepository.DeleteItem(id);
             var responceObj = new
             {
-                success = objCounts
+                success = deleteObjCounts
             };
             return JsonSerializer.Serialize(responceObj);
         }
@@ -115,14 +119,25 @@ namespace WebClient.Controllers
         [HttpGet]
         public dynamic GetEmployer()
         {
-            var employerRepository = new EmployerRepository();
             var employerList = employerRepository.GetItems();
-            if (employerList.Count > 0)
+            var outEmployerList = new List<dynamic>();
+            foreach (var employer in employerList)
+            {
+                var outEmployer = new
+                {
+                    id = employer.Id,
+                    name = employer.Name,
+                    position = employer.Position,
+                    tel = employer.Tel
+                };
+                outEmployerList.Add(outEmployer);
+            }
+            if (outEmployerList.Count > 0)
             {
                 var responceObj = new
                 {
                     success = 1,
-                    employers = employerList
+                    employers = outEmployerList
                 };
                 return JsonSerializer.Serialize(responceObj);
             }
@@ -140,7 +155,6 @@ namespace WebClient.Controllers
         [HttpGet("{id:int}")]
         public dynamic GetEmployer(int id)
         {
-            var employerRepository = new EmployerRepository();
             var employer = employerRepository.GetItem(id);
             if (employer != null)
             {

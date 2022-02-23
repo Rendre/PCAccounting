@@ -15,7 +15,7 @@ public class MySQLDatabaseContext : IDisposable
     }
 
 
-
+    #region User
     public User? GetUser(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
@@ -25,12 +25,40 @@ public class MySQLDatabaseContext : IDisposable
         var user = new User()
         {
             //маппинг
-            Id = reader.GetInt32(0), Login = reader.GetString(1),
-            Password = reader.GetString(2), EmployerId = reader.GetInt32(3)
+            Id = reader.GetInt32(0),
+            IsDeleted = reader.GetBoolean(1),
+            Login = reader.GetString(2),
+            Password = reader.GetString(3),
+            EmployerId = reader.GetInt32(4),
         };
         reader.Close();
         return user;
     }
+
+    public List<User> GetUsers(string sqlExpression)
+    {
+        var users = new List<User>();
+        var command = new MySqlCommand(sqlExpression, _connection);
+        var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            var user = new User()
+            {
+                Id = reader.GetInt32(0),
+                IsDeleted = reader.GetBoolean(1),
+                Login = reader.GetString(2),
+                Password = reader.GetString(3),
+                EmployerId = reader.GetInt32(4),
+            };
+            users.Add(user);
+        }
+        reader.Close();
+        return users;
+    }
+
+    #endregion
+
+
 
     public int ExecuteExp(string sqlExpression)
     {
@@ -44,8 +72,9 @@ public class MySQLDatabaseContext : IDisposable
         return Convert.ToInt32(command.ExecuteScalar());
     }
 
-    
 
+
+    #region Employer
     public Employer? GetEmployer(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
@@ -54,8 +83,11 @@ public class MySQLDatabaseContext : IDisposable
 
         var employer = new Employer()
         {
-            Id = reader.GetInt32(0), Name = reader.GetString(2),
-            Position = reader.GetString(3), Tel = reader.GetString(4)
+            Id = reader.GetInt32(0),
+            IsDeleted = reader.GetBoolean(1),
+            Name = reader.GetString(2),
+            Position = reader.GetString(3),
+            Tel = reader.GetString(4)
         };
         reader.Close();
         return employer;
@@ -71,6 +103,7 @@ public class MySQLDatabaseContext : IDisposable
             var employer = new Employer()
             {
                 Id = reader.GetInt32(0),
+                IsDeleted = reader.GetBoolean(1),
                 Name = reader.GetString(2),
                 Position = reader.GetString(3),
                 Tel = reader.GetString(4)
@@ -80,6 +113,8 @@ public class MySQLDatabaseContext : IDisposable
         reader.Close();
         return employers;
     }
+
+    #endregion
 
     public void Dispose()
     {
