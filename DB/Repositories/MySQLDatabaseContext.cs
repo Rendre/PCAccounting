@@ -54,8 +54,8 @@ public class MySQLDatabaseContext : IDisposable
 
         var employer = new Employer()
         {
-            Id = reader.GetInt32(0), Name = reader.GetString(1),
-            Position = reader.GetString(2), Tel = reader.GetString(3)
+            Id = reader.GetInt32(0), Name = reader.GetString(2),
+            Position = reader.GetString(3), Tel = reader.GetString(4)
         };
         reader.Close();
         return employer;
@@ -71,9 +71,9 @@ public class MySQLDatabaseContext : IDisposable
             var employer = new Employer()
             {
                 Id = reader.GetInt32(0),
-                Name = reader.GetString(1),
-                Position = reader.GetString(2),
-                Tel = reader.GetString(3)
+                Name = reader.GetString(2),
+                Position = reader.GetString(3),
+                Tel = reader.GetString(4)
             };
             employers.Add(employer);
         }

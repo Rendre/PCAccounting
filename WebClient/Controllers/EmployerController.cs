@@ -1,6 +1,4 @@
 ﻿using System.Text.Json;
-using DB.Entities;
-using DB.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using EmployerRepository = DB.Repositories.EmployerRepository;
 
@@ -72,7 +70,7 @@ namespace WebClient.Controllers
 
             }
         }
-        //чо ругается на сигнатуру если разные типы запросов на методах?
+        
         [HttpPut]
         public dynamic PutEmployer([FromBody] JsonElement emp)
         {

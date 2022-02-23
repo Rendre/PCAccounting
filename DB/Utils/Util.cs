@@ -19,6 +19,7 @@ public class Util
         var outputBuffer = transform.TransformFinalBlock(inputbuffer, 0, inputbuffer.Length);
         return Convert.ToBase64String(outputBuffer);
     }
+
     private static readonly string[] CryptKeys =
     {
         "leGOzfYCO2qBPoZiAsHQvib4",
