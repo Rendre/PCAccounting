@@ -58,21 +58,54 @@ public class MySQLDatabaseContext : IDisposable
 
     #endregion
 
-
-
-    public int ExecuteExp(string sqlExpression)
+    #region Computer
+    public Computer? GetComputer(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
-        return command.ExecuteNonQuery();
+        var reader = command.ExecuteReader();
+        if(!reader.Read()) return null;
+
+        var computer = new Computer()
+        {
+            Id = reader.GetInt32(0),
+            IsDeleted = reader.GetBoolean(1),
+            Name = reader.GetString(2),
+            Status = reader.GetInt32(3),
+            EmployerId = reader.GetInt32(4),
+            Date = reader.GetDateTime(5),
+            Cpu = reader.GetString(6),
+            Price = reader.GetDecimal(7)
+        };
+        reader.Close();
+        return computer;
     }
 
-    public int ExecuteScalar(string sqlExpression)
+    public List<Computer> GetComputers(string sqlExpression)
     {
+        var computers = new List<Computer>();
         var command = new MySqlCommand(sqlExpression, _connection);
-        return Convert.ToInt32(command.ExecuteScalar());
+        var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            var computer = new Computer()
+            {
+                Id = reader.GetInt32(0),
+                IsDeleted = reader.GetBoolean(1),
+                Name = reader.GetString(2),
+                Status = reader.GetInt32(3),
+                EmployerId = reader.GetInt32(4),
+                Date = reader.GetDateTime(5),
+                Cpu = reader.GetString(6),
+                Price = reader.GetDecimal(7)
+            };
+            computers.Add(computer);
+        }
+        reader.Close();
+        return computers;
     }
 
 
+    #endregion
 
     #region Employer
     public Employer? GetEmployer(string sqlExpression)
@@ -115,6 +148,18 @@ public class MySQLDatabaseContext : IDisposable
     }
 
     #endregion
+
+    public int ExecuteExp(string sqlExpression)
+    {
+        var command = new MySqlCommand(sqlExpression, _connection);
+        return command.ExecuteNonQuery();
+    }
+
+    public int ExecuteScalar(string sqlExpression)
+    {
+        var command = new MySqlCommand(sqlExpression, _connection);
+        return Convert.ToInt32(command.ExecuteScalar());
+    }
 
     public void Dispose()
     {

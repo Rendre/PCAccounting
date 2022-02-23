@@ -28,7 +28,7 @@ public class UserRepository : IDisposable
 
     public User? GetItem(string login)
     {
-        var sqlExpression = $"SELECT * FROM Users WHERE Login = '{login}' LIMIT 1";
+        var sqlExpression = $"SELECT * FROM Users WHERE Login = '{login}' WHERE IsDeleted = 0 LIMIT 1";
         var user = _databaseContext.GetUser(sqlExpression);
         return user;
     }
