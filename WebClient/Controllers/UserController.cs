@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using DB.Repositories;
+using DB.Repositories.User;
 using DB.Utils;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,17 +8,17 @@ namespace WebClient.Controllers
     [Route("[controller]")]
     public class UserController : Controller
     {
-        private UserRepository userRepository;
+        private readonly IUserRepository _userRepository;
 
         public UserController()
         {
-            userRepository = new UserRepository();
+            _userRepository = new UserRepository();
         }
 
         [HttpGet("{id:int}")]
         public dynamic GetUser(int id)
         {
-            var user = userRepository.GetItem(id);
+            var user = _userRepository.GetItem(id);
             if (user != null)
             {
                 var responseObj = new
@@ -44,7 +44,7 @@ namespace WebClient.Controllers
         [HttpGet]
         public dynamic GetUsers()
         {
-            var userList = userRepository.GetItems();
+            var userList = _userRepository.GetItems();
             var outUserList = new List<dynamic>();
             foreach (var user in userList)
             {
@@ -78,7 +78,7 @@ namespace WebClient.Controllers
         [HttpDelete("{id:int}")]
         public dynamic DeleteUser(int id)
         {
-            var deleteObjectCounts = userRepository.DeleteItem(id);
+            var deleteObjectCounts = _userRepository.DeleteItem(id);
             var resultObj = new
             {
                 success = deleteObjectCounts
@@ -94,7 +94,7 @@ namespace WebClient.Controllers
             var password = userJsn.GetProperty("password").GetString();
             password = Util.Encode(password);
             var employerId = userJsn.GetProperty("employerId").GetInt32();
-            var userId = userRepository.CreateUser(login, password, employerId);
+            var userId = _userRepository.CreateUser(login, password, employerId);
             if (userId <= 0)
             {
                 var resultObj = new
@@ -121,7 +121,7 @@ namespace WebClient.Controllers
             var password = userJsn.GetProperty("password").GetString();
             password = Util.Encode(password);
             var employerId = userJsn.GetProperty("employerId").GetInt32();
-            var success = userRepository.ChangeUser(id, login, password, employerId);
+            var success = _userRepository.ChangeUser(id, login, password, employerId);
             return JsonSerializer.Serialize(success);
         }
 

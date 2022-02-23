@@ -1,7 +1,7 @@
 ﻿using DB.Entities;
 using MySql.Data.MySqlClient;
 
-namespace DB.Repositories;
+namespace DB;
 
 public class MySQLDatabaseContext : IDisposable
 {

@@ -1,8 +1,7 @@
-﻿using DB.Entities;
+﻿namespace DB.Repositories.Employer;
+using Entities;
 
-namespace DB.Repositories;
-
-public class EmployerRepository : IDisposable
+public class EmployerRepository : IDisposable, IEmployerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
@@ -39,7 +38,6 @@ public class EmployerRepository : IDisposable
         _databaseContext.ExecuteExp(sqlExpression);
         var id = _databaseContext.ExecuteScalar(sqlExpressionForId);
         return id;
-
     }
    
     public int СhangeEmployer(int id, string? name, string? position, string? tel)
@@ -48,14 +46,11 @@ public class EmployerRepository : IDisposable
                             $" WHERE ID = {id}";
         var success = _databaseContext.ExecuteExp(sqlExpression);
         return success;
-
     }
-
 
     public void Dispose()
     {
         _databaseContext.Dispose();
         GC.SuppressFinalize(this);
     }
-
 }

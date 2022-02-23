@@ -1,8 +1,7 @@
-﻿using DB.Entities;
+﻿namespace DB.Repositories.Computer;
+using Entities;
 
-namespace DB.Repositories;
-
-public class ComputerRepository
+public class ComputerRepository : IComputerRepository, IDisposable
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
@@ -57,11 +56,9 @@ public class ComputerRepository
         return result;
     }
 
-
-
-
-
-    //удалить
-    
-
+    public void Dispose()
+    {
+        _databaseContext.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }

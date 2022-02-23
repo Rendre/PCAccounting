@@ -1,17 +1,17 @@
 ﻿using System.Text.Json;
+using DB.Repositories.Employer;
 using Microsoft.AspNetCore.Mvc;
-using EmployerRepository = DB.Repositories.EmployerRepository;
 
 namespace WebClient.Controllers
 {
     [Route("[controller]")]
     public class EmployerController : ControllerBase
     {
-        EmployerRepository employerRepository;
+        private readonly IEmployerRepository _employerRepository;
 
         public EmployerController()
         {
-            employerRepository = new EmployerRepository();
+            _employerRepository = new EmployerRepository();
         }
 
         /*public IResult Index()
@@ -55,7 +55,7 @@ namespace WebClient.Controllers
             var name = emp.GetProperty("name").GetString();
             var position = emp.GetProperty("position").GetString();
             var tel = emp.GetProperty("tel").GetString();
-            var empId = employerRepository.CreateEmployer(name, position, tel);
+            var empId = _employerRepository.CreateEmployer(name, position, tel);
             if (empId <= 0)
             {
                 var responceObj = new
@@ -84,7 +84,7 @@ namespace WebClient.Controllers
             var name = emp.GetProperty("name").GetString();
             var position = emp.GetProperty("position").GetString();
             var tel = emp.GetProperty("tel").GetString();
-            var success = employerRepository.СhangeEmployer(id, name, position, tel);
+            var success = _employerRepository.СhangeEmployer(id, name, position, tel);
             if (success > 0)
             {
                 var resultObj = new
@@ -108,7 +108,7 @@ namespace WebClient.Controllers
         [HttpDelete("{id:int}")]
         public dynamic Employer(int id)
         {
-            var deleteObjCounts = employerRepository.DeleteItem(id);
+            var deleteObjCounts = _employerRepository.DeleteItem(id);
             var responceObj = new
             {
                 success = deleteObjCounts
@@ -119,7 +119,7 @@ namespace WebClient.Controllers
         [HttpGet]
         public dynamic GetEmployer()
         {
-            var employerList = employerRepository.GetItems();
+            var employerList = _employerRepository.GetItems();
             var outEmployerList = new List<dynamic>();
             foreach (var employer in employerList)
             {
@@ -155,7 +155,7 @@ namespace WebClient.Controllers
         [HttpGet("{id:int}")]
         public dynamic GetEmployer(int id)
         {
-            var employer = employerRepository.GetItem(id);
+            var employer = _employerRepository.GetItem(id);
             if (employer != null)
             {
                 var responceObj = new

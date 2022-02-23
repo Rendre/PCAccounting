@@ -1,6 +1,7 @@
 using System.Data;
 using DB.Entities;
 using DB.Repositories;
+using DB.Repositories.Employer;
 using DB.Utils;
 using MySql.Data.MySqlClient;
 

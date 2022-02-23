@@ -1,4 +1,5 @@
 ﻿using DB.Repositories;
+using DB.Repositories.Computer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebClient.Controllers
@@ -6,11 +7,11 @@ namespace WebClient.Controllers
     [Route("[controller]")]
     public class ComputerController : Controller
     {
-        private ComputerRepository computerRepository;
+        private readonly IComputerRepository _computerRepository;
 
         public ComputerController()
         {
-            computerRepository = new ComputerRepository();
+            _computerRepository = new ComputerRepository();
         }
 
         [HttpGet]
@@ -24,11 +25,11 @@ namespace WebClient.Controllers
             var cpu = "pentium";
             decimal price = 322;
 
-            var newId = computerRepository.CreateComputer(name, statusId, employerId, date, cpu, price);
+            var newId = _computerRepository.CreateComputer(name, statusId, employerId, date, cpu, price);
 
-            var computer = computerRepository.GetComputer(newId);
+            var computer = _computerRepository.GetComputer(newId);
 
-            var success = computerRepository.ChangeComputer(newId, "AMD", 2, 2, DateTime.UtcNow, "AMD", 1488);
+            var success = _computerRepository.ChangeComputer(newId, "AMD", 2, 2, DateTime.UtcNow, "AMD", 1488);
 
             return 1;
         }

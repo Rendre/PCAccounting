@@ -1,8 +1,7 @@
-﻿using DB.Entities;
+﻿namespace DB.Repositories.User;
+using Entities;
 
-namespace DB.Repositories;
-
-public class UserRepository : IDisposable
+public class UserRepository : IDisposable, IUserRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
