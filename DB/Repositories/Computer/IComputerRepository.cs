@@ -3,11 +3,9 @@ using Entities;
 
 public interface IComputerRepository
 {
-    public dynamic CreateComputer(string name, int statusId, int employerId, DateTime date,
-        string cpu, decimal price);
+    public void CreateComputer(Computer computer);
 
-    public dynamic ChangeComputer(int id, string name, int statusId, int employerId, DateTime date,
-        string cpu, decimal price);
+    public dynamic ChangeComputer(Computer computer);
 
     public Computer GetComputer(int id);
 

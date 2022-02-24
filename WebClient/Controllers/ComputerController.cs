@@ -1,4 +1,6 @@
-﻿using DB.Repositories;
+﻿using System.Text.Json;
+using DB.Entities;
+using DB.Repositories;
 using DB.Repositories.Computer;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,24 +16,173 @@ namespace WebClient.Controllers
             _computerRepository = new ComputerRepository();
         }
 
-        [HttpGet]
-        public dynamic ComputerTest()
+        [HttpPost]
+        public dynamic ComputerTest([FromBody] JsonElement json)
         {
-            var id = 15;
-            var name = "TestComp";
-            var statusId = 1;
-            var employerId = 1;
-            var date = DateTime.UtcNow;
-            var cpu = "pentium";
-            decimal price = 322;
+            if (json.TryGetProperty("id", out var jsonElementId))
+            {
+                var id = jsonElementId.GetInt32();
+                var computer = GetComputer(id);
+            }
 
-            var newId = _computerRepository.CreateComputer(name, statusId, employerId, date, cpu, price);
+            if (json.TryGetProperty("list", out var jsonElementList))
+            {
+                var list = GetComputers();
+            }
 
-            var computer = _computerRepository.GetComputer(newId);
+            if (json.TryGetProperty("comp", out var jsonElementComp))
+            {
+                int id = 0;
+                int del = 0;
+                string name = "";
 
-            var success = _computerRepository.ChangeComputer(newId, "AMD", 2, 2, DateTime.UtcNow, "AMD", 1488);
+                if (jsonElementComp.TryGetProperty("id", out var idElement))
+                {
+                    id = idElement.GetInt32();
+                }
+                if (jsonElementComp.TryGetProperty("del", out var delElement))
+                {
+                    del = delElement.GetInt32();
+                }
+                if (jsonElementComp.TryGetProperty("name", out var nameElement))
+                {
+                    name = nameElement.GetString();
+                }
 
-            return 1;
+                // создание
+                if (id == 0 && 
+                    del == 0 && 
+                    name != null)
+                {
+                    return CreateComputer(jsonElementComp, name);
+                }
+
+                // изменение
+                if (id > 0 && 
+                    del == 0)
+                {
+                    return ChangeComputer(jsonElementComp, id);
+                }
+
+                //delete
+                if (id > 0 && 
+                    del != 0)
+                {
+                    DeleteComputer(id);
+                }
+            }
+            return "";
+        }
+
+        private dynamic CreateComputer(JsonElement jsonElementComp, string name)
+        {
+            var computer = new Computer() {Name = name};
+
+            if (jsonElementComp.TryGetProperty("status", out var statusElement))
+            {
+                computer.Status = statusElement.GetInt32();
+            }
+            if (jsonElementComp.TryGetProperty("employerId", out var employerIdElement))
+            {
+                computer.EmployerId = employerIdElement.GetInt32();
+            }
+            if (jsonElementComp.TryGetProperty("date", out var dateElement))
+            {
+                computer.Date = dateElement.GetDateTime();
+            }
+            if (jsonElementComp.TryGetProperty("cpu", out var cpuElement))
+            {
+                computer.Cpu = cpuElement.GetString();
+            }
+            if (jsonElementComp.TryGetProperty("price", out var priceElement))
+            {
+                computer.Price = priceElement.GetDecimal();
+            }
+
+            _computerRepository.CreateComputer(computer);
+
+            if (computer.Id <= 0)
+            {
+                var responceObj = new
+                {
+                    success = 0
+                };
+                return JsonSerializer.Serialize(responceObj);
+
+            }
+            else
+            {
+                var responceObj = new
+                {
+                    success = 1,
+                    id = computer.Id
+                };
+                return JsonSerializer.Serialize(responceObj);
+
+            }
+        }
+
+        private dynamic ChangeComputer(JsonElement jsonElementComp, int id)
+        {
+            var computer = _computerRepository.GetComputer(id);
+
+            if (jsonElementComp.TryGetProperty("name", out var nameElement))
+            {
+                computer.Name = nameElement.GetString();
+            }
+            if (jsonElementComp.TryGetProperty("status", out var statusElement))
+            {
+                computer.Status = statusElement.GetInt32();
+            }
+            if (jsonElementComp.TryGetProperty("employerId", out var employerIdElement))
+            {
+                computer.EmployerId = employerIdElement.GetInt32();
+            }
+            if (jsonElementComp.TryGetProperty("date", out var dateElement))
+            {
+                computer.Date = dateElement.GetDateTime();
+            }
+            if (jsonElementComp.TryGetProperty("cpu", out var cpuElement))
+            {
+                computer.Cpu = cpuElement.GetString();
+            }
+            if (jsonElementComp.TryGetProperty("price", out var priceElement))
+            {
+                computer.Price = priceElement.GetDecimal();
+            }
+
+            var success = _computerRepository.ChangeComputer(computer);
+            if (success > 0)
+            {
+                var resultObj = new
+                {
+                    Success = success,
+                };
+                return JsonSerializer.Serialize(resultObj);
+            }
+            else
+            {
+                var resultObj = new
+                {
+                    Success = success,
+                };
+                return JsonSerializer.Serialize(resultObj);
+            }
+        }
+
+        private static dynamic GetComputer(int id)
+        {
+            return "";
+        }
+
+        private static dynamic GetComputers()
+        {
+            return "";
+        }
+
+        private static dynamic DeleteComputer(int id)
+        {
+            return "";
         }
     }
 }

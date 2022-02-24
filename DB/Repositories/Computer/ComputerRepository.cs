@@ -1,4 +1,6 @@
-﻿namespace DB.Repositories.Computer;
+﻿using System.Globalization;
+
+namespace DB.Repositories.Computer;
 using Entities;
 
 public class ComputerRepository : IComputerRepository, IDisposable
@@ -10,27 +12,25 @@ public class ComputerRepository : IComputerRepository, IDisposable
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public dynamic CreateComputer(string name, int statusId, int employerId, DateTime date,
-                                    string cpu, decimal price)
+    public void CreateComputer(Computer computer)
     {
         var sqlExpression = "INSERT INTO technick (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
-                            $"VALUES ('{name}', {statusId}, {employerId}, '{date.ToString("yyyy-MM-dd HH:mm:ss")}', '{cpu}', '{price}')";
+                            $"VALUES ('{computer.Name}', {computer.Status}, {computer.EmployerId}, '{computer.Date.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
         var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
         var id = _databaseContext.ExecuteScalar(sqlExpressionForId);
-        return id;
+        computer.Id = id;
     }
 
-    public dynamic ChangeComputer(int id, string name, int statusId, int employerId, DateTime date,
-                                    string cpu, decimal price)
+    public dynamic ChangeComputer(Computer computer)
     {
-        var sqlExpression = $"UPDATE technick SET Name = '{name}', " +
-                            $"StatusID = {statusId}, " +
-                            $"EmployerID = {employerId}, " +
-                            $"DateCreated = '{date:yyyy-MM-dd HH:mm:ss}', " +
-                            $"Cpu = '{cpu}', " +
-                            $"Price = '{price}' " +
-                            $"WHERE ID = {id}";
+        var sqlExpression = $"UPDATE technick SET Name = '{computer.Name}', " +
+                            $"StatusID = {computer.Status}, " +
+                            $"EmployerID = {computer.EmployerId}, " +
+                            $"DateCreated = '{computer.Date:yyyy-MM-dd HH:mm:ss}', " +
+                            $"Cpu = '{computer.Cpu}', " +
+                            $"Price = '{computer.Price.ToString(CultureInfo.InvariantCulture)}' " +
+                            $"WHERE ID = {computer.Id}";
         var success = _databaseContext.ExecuteExp(sqlExpression);
         return success;
     }
