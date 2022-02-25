@@ -7,7 +7,7 @@ public interface IComputerRepository
 
     public dynamic ChangeComputer(Computer computer);
 
-    public Computer GetComputer(int id);
+    public Computer? GetComputer(int id);
 
     public List<Computer> GetComputers();
 

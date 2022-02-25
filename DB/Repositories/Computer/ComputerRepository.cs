@@ -35,7 +35,7 @@ public class ComputerRepository : IComputerRepository, IDisposable
         return success;
     }
 
-    public Computer GetComputer(int id)
+    public Computer? GetComputer(int id)
     {
         var sqlExpression = $"SELECT * FROM technick WHERE ID = {id} AND IsDeleted = 0 LIMIT 1";
         var computer = _databaseContext.GetComputer(sqlExpression);
