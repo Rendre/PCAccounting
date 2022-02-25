@@ -22,12 +22,12 @@ namespace WebClient.Controllers
             if (json.TryGetProperty("id", out var jsonElementId))
             {
                 var id = jsonElementId.GetInt32();
-                var computer = GetComputer(id);
+                return GetComputer(id);
             }
 
             if (json.TryGetProperty("list", out var jsonElementList))
             {
-                var list = GetComputers();
+                return GetComputers();
             }
 
             if (json.TryGetProperty("comp", out var jsonElementComp))
@@ -50,22 +50,22 @@ namespace WebClient.Controllers
                 }
 
                 // создание
-                if (id == 0 && 
-                    del == 0 && 
+                if (id == 0 &&
+                    del == 0 &&
                     name != null)
                 {
                     return CreateComputer(jsonElementComp, name);
                 }
 
                 // изменение
-                if (id > 0 && 
+                if (id > 0 &&
                     del == 0)
                 {
                     return ChangeComputer(jsonElementComp, id);
                 }
 
                 //delete
-                if (id > 0 && 
+                if (id > 0 &&
                     del != 0)
                 {
                     DeleteComputer(id);
@@ -74,9 +74,78 @@ namespace WebClient.Controllers
             return "";
         }
 
+        private dynamic GetComputer(int id)
+        {
+            var computer = _computerRepository.GetComputer(id);
+            if (computer != null)
+            {
+                var outComp = new
+                {
+                    name = computer.Name,
+                    status = computer.Status,
+                    employerId = computer.EmployerId,
+                    date = computer.Date,
+                    cpu = computer.Cpu,
+                    price = computer.Price
+                };
+                var responseObj = new
+                {
+                    success = 1,
+                    comp = outComp
+
+                };
+                return JsonSerializer.Serialize(responseObj);
+            }
+            else
+            {
+                var responseObj = new
+                {
+                    success = 0
+
+                };
+                return JsonSerializer.Serialize(responseObj);
+            }
+        }
+
+
+        private dynamic GetComputers()
+        {
+            var computers = _computerRepository.GetComputers();
+            var outComputerList = new List<dynamic>();
+
+            foreach (var computer in computers)
+            {
+                var outComp = new
+                {
+                    id = computer.Id,
+                    name = computer.Name,
+                    status = computer.Status,
+                    employerId = computer.EmployerId,
+                    date = computer.Date,
+                    cpu = computer.Cpu,
+                    price = computer.Price
+                };
+                outComputerList.Add(outComp);
+            }
+
+            var responseObj = new
+            {
+                success = 1,
+                comps = outComputerList
+            };
+            return JsonSerializer.Serialize(responseObj);
+        }
+
+        private static dynamic DeleteComputer(int id)
+        {
+
+
+            return "";
+        }
+
         private dynamic CreateComputer(JsonElement jsonElementComp, string name)
         {
-            var computer = new Computer() {Name = name};
+            var computer = new Computer() { Name = name };
 
             if (jsonElementComp.TryGetProperty("status", out var statusElement))
             {
@@ -170,19 +239,6 @@ namespace WebClient.Controllers
             }
         }
 
-        private static dynamic GetComputer(int id)
-        {
-            return "";
-        }
 
-        private static dynamic GetComputers()
-        {
-            return "";
-        }
-
-        private static dynamic DeleteComputer(int id)
-        {
-            return "";
-        }
     }
 }
