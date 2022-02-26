@@ -1,7 +1,7 @@
 ﻿namespace DB.Repositories.User;
 using Entities;
 
-public interface IUserRepository
+public interface IUserRepository : IDisposable
 {
     public User? GetItem(int id);
 

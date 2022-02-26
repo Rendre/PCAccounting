@@ -1,7 +1,7 @@
 ﻿namespace DB.Repositories.Computer;
 using Entities;
 
-public interface IComputerRepository
+public interface IComputerRepository : IDisposable
 {
     public void CreateComputer(Computer computer);
 

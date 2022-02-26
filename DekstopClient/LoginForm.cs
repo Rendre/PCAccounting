@@ -1,4 +1,7 @@
-﻿using DB.Utils;
+﻿using DB.Repositories.Computer;
+using DB.Repositories.Employer;
+using DB.Repositories.User;
+using DB.Utils;
 using DekstopClient.Services.LoginService;
 using DekstopClient.Services.RegistrationService;
 
@@ -12,8 +15,8 @@ namespace DekstopClient
             textBox2.PasswordChar = '*';
             textBox1.TextAlign = HorizontalAlignment.Center;
             textBox2.TextAlign = HorizontalAlignment.Center;
-            textBox1.Text = "rendre";
-            textBox2.Text = "1234";
+            textBox1.Text = "test";
+            textBox2.Text = "test";
         }
 
         private void LoginForm_Load(object sender, EventArgs e)
@@ -35,7 +38,7 @@ namespace DekstopClient
             if (user != null &&
                 (user.Password.Equals(password)))
             {
-                var mainForm = new MainForm();
+                var mainForm = new MainForm(new EmployerRepository(), new ComputerRepository());
                 mainForm.User = user;
                 mainForm.LoginForm = this;
                 mainForm.Show();
@@ -65,7 +68,7 @@ namespace DekstopClient
 
         private void RegistrationClick(object sender, EventArgs e)
         {
-            IRegistrationService registrationService = new RegistrationService();
+            IRegistrationService registrationService = new RegistrationService(new UserRepository());
             Registration(registrationService);
 
         }

@@ -20,7 +20,12 @@ public class MySQLDatabaseContext : IDisposable
     {
         var command = new MySqlCommand(sqlExpression, _connection);
         var reader = command.ExecuteReader();
-        if (!reader.Read()) return null;
+        if (!reader.Read())
+        {
+            reader.Close();
+            return null;
+        }
+
 
         var user = new User()
         {
@@ -63,7 +68,7 @@ public class MySQLDatabaseContext : IDisposable
     {
         var command = new MySqlCommand(sqlExpression, _connection);
         var reader = command.ExecuteReader();
-        if(!reader.Read()) return null;
+        if (!reader.Read()) return null;
 
         var computer = new Computer()
         {

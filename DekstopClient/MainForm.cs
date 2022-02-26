@@ -1,9 +1,7 @@
-using System.Data;
 using DB.Entities;
-using DB.Repositories;
+using DB.Repositories.Computer;
 using DB.Repositories.Employer;
 using DB.Utils;
-using MySql.Data.MySqlClient;
 
 namespace DekstopClient
 {
@@ -12,10 +10,15 @@ namespace DekstopClient
         public User User { get; set; }
         public LoginForm LoginForm { get; set; }
 
-        public MainForm()
+        private readonly IEmployerRepository _employerRepository;
+        private readonly IComputerRepository _computerRepository;
+
+        public MainForm(IEmployerRepository employerRepository, IComputerRepository computerRepository)
         {
             InitializeComponent();
             radioButton1.Checked = true;
+            _employerRepository = employerRepository;
+            _computerRepository = computerRepository;
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
@@ -33,7 +36,7 @@ namespace DekstopClient
         private void AddNewTechClick(object sender, EventArgs e)
         {
             //на кнопку просмотр
-            var newTechForm = new NewTechForm();
+            var newTechForm = new NewTechForm(new ComputerRepository(), new EmployerRepository());
             var result = newTechForm.ShowDialog();
             if (result == DialogResult.OK)
             {
@@ -43,11 +46,11 @@ namespace DekstopClient
 
         private void ShowTechClick(object sender, EventArgs e)
         {
-            var newTechForm = new NewTechForm();
+            var newTechForm = new NewTechForm(new ComputerRepository(), new EmployerRepository());
             try
             {
                 var currentRow = dataGridView3.CurrentCell.RowIndex;
-                newTechForm.ComputerID = (int)dataGridView3[0, currentRow].Value;
+                newTechForm.ComputerID = (int)dataGridView3["Id", currentRow].Value;
                 var result = newTechForm.ShowDialog();
                 if (result == DialogResult.OK)
                 {
@@ -64,10 +67,10 @@ namespace DekstopClient
         {
             if (tabControl1.SelectedIndex != 1) return;
 
-            var employerRepository = new EmployerRepository();
-            var employers =  employerRepository.GetItems();
+            var employers = _employerRepository.GetItems();
             dataGridView2.DataSource = employers;
             dataGridView2.Columns["Id"]!.DisplayIndex = 0;
+            dataGridView2.Columns["IsDeleted"]!.Visible = false;
 
         }
 
@@ -86,23 +89,12 @@ namespace DekstopClient
 
             if (radioButton1.Checked)
             {
-                var str = string.Format(
-                        "server={0}; database={1}; charset=utf8; user id={2}; password={3}; pooling=false;", "127.0.0.1",
-                        "retraincorp", "root", "root");
-                    using var connection = new MySqlConnection(str);
-                    string sqlExpression = "INSERT INTO employers (Name, Position, Tel) " +
-                                                 $"VALUES ('{name}', '{job}', '{tel}')";
-                    connection.Open();
-                    var command = new MySqlCommand(sqlExpression, connection);
-                    command.ExecuteNonQuery();
-                    sqlExpression = "SELECT * FROM employers";
-                    command = new MySqlCommand(sqlExpression, connection);
-                    var reader = command.ExecuteReader();
-                    var table = new DataTable();
-                    table.Load(reader);
 
-                    dataGridView2.DataSource = table;
-                    reader.Close();
+                _employerRepository.CreateEmployer(name, job, tel);
+
+                var table = _employerRepository.GetItems();
+                dataGridView2.DataSource = table;
+
             }
             else if (radioButton2.Checked)
             {
@@ -110,25 +102,14 @@ namespace DekstopClient
                 var currentRow = dataGridView2.CurrentCell.RowIndex;
                 var currentColumn = dataGridView2.CurrentCell.ColumnIndex;
                 var id = (int)dataGridView2["Id", currentRow].Value;
-                var str = string.Format(
-                    "server={0}; database={1}; charset=utf8; user id={2}; password={3}; pooling=false;", "127.0.0.1",
-                    "retraincorp", "root", "root");
-                using var connection = new MySqlConnection(str);
-                string sqlExpression = $"UPDATE employers SET Name = '{name}', " +
-                                       $"Position = '{job}', " +
-                                       $"Tel = '{tel}' " +
-                                       $"WHERE ID = {id}";
-                connection.Open();
-                var command = new MySqlCommand(sqlExpression, connection);
-                command.ExecuteNonQuery();
-                sqlExpression = "SELECT * FROM employers";
-                command = new MySqlCommand(sqlExpression, connection);
-                var reader = command.ExecuteReader();
-                var table = new DataTable();
-                table.Load(reader);
 
+
+                _employerRepository.СhangeEmployer(id, name, job, tel);
+
+                var table = _employerRepository.GetItems();
                 dataGridView2.DataSource = table;
-                reader.Close();
+
+
                 //курсор возвр на прежнее место
                 dataGridView2.CurrentCell = dataGridView2.Rows[currentRow].Cells[currentColumn];
 
@@ -168,14 +149,7 @@ namespace DekstopClient
             try
             {
                 var currentRow = dataGridView3.CurrentCell.RowIndex;
-                var Id = (int)dataGridView3[0, currentRow].Value;
-                var str = string.Format(
-                    "server={0}; database={1}; charset=utf8; user id={2}; password={3}; pooling=false;", "127.0.0.1",
-                    "retraincorp", "root", "root");
-                using var connection = new MySqlConnection(str);
-                string sqlExpression = $"DELETE FROM technick WHERE ID = {Id}";
-                connection.Open();
-                var command = new MySqlCommand(sqlExpression, connection);
+                var id = (int)dataGridView3["Id", currentRow].Value;
 
                 DialogResult result = MessageBox.Show(
                     "Вы действительно хотите удалить устройсво?",
@@ -187,16 +161,8 @@ namespace DekstopClient
 
                 if (result == DialogResult.Yes)
                 {
-                    command.ExecuteNonQuery();
-
-                    sqlExpression = "SELECT * FROM technick";
-                    command = new MySqlCommand(sqlExpression, connection);
-                    var reader = command.ExecuteReader();
-                    var table = new DataTable();
-                    table.Load(reader);
-
-                    dataGridView3.DataSource = table;
-                    reader.Close();
+                    _computerRepository.DeleteComputer(id);
+                    RefreshDB();
                 }
             }
             catch (Exception)
@@ -207,17 +173,12 @@ namespace DekstopClient
 
         private void RefreshDB()
         {
-            var str = string.Format("server={0}; database={1}; charset=utf8; user id={2}; password={3}; pooling=false;", "127.0.0.1", "retraincorp", "root", "root");
-            using var connection = new MySqlConnection(str);
-            const string sqlExpression = "SELECT * FROM technick";
-            connection.Open();
-            var command = new MySqlCommand(sqlExpression, connection);
-            var reader = command.ExecuteReader();
-            var table = new DataTable();
-            table.Load(reader);
-
+            dataGridView3.DataSource = null;
+            var table = _computerRepository.GetComputers();
             dataGridView3.DataSource = table;
-            reader.Close();
+            dataGridView3.Columns["ID"]!.DisplayIndex = 0; 
+            dataGridView3.Columns["IsDeleted"]!.Visible = false;
+
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)

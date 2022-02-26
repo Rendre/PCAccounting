@@ -1,29 +1,27 @@
-﻿using MySql.Data.MySqlClient;
+﻿using DB.Repositories.User;
 
 namespace DekstopClient.Services.RegistrationService;
 
 public class RegistrationService : IRegistrationService
 {
+    private readonly IUserRepository _userRepository;
+
+    public RegistrationService(IUserRepository userRepository)
+    { 
+        _userRepository = userRepository;
+    }
+
     public bool Registration(string login, string password)
     {
-        var str = string.Format(
-            "server={0}; database={1}; charset=utf8; user id={2}; password={3}; pooling=false;", "127.0.0.1",
-            "retraincorp", "root", "root");
-        using var connection = new MySqlConnection(str);
-        var sqlExpression = $"SELECT * FROM Users WHERE Login = '{login}' LIMIT 1";
-        connection.Open();
-        var command = new MySqlCommand(sqlExpression, connection);
-        var reader = command.ExecuteReader();
-        if (reader.Read())
+        using (_userRepository)
         {
-            return false;
-        }
-        else
-        {
-            reader.Close();
-            sqlExpression = $"INSERT INTO users (Login, Pass) VALUES ('{login}', '{password}')";
-            command = new MySqlCommand(sqlExpression, connection);
-            command.ExecuteNonQuery();
+            var user = _userRepository.GetItem(login);
+            if (user != null)
+            {
+                return false;
+            }
+
+            _userRepository.CreateUser(login, password, 0);
             return true;
         }
     }

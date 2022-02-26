@@ -1,7 +1,7 @@
 ﻿namespace DB.Repositories.Employer;
 using Entities;
 
-public interface IEmployerRepository
+public interface IEmployerRepository : IDisposable
 {
     public Employer? GetItem(int id);
 

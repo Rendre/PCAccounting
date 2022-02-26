@@ -1,7 +1,7 @@
 ﻿namespace DB.Repositories.Employer;
 using Entities;
 
-public class EmployerRepository : IDisposable, IEmployerRepository
+public class EmployerRepository :  IEmployerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 

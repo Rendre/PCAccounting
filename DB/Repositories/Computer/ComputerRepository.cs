@@ -3,7 +3,7 @@
 namespace DB.Repositories.Computer;
 using Entities;
 
-public class ComputerRepository : IComputerRepository, IDisposable
+public class ComputerRepository : IComputerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 

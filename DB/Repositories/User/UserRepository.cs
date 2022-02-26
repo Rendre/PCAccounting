@@ -1,7 +1,7 @@
 ﻿namespace DB.Repositories.User;
 using Entities;
 
-public class UserRepository : IDisposable, IUserRepository
+public class UserRepository : IUserRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
@@ -27,7 +27,7 @@ public class UserRepository : IDisposable, IUserRepository
 
     public User? GetItem(string login)
     {
-        var sqlExpression = $"SELECT * FROM Users WHERE Login = '{login}' WHERE IsDeleted = 0 LIMIT 1";
+        var sqlExpression = $"SELECT * FROM Users WHERE Login = '{login}' AND IsDeleted = 0 LIMIT 1";
         var user = _databaseContext.GetUser(sqlExpression);
         return user;
     }
