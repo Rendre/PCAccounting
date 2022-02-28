@@ -38,7 +38,7 @@ namespace DekstopClient
             if (user != null &&
                 (user.Password.Equals(password)))
             {
-                var mainForm = new MainForm(new EmployerRepository(), new ComputerRepository());
+                var mainForm = new MainForm(new EmployerRepositoryDapper(), new ComputerRepositoryDefault());
                 mainForm.User = user;
                 mainForm.LoginForm = this;
                 mainForm.Show();
@@ -68,7 +68,7 @@ namespace DekstopClient
 
         private void RegistrationClick(object sender, EventArgs e)
         {
-            IRegistrationService registrationService = new RegistrationService(new UserRepository());
+            IRegistrationService registrationService = new RegistrationService(new UserRepositoryDefault());
             Registration(registrationService);
 
         }

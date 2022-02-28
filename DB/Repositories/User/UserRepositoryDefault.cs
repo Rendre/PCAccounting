@@ -1,11 +1,11 @@
 ﻿namespace DB.Repositories.User;
 using Entities;
 
-public class UserRepository : IUserRepository
+public class UserRepositoryDefault : IUserRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public UserRepository()
+    public UserRepositoryDefault()
     {
         _databaseContext = new MySQLDatabaseContext();
     }

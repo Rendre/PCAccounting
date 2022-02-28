@@ -1,33 +1,34 @@
 ﻿namespace DB.Repositories.Employer;
 using Entities;
 
-public class EmployerRepository :  IEmployerRepository
+public class EmployerRepositoryDapper :  IEmployerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public EmployerRepository()
+    public EmployerRepositoryDapper()
     {
         _databaseContext = new MySQLDatabaseContext();
     }
    
-    public Employer? GetItem(int id)
+    public Employer GetItem(int id)
     {
         var sqlExpression = $"SELECT * FROM employers WHERE ID = {id} AND IsDeleted = 0 LIMIT 1";
-        var employer = _databaseContext.GetEmployer(sqlExpression);
+        var employer = _databaseContext.GetByQuery<Employer>(sqlExpression);
         return employer;
     }
   
     public List<Employer> GetItems()
     {
         var sqlExpression = $"SELECT * FROM employers WHERE IsDeleted = 0";
-        var employers = _databaseContext.GetEmployers(sqlExpression);
+        //var employers = _databaseContext.GetEmployers(sqlExpression);
+        var employers = _databaseContext.GetAllByQuery<Employer>(sqlExpression);
         return employers;
     }
 
     public int DeleteItem(int id)
     {
         var sqlExpression = $"UPDATE employers SET IsDeleted = 1 WHERE ID = {id}";
-        return _databaseContext.ExecuteExp(sqlExpression);
+        return _databaseContext.ExecuteByQuery(sqlExpression);
     }
     
     public int CreateEmployer(string? name, string? position, string? tel)
@@ -35,8 +36,8 @@ public class EmployerRepository :  IEmployerRepository
         var sqlExpression = $"INSERT INTO employers (Name, Position, Tel)" +
                             $"VALUES ('{name}', '{position}', '{tel}')";
         var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
-        _databaseContext.ExecuteExp(sqlExpression);
-        var id = _databaseContext.ExecuteScalar(sqlExpressionForId);
+        _databaseContext.ExecuteByQuery(sqlExpression);
+        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
         return id;
     }
    
@@ -44,7 +45,7 @@ public class EmployerRepository :  IEmployerRepository
     {
         var sqlExpression = $"UPDATE employers SET Name = '{name}', Position = '{position}', Tel = '{tel}'" +
                             $" WHERE ID = {id}";
-        var success = _databaseContext.ExecuteExp(sqlExpression);
+        var success = _databaseContext.ExecuteByQuery(sqlExpression);
         return success;
     }
 

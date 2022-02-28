@@ -13,7 +13,7 @@ namespace WebClient.Controllers
 
         public ComputerController()
         {
-            _computerRepository = new ComputerRepository();
+            _computerRepository = new ComputerRepositoryDefault();
         }
 
         [HttpPost]

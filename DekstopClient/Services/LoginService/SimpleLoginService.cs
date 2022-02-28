@@ -7,7 +7,7 @@ public class SimpleLoginService : ILoginService
 {
     public User? Login(string login)
     {
-        var userRepository = new UserRepository();
+        var userRepository = new UserRepositoryDefault();
         using (userRepository)
         {
             return userRepository.GetItem(login);

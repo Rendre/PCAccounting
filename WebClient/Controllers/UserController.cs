@@ -12,7 +12,7 @@ namespace WebClient.Controllers
 
         public UserController()
         {
-            _userRepository = new UserRepository();
+            _userRepository = new UserRepositoryDefault();
         }
 
         [HttpGet("{id:int}")]

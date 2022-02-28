@@ -3,11 +3,11 @@
 namespace DB.Repositories.Computer;
 using Entities;
 
-public class ComputerRepository : IComputerRepository
+public class ComputerRepositoryDefault : IComputerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public ComputerRepository()
+    public ComputerRepositoryDefault()
     {
         _databaseContext = new MySQLDatabaseContext();
     }

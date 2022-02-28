@@ -36,7 +36,7 @@ namespace DekstopClient
         private void AddNewTechClick(object sender, EventArgs e)
         {
             //на кнопку просмотр
-            var newTechForm = new NewTechForm(new ComputerRepository(), new EmployerRepository());
+            var newTechForm = new NewTechForm(new ComputerRepositoryDefault(), new EmployerRepositoryDapper());
             var result = newTechForm.ShowDialog();
             if (result == DialogResult.OK)
             {
@@ -46,7 +46,7 @@ namespace DekstopClient
 
         private void ShowTechClick(object sender, EventArgs e)
         {
-            var newTechForm = new NewTechForm(new ComputerRepository(), new EmployerRepository());
+            var newTechForm = new NewTechForm(new ComputerRepositoryDefault(), new EmployerRepositoryDapper());
             try
             {
                 var currentRow = dataGridView3.CurrentCell.RowIndex;

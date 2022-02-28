@@ -11,7 +11,7 @@ namespace WebClient.Controllers
 
         public EmployerController()
         {
-            _employerRepository = new EmployerRepository();
+            _employerRepository = new EmployerRepositoryDapper();
         }
 
         /*public IResult Index()
