@@ -38,9 +38,9 @@ namespace DekstopClient
                     date.Year > 2010)
                 {
                     computer.Name = name;
-                    computer.Status = status;
+                    computer.StatusID = status;
                     computer.EmployerId = employer.Id;
-                    computer.Date = date;
+                    computer.DateCreated = date;
                     computer.Cpu = cpu;
                     computer.Price = Convert.ToDecimal(price);
 
@@ -59,9 +59,9 @@ namespace DekstopClient
             //изменения компуктера
             var currComputer = _computerRepository.GetComputer(ComputerID);
             currComputer.Name = textBox1.Text;
-            currComputer.Status = (int)(StatusEnum)comboBox1.SelectedItem;
+            currComputer.StatusID = (int)(StatusEnum)comboBox1.SelectedItem;
             currComputer.EmployerId = ((Employer)comboBox2.SelectedItem).Id;
-            currComputer.Date = dateTimePicker1.Value;
+            currComputer.DateCreated = dateTimePicker1.Value;
             currComputer.Cpu = textBox5.Text;
             currComputer.Price = Convert.ToDecimal(textBox6.Text);
             
@@ -99,12 +99,12 @@ namespace DekstopClient
 
             var computer = _computerRepository.GetComputer(ComputerID);
             textBox1.Text = computer.Name;
-            var index = comboBox1.Items.IndexOf((StatusEnum)computer.Status);
+            var index = comboBox1.Items.IndexOf((StatusEnum)computer.StatusID);
             comboBox1.SelectedIndex = index;
             var employers = comboBox2.Items.Cast<Employer>().First(e => e.Id == computer.EmployerId);
             index = comboBox2.Items.IndexOf(employers);
             comboBox2.SelectedIndex = index;
-            dateTimePicker1.Value = computer.Date;
+            dateTimePicker1.Value = computer.DateCreated;
             textBox5.Text = computer.Cpu;
             textBox6.Text = computer.Price.ToString();
         }
@@ -126,13 +126,13 @@ namespace DekstopClient
             {
                 button2.Hide();
                 textBox1.Text = computer.Name;
-                var index = comboBox1.Items.IndexOf((StatusEnum)computer.Status);
+                var index = comboBox1.Items.IndexOf((StatusEnum)computer.StatusID);
                 comboBox1.SelectedIndex = index;
                 // из сотрудников, хранящихся в комбобоксе - берем того, у которого индекс совпадает с искомым
                 var employers = comboBox2.Items.Cast<Employer>().First(e => e.Id == computer.EmployerId);
                 index = comboBox2.Items.IndexOf(employers);
                 comboBox2.SelectedIndex = index;
-                dateTimePicker1.Value = computer.Date;
+                dateTimePicker1.Value = computer.DateCreated;
                 textBox5.Text = computer.Cpu;
                 textBox6.Text = computer.Price.ToString();
             }

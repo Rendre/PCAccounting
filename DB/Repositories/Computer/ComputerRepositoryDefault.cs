@@ -15,7 +15,7 @@ public class ComputerRepositoryDefault : IComputerRepository
     public void CreateComputer(Computer computer)
     {
         var sqlExpression = "INSERT INTO technick (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
-                            $"VALUES ('{computer.Name}', {computer.Status}, {computer.EmployerId}, '{computer.Date.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
+                            $"VALUES ('{computer.Name}', {computer.StatusID}, {computer.EmployerId}, '{computer.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
         var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
         var id = _databaseContext.ExecuteScalar(sqlExpressionForId);
@@ -25,9 +25,9 @@ public class ComputerRepositoryDefault : IComputerRepository
     public dynamic ChangeComputer(Computer computer)
     {
         var sqlExpression = $"UPDATE technick SET Name = '{computer.Name}', " +
-                            $"StatusID = {computer.Status}, " +
+                            $"StatusID = {computer.StatusID}, " +
                             $"EmployerID = {computer.EmployerId}, " +
-                            $"DateCreated = '{computer.Date:yyyy-MM-dd HH:mm:ss}', " +
+                            $"DateCreated = '{computer.DateCreated:yyyy-MM-dd HH:mm:ss}', " +
                             $"Cpu = '{computer.Cpu}', " +
                             $"Price = '{computer.Price.ToString(CultureInfo.InvariantCulture)}' " +
                             $"WHERE ID = {computer.Id}";
@@ -60,5 +60,10 @@ public class ComputerRepositoryDefault : IComputerRepository
     {
         _databaseContext.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    public List<Computer> GetFilterComputers(string name = null, int statusId = 0, int employerId = 0, DateTime date = default, string cpu = null, decimal price = 0)
+    {
+        throw new NotImplementedException();
     }
 }

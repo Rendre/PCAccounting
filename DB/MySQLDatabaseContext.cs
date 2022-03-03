@@ -76,9 +76,9 @@ public class MySQLDatabaseContext : IDisposable
             Id = reader.GetInt32(0),
             IsDeleted = reader.GetBoolean(1),
             Name = reader.GetString(2),
-            Status = reader.GetInt32(3),
+            StatusID = reader.GetInt32(3),
             EmployerId = reader.GetInt32(4),
-            Date = reader.GetDateTime(5),
+            DateCreated = reader.GetDateTime(5),
             Cpu = reader.GetString(6),
             Price = reader.GetDecimal(7)
         };
@@ -98,9 +98,9 @@ public class MySQLDatabaseContext : IDisposable
                 Id = reader.GetInt32(0),
                 IsDeleted = reader.GetBoolean(1),
                 Name = reader.GetString(2),
-                Status = reader.GetInt32(3),
+                StatusID = reader.GetInt32(3),
                 EmployerId = reader.GetInt32(4),
-                Date = reader.GetDateTime(5),
+                DateCreated = reader.GetDateTime(5),
                 Cpu = reader.GetString(6),
                 Price = reader.GetDecimal(7)
             };

@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using DB.Entities;
-using DB.Repositories;
 using DB.Repositories.Computer;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +12,7 @@ namespace WebClient.Controllers
 
         public ComputerController()
         {
-            _computerRepository = new ComputerRepositoryDefault();
+            _computerRepository = new ComputerRepositoryDapper();
         }
 
         [HttpPost]
@@ -31,7 +30,48 @@ namespace WebClient.Controllers
             }
             if (json.TryGetProperty("list", out var jsonElementList))
             {
-                return GetComputers();
+                //// компы
+                ////return GetComputers();
+                //json.TryGetProperty("name", out var nameElement);
+                //json.TryGetProperty("status", out var statusElement);
+                //json.TryGetProperty("employerId", out var employerIdElement);
+                //json.TryGetProperty("date", out var dateElement);
+                //json.TryGetProperty("cpu", out var cpuElement);
+                //json.TryGetProperty("price", out var priceElement);
+
+                string? name = null;
+                int status = 0;
+                int employerId = 0;
+                DateTime date = default(DateTime);
+                string? cpu = null;
+                decimal price = 0;
+
+                if (json.TryGetProperty("name", out var nameElement))
+                {
+                    name = nameElement.GetString();
+                }
+                if (json.TryGetProperty("status", out var statusElement))
+                {
+                    status = statusElement.GetInt32();
+                }
+                if (json.TryGetProperty("employerId", out var employerIdElement))
+                {
+                    employerId = employerIdElement.GetInt32();
+                }
+                if (json.TryGetProperty("date", out var dateElement))
+                {
+                    date = dateElement.GetDateTime();
+                }
+                if (json.TryGetProperty("cpu", out var cpuElement))
+                {
+                    cpu = cpuElement.GetString();
+                }
+                if (json.TryGetProperty("price", out var priceElement))
+                {
+                    price = priceElement.GetDecimal();
+                }
+
+                return GetComputers(name, status, employerId, date, cpu, price);
             }
             if (json.TryGetProperty("comp", out var jsonElementComp))
             {
@@ -74,7 +114,7 @@ namespace WebClient.Controllers
             }
             if (jsonElementComp.TryGetProperty("status", out var statusElement))
             {
-                computer.Status = statusElement.GetInt32();
+                computer.StatusID = statusElement.GetInt32();
             }
             if (jsonElementComp.TryGetProperty("employerId", out var employerIdElement))
             {
@@ -82,7 +122,7 @@ namespace WebClient.Controllers
             }
             if (jsonElementComp.TryGetProperty("date", out var dateElement))
             {
-                computer.Date = dateElement.GetDateTime();
+                computer.DateCreated = dateElement.GetDateTime();
             }
             if (jsonElementComp.TryGetProperty("cpu", out var cpuElement))
             {
@@ -122,9 +162,9 @@ namespace WebClient.Controllers
                 var outComp = new
                 {
                     name = computer.Name,
-                    status = computer.Status,
+                    status = computer.StatusID,
                     employerId = computer.EmployerId,
-                    date = computer.Date,
+                    date = computer.DateCreated,
                     cpu = computer.Cpu,
                     price = computer.Price
                 };
@@ -158,9 +198,9 @@ namespace WebClient.Controllers
                 {
                     id = computer.Id,
                     name = computer.Name,
-                    status = computer.Status,
+                    status = computer.StatusID,
                     employerId = computer.EmployerId,
-                    date = computer.Date,
+                    date = computer.DateCreated,
                     cpu = computer.Cpu,
                     price = computer.Price
                 };
@@ -174,6 +214,36 @@ namespace WebClient.Controllers
             };
             return JsonSerializer.Serialize(responseObj);
         }
+
+        private dynamic GetComputers(string? name, int statusId, int employerId, DateTime date,
+            string? cpu, decimal price)
+        {
+            var computers = _computerRepository.GetFilterComputers(name, statusId, employerId, date, cpu, price);
+            var outComputerList = new List<dynamic>();
+
+            foreach (var computer in computers)
+            {
+                var outComp = new
+                {
+                    id = computer.Id,
+                    name = computer.Name,
+                    status = computer.StatusID,
+                    employerId = computer.EmployerId,
+                    date = computer.DateCreated,
+                    cpu = computer.Cpu,
+                    price = computer.Price
+                };
+                outComputerList.Add(outComp);
+            }
+
+            var responseObj = new
+            {
+                success = 1,
+                comps = outComputerList
+            };
+            return JsonSerializer.Serialize(responseObj);
+        }
+
     }
 }
 
