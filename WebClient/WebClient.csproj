@@ -10,4 +10,12 @@
     <ProjectReference Include="..\DB\DB.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Jobs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Quartz" Version="3.3.3" />
+  </ItemGroup>
+
 </Project>

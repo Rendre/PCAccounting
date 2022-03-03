@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using DB.Entities;
 using MySql.Data.MySqlClient;
+using Task = DB.Entities.Task;
 
 namespace DB;
 
@@ -133,9 +134,14 @@ public class MySQLDatabaseContext : IDisposable
         return employer;
     }
 
-    public T GetByQuery<T>(string sqlExpression)
+    public T? GetByQuery<T>(string sqlExpression)
     {
         return _connection.QueryFirstOrDefault<T>(sqlExpression);
+    }
+
+    public T? GetByQuery<T>(string sqlExp, DynamicParameters parameters)
+    {
+        return _connection.QueryFirstOrDefault<T>(sqlExp, parameters);
     }
 
     //[Obsolete]
@@ -163,6 +169,11 @@ public class MySQLDatabaseContext : IDisposable
     public List<T> GetAllByQuery<T>(string sqlExpression)
     {
         return _connection.Query<T>(sqlExpression).ToList();
+    }
+
+    public IEnumerable<T> GetAllByQuery<T>(string sqlExp, DynamicParameters parameters)
+    {
+        return _connection.Query<T>(sqlExp, parameters);
     }
 
     #endregion
