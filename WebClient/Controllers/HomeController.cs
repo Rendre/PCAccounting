@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using WebClient.Models;
+using DB.Entities;
+using DB.Repositories.Task;
 
 namespace WebClient.Controllers
 {
+    [Route("[controller]")]
     public class HomeController : ControllerBase
     {
         private readonly ILogger<HomeController> _logger;
@@ -15,6 +16,8 @@ namespace WebClient.Controllers
 
         public string Index()
         {
+            var taskRepository = new TaskDapperRepository();
+            var qq = taskRepository.GetItems(type: TaskType.Auth, name:"Первий");
             return "123";
         }
     }
