@@ -20,7 +20,7 @@ public class TaskDapperRepository : ITaskRepository
         const string sqlExp = "SELECT * FROM Tasks WHERE ID=@ID AND IsDeleted=0";
         var parameters = new DynamicParameters();
         parameters.Add("@ID", id);
-        var task = _context.GetByQuery<Entities.Task>(sqlExp);
+        var task = _context.GetByQuery<Entities.Task>(sqlExp, parameters);
         return task;
     }
 

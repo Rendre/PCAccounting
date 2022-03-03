@@ -17,7 +17,7 @@ namespace WebClient.Controllers
         public string Index()
         {
             var taskRepository = new TaskDapperRepository();
-            var qq = taskRepository.GetItems(type: TaskType.Auth, name:"Первий");
+            var qq = taskRepository.GetItems(type: TaskType.Auth, name:"FirstTask");
             return "123";
         }
     }
