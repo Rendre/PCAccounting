@@ -6,7 +6,7 @@ namespace DekstopClient
 {
     public partial class NewTechForm : Form
     {
-        public int ComputerID { get; set; }//по этому айди делается запрос и заполняется форма
+        public uint ComputerID { get; set; }//по этому айди делается запрос и заполняется форма
         private Computer computer = new();
         private readonly IComputerRepository _computerRepository;
         private readonly IEmployerRepository _employerRepository;
@@ -24,7 +24,7 @@ namespace DekstopClient
             if (!checkBox1.Checked)
             {
                 var name = textBox1.Text;
-                var status = (int)(StatusEnum)comboBox1.SelectedItem;
+                var status = (uint)(StatusEnum)comboBox1.SelectedItem;
                 var employer = (Employer)comboBox2.SelectedItem;
                 var date = dateTimePicker1.Value;
                 var cpu = textBox5.Text;
@@ -59,7 +59,7 @@ namespace DekstopClient
             //изменения компуктера
             var currComputer = _computerRepository.GetComputer(ComputerID);
             currComputer.Name = textBox1.Text;
-            currComputer.StatusID = (int)(StatusEnum)comboBox1.SelectedItem;
+            currComputer.StatusID = (uint)(StatusEnum)comboBox1.SelectedItem;
             currComputer.EmployerId = ((Employer)comboBox2.SelectedItem).Id;
             currComputer.DateCreated = dateTimePicker1.Value;
             currComputer.Cpu = textBox5.Text;

@@ -25,7 +25,7 @@ namespace WebClient.Controllers
 
             if (json.TryGetProperty("id", out var jsonElementId))
             {
-                var id = jsonElementId.GetInt32();
+                var id = jsonElementId.GetUInt32();
                 return GetComputer(id);
             }
             if (json.TryGetProperty("list", out var jsonElementList))
@@ -40,9 +40,9 @@ namespace WebClient.Controllers
                 //json.TryGetProperty("price", out var priceElement);
 
                 string? name = null;
-                int status = 0;
-                int employerId = 0;
-                DateTime date = default(DateTime);
+                uint status = 0;
+                uint employerId = 0;
+                DateTime? date = null;
                 string? cpu = null;
                 decimal price = 0;
 
@@ -52,11 +52,11 @@ namespace WebClient.Controllers
                 }
                 if (json.TryGetProperty("status", out var statusElement))
                 {
-                    status = statusElement.GetInt32();
+                    status = statusElement.GetUInt32();
                 }
                 if (json.TryGetProperty("employerId", out var employerIdElement))
                 {
-                    employerId = employerIdElement.GetInt32();
+                    employerId = employerIdElement.GetUInt32();
                 }
                 if (json.TryGetProperty("date", out var dateElement))
                 {
@@ -86,7 +86,7 @@ namespace WebClient.Controllers
 
             if (jsonElementComp.TryGetProperty("id", out var idElement))
             {
-                var id = idElement.GetInt32();
+                var id = idElement.GetUInt32();
                 computer = _computerRepository.GetComputer(id);
                 if (computer == null) return JsonSerializer.Serialize(errorObj);
             }
@@ -114,11 +114,11 @@ namespace WebClient.Controllers
             }
             if (jsonElementComp.TryGetProperty("status", out var statusElement))
             {
-                computer.StatusID = statusElement.GetInt32();
+                computer.StatusID = statusElement.GetUInt32();
             }
             if (jsonElementComp.TryGetProperty("employerId", out var employerIdElement))
             {
-                computer.EmployerId = employerIdElement.GetInt32();
+                computer.EmployerId = employerIdElement.GetUInt32();
             }
             if (jsonElementComp.TryGetProperty("date", out var dateElement))
             {
@@ -154,7 +154,7 @@ namespace WebClient.Controllers
             }
         }
 
-        private dynamic GetComputer(int id)
+        private dynamic GetComputer(uint id)
         {
             var computer = _computerRepository.GetComputer(id);
             if (computer != null)
@@ -215,7 +215,7 @@ namespace WebClient.Controllers
             return JsonSerializer.Serialize(responseObj);
         }
 
-        private dynamic GetComputers(string? name, int statusId, int employerId, DateTime date,
+        private dynamic GetComputers(string? name, uint statusId, uint employerId, DateTime? date,
             string? cpu, decimal price)
         {
             var computers = _computerRepository.GetFilterComputers(name, statusId, employerId, date, cpu, price);

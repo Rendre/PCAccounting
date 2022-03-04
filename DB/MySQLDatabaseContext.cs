@@ -1,9 +1,8 @@
-﻿using Dapper;
+﻿namespace DB;
 using DB.Entities;
+using Dapper;
 using MySql.Data.MySqlClient;
-using Task = DB.Entities.Task;
 
-namespace DB;
 
 public class MySQLDatabaseContext : IDisposable
 {
@@ -32,11 +31,11 @@ public class MySQLDatabaseContext : IDisposable
         var user = new User()
         {
             //маппинг
-            Id = reader.GetInt32(0),
+            Id = reader.GetUInt32(0),
             IsDeleted = reader.GetBoolean(1),
             Login = reader.GetString(2),
             Password = reader.GetString(3),
-            EmployerId = reader.GetInt32(4),
+            EmployerId = reader.GetUInt32(4),
         };
         reader.Close();
         return user;
@@ -51,11 +50,11 @@ public class MySQLDatabaseContext : IDisposable
         {
             var user = new User()
             {
-                Id = reader.GetInt32(0),
+                Id = reader.GetUInt32(0),
                 IsDeleted = reader.GetBoolean(1),
                 Login = reader.GetString(2),
                 Password = reader.GetString(3),
-                EmployerId = reader.GetInt32(4),
+                EmployerId = reader.GetUInt32(4),
             };
             users.Add(user);
         }
@@ -74,11 +73,11 @@ public class MySQLDatabaseContext : IDisposable
 
         var computer = new Computer()
         {
-            Id = reader.GetInt32(0),
+            Id = reader.GetUInt32(0),
             IsDeleted = reader.GetBoolean(1),
             Name = reader.GetString(2),
-            StatusID = reader.GetInt32(3),
-            EmployerId = reader.GetInt32(4),
+            StatusID = reader.GetUInt32(3),
+            EmployerId = reader.GetUInt32(4),
             DateCreated = reader.GetDateTime(5),
             Cpu = reader.GetString(6),
             Price = reader.GetDecimal(7)
@@ -96,11 +95,11 @@ public class MySQLDatabaseContext : IDisposable
         {
             var computer = new Computer()
             {
-                Id = reader.GetInt32(0),
+                Id = reader.GetUInt32(0),
                 IsDeleted = reader.GetBoolean(1),
                 Name = reader.GetString(2),
-                StatusID = reader.GetInt32(3),
-                EmployerId = reader.GetInt32(4),
+                StatusID = reader.GetUInt32(3),
+                EmployerId = reader.GetUInt32(4),
                 DateCreated = reader.GetDateTime(5),
                 Cpu = reader.GetString(6),
                 Price = reader.GetDecimal(7)
@@ -124,7 +123,7 @@ public class MySQLDatabaseContext : IDisposable
 
         var employer = new Employer()
         {
-            Id = reader.GetInt32(0),
+            Id = reader.GetUInt32(0),
             IsDeleted = reader.GetBoolean(1),
             Name = reader.GetString(2),
             Position = reader.GetString(3),
@@ -154,7 +153,7 @@ public class MySQLDatabaseContext : IDisposable
         {
             var employer = new Employer()
             {
-                Id = reader.GetInt32(0),
+                Id = reader.GetUInt32(0),
                 IsDeleted = reader.GetBoolean(1),
                 Name = reader.GetString(2),
                 Position = reader.GetString(3),
@@ -171,34 +170,39 @@ public class MySQLDatabaseContext : IDisposable
         return _connection.Query<T>(sqlExpression).ToList();
     }
 
-    public IEnumerable<T> GetAllByQuery<T>(string sqlExp, DynamicParameters parameters)
+    public List<T> GetAllByQuery<T>(string sqlExp, DynamicParameters parameters)
     {
-        return _connection.Query<T>(sqlExp, parameters);
+        return (List<T>) _connection.Query<T>(sqlExp, parameters);
     }
 
     #endregion
     //[Obsolete]
-    public int ExecuteExp(string sqlExpression)
+    public uint ExecuteExp(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
-        return command.ExecuteNonQuery();
+        return (uint) command.ExecuteNonQuery();
     }
 
-    public int ExecuteByQuery(string sqlExpression)
+    public uint ExecuteByQuery(string sqlExpression)
     {
-        return _connection.Execute(sqlExpression);
+        return (uint) _connection.Execute(sqlExpression);
+    }
+
+    public uint ExecuteByQuery(string sqlExpression, DynamicParameters dynamicParameters)
+    {
+        return (uint) _connection.Execute(sqlExpression, dynamicParameters);
     }
 
     //[Obsolete]
-    public int ExecuteScalar(string sqlExpression)
+    public uint ExecuteScalar(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
-        return Convert.ToInt32(command.ExecuteScalar());
+        return Convert.ToUInt32(command.ExecuteScalar());
     }
 
-    public int ExecuteScalarByQuery(string sqlExpression)
+    public uint ExecuteScalarByQuery(string sqlExpression)
     {
-        return _connection.ExecuteScalar<int>(sqlExpression);
+        return _connection.ExecuteScalar<uint>(sqlExpression);
     }
 
     public void Dispose()

@@ -7,13 +7,12 @@ public interface IComputerRepository : IDisposable
 
     public dynamic ChangeComputer(Computer computer);
 
-    public Computer? GetComputer(int id);
+    public Computer? GetComputer(uint id);
 
     public List<Computer> GetComputers();
 
-    public List<Computer> GetFilterComputers(string name = null, int statusId = 0, int employerId = 0,
-        DateTime date = default(DateTime),
-        string cpu = null, decimal price = 0);
+    public List<Computer> GetFilterComputers(string name = null, uint statusId = 0, uint employerId = 0,
+        DateTime? date = null, string cpu = null, decimal price = 0);
 
-    public dynamic DeleteComputer(int id);
+    public dynamic DeleteComputer(uint id);
 }

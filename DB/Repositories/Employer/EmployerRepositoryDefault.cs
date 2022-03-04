@@ -10,7 +10,7 @@ public class EmployerRepositoryDefault : IEmployerRepository
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public Employer? GetItem(int id)
+    public Employer? GetItem(uint id)
     {
         var sqlExpression = $"SELECT * FROM employers WHERE ID = {id} AND IsDeleted = 0 LIMIT 1";
         var employer = _databaseContext.GetEmployer(sqlExpression);
@@ -25,27 +25,32 @@ public class EmployerRepositoryDefault : IEmployerRepository
         return employers;
     }
 
-    public int DeleteItem(int id)
+    public List<Employer> GetItems(string? name, string? position, string? tel)
     {
-        var sqlExpression = $"UPDATE employers SET IsDeleted = 1 WHERE ID = {id}";
-        return _databaseContext.ExecuteExp(sqlExpression);
+        throw new NotImplementedException();
     }
 
-    public int CreateEmployer(string? name, string? position, string? tel)
+    public uint DeleteItem(uint id)
+    {
+        var sqlExpression = $"UPDATE employers SET IsDeleted = 1 WHERE ID = {id}";
+        return (uint) _databaseContext.ExecuteExp(sqlExpression);
+    }
+
+    public uint CreateEmployer(Employer employer)
     {
         var sqlExpression = $"INSERT INTO employers (Name, Position, Tel)" +
-                            $"VALUES ('{name}', '{position}', '{tel}')";
+                            $"VALUES ('{employer.Name}', '{employer.Position}', '{employer.Tel}')";
         var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
         var id = _databaseContext.ExecuteScalar(sqlExpressionForId);
         return id;
     }
 
-    public int СhangeEmployer(int id, string? name, string? position, string? tel)
+    public uint СhangeEmployer(Employer employer)
     {
-        var sqlExpression = $"UPDATE employers SET Name = '{name}', Position = '{position}', Tel = '{tel}'" +
-                            $" WHERE ID = {id}";
-        var success = _databaseContext.ExecuteExp(sqlExpression);
+        var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
+                            $" WHERE ID = {employer.Id}";
+        var success = (uint) _databaseContext.ExecuteExp(sqlExpression);
         return success;
     }
 

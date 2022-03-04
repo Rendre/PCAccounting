@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using DB.Entities;
 using DB.Repositories.Employer;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,49 +14,17 @@ namespace WebClient.Controllers
         {
             _employerRepository = new EmployerRepositoryDapper();
         }
-
-        /*public IResult Index()
-        {
-            var computer = new Computer() { Name = "comp1", Status = 1 };
-            var json = Results.Json(computer);
-            return json;
-        }
-
-        public dynamic Second()
-        {
-            var computer = new Computer() { Name = "comp2" };
-            return computer;
-        }
-
-        public string Third()
-        {
-            var computer = new Computer() { Name = "tretii" };
-            var jsonString = JsonSerializer.Serialize(computer);
-            return jsonString;
-        }
-
-        public dynamic Forth()
-        {
-            var userRepository = new UserRepository();
-            var user = userRepository.GetItem(5);
-            var userMap = new Dictionary<string, object>();
-            userMap["Id"] = user.Id;
-            userMap["name"] = user.Login;
-            userMap["Password"] = user.Password;
-            userMap["EmployerId"] = user.EmployerId;
-
-            var json = JsonSerializer.Serialize(userMap);
-
-            return json;
-        }*/
-
+        
         [HttpPost]
         public dynamic Employer([FromBody] JsonElement emp)
         {
             var name = emp.GetProperty("name").GetString();
             var position = emp.GetProperty("position").GetString();
             var tel = emp.GetProperty("tel").GetString();
-            var empId = _employerRepository.CreateEmployer(name, position, tel);
+
+            var employer = new Employer() {Name = name, Position = position, Tel = tel};
+
+            var empId = _employerRepository.CreateEmployer(employer);
             if (empId <= 0)
             {
                 var responceObj = new
@@ -80,11 +49,13 @@ namespace WebClient.Controllers
         [HttpPut]
         public dynamic PutEmployer([FromBody] JsonElement emp)
         {
-            var id = emp.GetProperty("id").GetInt32();
+            var id = emp.GetProperty("id").GetUInt32();
             var name = emp.GetProperty("name").GetString();
             var position = emp.GetProperty("position").GetString();
             var tel = emp.GetProperty("tel").GetString();
-            var success = _employerRepository.СhangeEmployer(id, name, position, tel);
+            var employer = new Employer() {Id = id, Name = name, Position = position, Tel = tel };
+
+            var success = _employerRepository.СhangeEmployer(employer);
             if (success > 0)
             {
                 var resultObj = new
@@ -106,7 +77,7 @@ namespace WebClient.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public dynamic Employer(int id)
+        public dynamic Employer(uint id)
         {
             var deleteObjCounts = _employerRepository.DeleteItem(id);
             var responceObj = new
@@ -117,9 +88,28 @@ namespace WebClient.Controllers
         }
 
         [HttpGet]
-        public dynamic GetEmployer()
+        public dynamic GetEmployer([FromBody] JsonElement json)
         {
-            var employerList = _employerRepository.GetItems();
+            string? name = null;
+            string? position = null;
+            string? tel = null;
+
+            if (json.TryGetProperty("name", out var nameElement))
+            {
+                name = nameElement.GetString();
+            }
+
+            if (json.TryGetProperty("position", out var positionElement))
+            {
+                position = positionElement.GetString();
+            }
+
+            if (json.TryGetProperty("tel", out var telElement))
+            {
+                tel = telElement.GetString();
+            }
+
+            var employerList = _employerRepository.GetItems(name, position, tel);
             var outEmployerList = new List<dynamic>();
             foreach (var employer in employerList)
             {
@@ -149,11 +139,12 @@ namespace WebClient.Controllers
                 };
                 return JsonSerializer.Serialize(responceObj);
             }
-
         }
 
+
+
         [HttpGet("{id:int}")]
-        public dynamic GetEmployer(int id)
+        public dynamic GetEmployer(uint id)
         {
             var employer = _employerRepository.GetItem(id);
             if (employer != null)

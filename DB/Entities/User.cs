@@ -4,7 +4,7 @@
     {
         public string Login { get; set; }
         public string Password { get; set; }
-        public int EmployerId { get; set; }
+        public uint EmployerId { get; set; }
 
     }
 }

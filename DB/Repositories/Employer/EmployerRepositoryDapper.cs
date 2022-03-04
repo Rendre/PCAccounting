@@ -1,7 +1,8 @@
-﻿namespace DB.Repositories.Employer;
+﻿using Dapper;
+namespace DB.Repositories.Employer;
 using Entities;
 
-public class EmployerRepositoryDapper :  IEmployerRepository
+public class EmployerRepositoryDapper : IEmployerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
@@ -9,43 +10,91 @@ public class EmployerRepositoryDapper :  IEmployerRepository
     {
         _databaseContext = new MySQLDatabaseContext();
     }
-   
-    public Employer GetItem(int id)
+
+    public Employer GetItem(uint id)
     {
-        var sqlExpression = $"SELECT * FROM employers WHERE ID = {id} AND IsDeleted = 0 LIMIT 1";
-        var employer = _databaseContext.GetByQuery<Employer>(sqlExpression);
+        if (id == 0)
+        {
+            return null;
+        }
+
+        var parameters = new DynamicParameters();
+        var conditions = new List<string>(2) { "IsDeleted = 0" };
+
+
+        conditions.Add("ID = @ID");
+        parameters.Add("@ID", id);
+
+
+        var sqlExpression = $"SELECT * FROM employers WHERE {string.Join(" AND ", conditions)}";
+        var employer = _databaseContext.GetByQuery<Employer>(sqlExpression, parameters);
         return employer;
     }
-  
-    public List<Employer> GetItems()
+
+    //запрос с фильтром
+    public List<Employer> GetItems(string? name, string? position, string? tel)
     {
-        var sqlExpression = $"SELECT * FROM employers WHERE IsDeleted = 0";
-        //var employers = _databaseContext.GetEmployers(sqlExpression);
-        var employers = _databaseContext.GetAllByQuery<Employer>(sqlExpression);
+        var parameters = new DynamicParameters();
+        var conditions = new List<string>(4) { "IsDeleted = 0" };
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            // часть sql запроса, на место @Name подставится
+            // значение из parameters - лежащее там под соотв. ключем
+            conditions.Add("Name = @Name");
+            parameters.Add("@Name", name);
+        }
+
+        if (!string.IsNullOrEmpty(position))
+        {
+            conditions.Add("Position = @Position");
+            parameters.Add("@Position", position);
+        }
+
+        if (!string.IsNullOrEmpty(tel))
+        {
+            conditions.Add("Tel = @Tel");
+            parameters.Add("@Tel", tel);
+        }
+
+        var sqlExpression = $"SELECT * FROM employers WHERE {string.Join(" AND ", conditions)}";
+        var employers = (List<Employer>)_databaseContext.GetAllByQuery<Employer>(sqlExpression, parameters);
         return employers;
     }
 
-    public int DeleteItem(int id)
+    public uint DeleteItem(uint id)
     {
-        var sqlExpression = $"UPDATE employers SET IsDeleted = 1 WHERE ID = {id}";
-        return _databaseContext.ExecuteByQuery(sqlExpression);
+        if (id == 0)
+        {
+            return 0;
+        }
+
+        var parameters = new DynamicParameters();
+        var conditions = new List<string>(1) { };
+
+        conditions.Add("ID = @ID");
+        parameters.Add("@ID", id);
+
+
+        var sqlExpression = $"UPDATE employers SET IsDeleted = 1 WHERE {string.Join(" ", conditions)}";
+        return _databaseContext.ExecuteByQuery(sqlExpression, parameters);
     }
-    
-    public int CreateEmployer(string? name, string? position, string? tel)
+
+    public uint CreateEmployer(Employer employer)
     {
         var sqlExpression = $"INSERT INTO employers (Name, Position, Tel)" +
-                            $"VALUES ('{name}', '{position}', '{tel}')";
+                            $"VALUES ('{employer.Name}', '{employer.Position}', '{employer.Tel}')";
         var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteByQuery(sqlExpression);
         var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
         return id;
     }
-   
-    public int СhangeEmployer(int id, string? name, string? position, string? tel)
+
+    public uint СhangeEmployer(Employer employer)
     {
-        var sqlExpression = $"UPDATE employers SET Name = '{name}', Position = '{position}', Tel = '{tel}'" +
-                            $" WHERE ID = {id}";
-        var success = _databaseContext.ExecuteByQuery(sqlExpression);
+        var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
+                            $" WHERE ID = {employer.Id}";
+        var success = (uint)_databaseContext.ExecuteByQuery(sqlExpression);
         return success;
     }
 
@@ -54,4 +103,61 @@ public class EmployerRepositoryDapper :  IEmployerRepository
         _databaseContext.Dispose();
         GC.SuppressFinalize(this);
     }
+
+    public List<Employer> GetItems()
+    {
+        throw new NotImplementedException();
+    }
 }
+
+//public Employer GetItem(int id)
+//{
+//    var sqlExpression = $"SELECT * FROM employers WHERE ID = {id} AND IsDeleted = 0 LIMIT 1";
+//    var employer = _databaseContext.GetByQuery<Employer>(sqlExpression);
+//    return employer;
+//}
+
+//public int DeleteItem(int id)
+//{
+//    var sqlExpression = $"UPDATE employers SET IsDeleted = 1 WHERE ID = {id}";
+//    return _databaseContext.ExecuteByQuery(sqlExpression);
+//}
+
+//public List<Employer> GetItems()
+//{
+//    var sqlExpression = $"SELECT * FROM employers WHERE IsDeleted = 0";
+//    //var employers = _databaseContext.GetEmployers(sqlExpression);
+//    var employers = _databaseContext.GetAllByQuery<Employer>(sqlExpression);
+//    return employers;
+//}
+
+//public int CreateEmployer(string? name, string? position, string? tel)
+//{
+//    var conditions = new List<string>(3);
+//    var parameters = new DynamicParameters();
+
+//    if (string.IsNullOrEmpty(name))
+//    {
+//        conditions.Add("@Name");
+//        parameters.Add("@Name", name);
+//    }
+
+//    if (string.IsNullOrEmpty(position))
+//    {
+//        conditions.Add("@Position");
+//        parameters.Add("@Position", position);
+//    }
+
+//    if (string.IsNullOrEmpty(tel))
+//    {
+//        conditions.Add("@Tel");
+//        parameters.Add("@Tel", tel);
+//    }
+
+//    var sqlExpressions = $"INSERT INTO employers (Name, Position, Tel) VALUES ({string.Join(" ,", conditions)})";
+//    _databaseContext.ExecuteByQuery(sqlExpressions, parameters);
+//    var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
+//    var resultId = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
+
+//    return resultId;
+//}

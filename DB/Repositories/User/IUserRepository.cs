@@ -3,16 +3,16 @@ using Entities;
 
 public interface IUserRepository : IDisposable
 {
-    public User? GetItem(int id);
+    public User? GetItem(uint id);
 
     public List<User> GetItems();
 
     public User? GetItem(string login);
 
-    public int DeleteItem(int id);
+    public uint DeleteItem(uint id);
 
-    public int CreateUser(string login, string password, int employerId);
+    public uint CreateUser(string login, string password, uint employerId);
 
-    public int ChangeUser(int id, string login, string password, int employerID);
+    public uint ChangeUser(uint id, string login, string password, uint employerID);
 
 }

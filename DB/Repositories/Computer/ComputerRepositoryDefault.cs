@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Dapper;
 
 namespace DB.Repositories.Computer;
 using Entities;
@@ -35,7 +36,7 @@ public class ComputerRepositoryDefault : IComputerRepository
         return success;
     }
 
-    public Computer? GetComputer(int id)
+    public Computer? GetComputer(uint id)
     {
         var sqlExpression = $"SELECT * FROM technick WHERE ID = {id} AND IsDeleted = 0 LIMIT 1";
         var computer = _databaseContext.GetComputer(sqlExpression);
@@ -49,7 +50,7 @@ public class ComputerRepositoryDefault : IComputerRepository
         return computers;
     }
 
-    public dynamic DeleteComputer(int id)
+    public dynamic DeleteComputer(uint id)
     {
         var sqlExpression = $"UPDATE technick SET IsDeleted = 1 WHERE ID = {id}";
         var result = _databaseContext.ExecuteExp(sqlExpression);
@@ -62,7 +63,7 @@ public class ComputerRepositoryDefault : IComputerRepository
         GC.SuppressFinalize(this);
     }
 
-    public List<Computer> GetFilterComputers(string name = null, int statusId = 0, int employerId = 0, DateTime date = default, string cpu = null, decimal price = 0)
+    public List<Computer> GetFilterComputers(string name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null, string cpu = null, decimal price = 0)
     {
         throw new NotImplementedException();
     }

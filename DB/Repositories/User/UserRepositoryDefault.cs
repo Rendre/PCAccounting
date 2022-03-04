@@ -10,7 +10,7 @@ public class UserRepositoryDefault : IUserRepository
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public User? GetItem(int id)
+    public User? GetItem(uint id)
     {
         var sqlExpression = $"SELECT * FROM Users WHERE ID = {id} AND IsDeleted = 0 LIMIT 1";
             var user = _databaseContext.GetUser(sqlExpression);
@@ -32,15 +32,15 @@ public class UserRepositoryDefault : IUserRepository
         return user;
     }
 
-    public int DeleteItem(int id)
+    public uint DeleteItem(uint id)
     {
         var sqlExpression = $"UPDATE users SET IsDeleted = 1 WHERE ID = {id}";
-        var result = _databaseContext.ExecuteExp(sqlExpression);
+        var result = (uint) _databaseContext.ExecuteExp(sqlExpression);
         return result;
 
     }
 
-    public int CreateUser(string login, string password, int employerId)
+    public uint CreateUser(string login, string password, uint employerId)
     {
         var sqlExpression = $"INSERT INTO users (Login, Pass, EmployerId)" +
                             $"VALUES ('{login}', '{password}', {employerId})";
@@ -50,12 +50,12 @@ public class UserRepositoryDefault : IUserRepository
         return id;
     }
 
-    public int ChangeUser(int id, string login, string password, int employerID)
+    public uint ChangeUser(uint id, string login, string password, uint employerID)
     {
         var sqlExpression = $"UPDATE users SET Login = '{login}', " +
                             $"Pass = '{password}', EmployerId = {employerID} " +
                             $"WHERE ID = {id}";
-        var success = _databaseContext.ExecuteExp(sqlExpression);
+        var success = (uint) _databaseContext.ExecuteExp(sqlExpression);
         return success;
     }
 
