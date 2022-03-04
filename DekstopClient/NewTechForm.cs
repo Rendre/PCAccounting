@@ -1,6 +1,8 @@
-﻿using DB.Entities;
+﻿using System.Text;
+using DB.Entities;
 using DB.Repositories.Computer;
 using DB.Repositories.Employer;
+using DB.Repositories.Picture;
 
 namespace DekstopClient
 {
@@ -10,11 +12,13 @@ namespace DekstopClient
         private Computer computer = new();
         private readonly IComputerRepository _computerRepository;
         private readonly IEmployerRepository _employerRepository;
-        public NewTechForm(IComputerRepository computerRepository, IEmployerRepository employerRepository)
+        private readonly IPictureRepository _pictureRepository;
+        public NewTechForm(IComputerRepository computerRepository, IEmployerRepository employerRepository, IPictureRepository pictureRepository)
         {
             InitializeComponent();
             _computerRepository = computerRepository;
             _employerRepository = employerRepository;
+            _pictureRepository = pictureRepository;
         }
 
         private void AddClick(object sender, EventArgs e)
@@ -141,6 +145,28 @@ namespace DekstopClient
             dateTimePicker1.Enabled = isChecked;
             textBox5.ReadOnly = !isChecked;
             textBox6.ReadOnly = !isChecked;
+        }
+
+        //pictureBox1.Image = Image.FromFile("C:\Users\Eugene\Pictures\12.jpg");
+        //+ создаю сущность картинку
+        //+ интерфейс, репозиторий для нее
+        //в бд храню только путь к картинке, сама картинка хранится на диске
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                //в константе папка файлы
+                //относительный путь -  надо находить папку имагес
+
+                var filePath = openFileDialog1.FileName;
+                if (!string.IsNullOrEmpty(filePath))
+                {
+                    var picture = new Picture() {ComputerId = ComputerID, Path = filePath};
+                    _pictureRepository.SaveItem(picture);
+                }
+               
+
+            }
         }
     }
 }
