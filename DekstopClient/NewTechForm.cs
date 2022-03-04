@@ -15,8 +15,6 @@ namespace DekstopClient
             InitializeComponent();
             _computerRepository = computerRepository;
             _employerRepository = employerRepository;
-            //подключиться к бд и заполнить комбобоксы
-            //comboBox1.Items.Add(1);
         }
 
         private void AddClick(object sender, EventArgs e)
@@ -79,7 +77,7 @@ namespace DekstopClient
         {
             comboBox1.Items.AddRange(new object[] { StatusEnum.Defective, StatusEnum.Properly, StatusEnum.UnderRepair, StatusEnum.Null });
             comboBox2.Items.Add(new Employer() {Id = 0, Name = "null"});
-            var employerList = _employerRepository.GetItems();
+            var employerList = _employerRepository.GetItems(null, null, null);
             comboBox2.Items.AddRange(employerList.ToArray());
 
             if (ComputerID == 0)
@@ -97,7 +95,7 @@ namespace DekstopClient
             comboBox2.Enabled = false;
             dateTimePicker1.Enabled = false;
 
-            var computer = _computerRepository.GetComputer(ComputerID);
+            computer = _computerRepository.GetComputer(ComputerID);
             textBox1.Text = computer.Name;
             var index = comboBox1.Items.IndexOf((StatusEnum)computer.StatusID);
             comboBox1.SelectedIndex = index;

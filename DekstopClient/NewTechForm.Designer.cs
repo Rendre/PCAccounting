@@ -126,9 +126,9 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(451, 316);
+            this.button1.Location = new System.Drawing.Point(797, 351);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(101, 58);
+            this.button1.Size = new System.Drawing.Size(98, 23);
             this.button1.TabIndex = 12;
             this.button1.Text = "DEBUG";
             this.button1.UseVisualStyleBackColor = true;
@@ -192,7 +192,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveBorder;
-            this.ClientSize = new System.Drawing.Size(564, 407);
+            this.ClientSize = new System.Drawing.Size(917, 426);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.comboBox1);

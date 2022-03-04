@@ -103,7 +103,7 @@ public class ComputerRepositoryDapper : IComputerRepository
         parameters.Add("@ID", id);
 
 
-        var sqlExpression = $"SELECT * FROM employers WHERE {string.Join(" AND ", conditions)}";
+        var sqlExpression = $"SELECT * FROM technick WHERE {string.Join(" AND ", conditions)}";
         var computer = _databaseContext.GetByQuery<Computer>(sqlExpression, parameters);
         return computer;
     }

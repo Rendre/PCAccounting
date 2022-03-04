@@ -46,11 +46,11 @@ namespace DekstopClient
 
         private void ShowTechClick(object sender, EventArgs e)
         {
-            var newTechForm = new NewTechForm(new ComputerRepositoryDefault(), new EmployerRepositoryDapper());
+            var newTechForm = new NewTechForm(new ComputerRepositoryDapper(), new EmployerRepositoryDapper());
             try
             {
                 var currentRow = dataGridView3.CurrentCell.RowIndex;
-                newTechForm.ComputerID = (int)dataGridView3["Id", currentRow].Value;
+                newTechForm.ComputerID = (uint)dataGridView3["Id", currentRow].Value;
                 var result = newTechForm.ShowDialog();
                 if (result == DialogResult.OK)
                 {
@@ -77,10 +77,10 @@ namespace DekstopClient
         private void AddOrChangeClick(object sender, EventArgs e)
         {
             var name = textBox1.Text;
-            var job = textBox2.Text;
+            var position = textBox2.Text;
             var tel = Util.CheckTelNumber(textBox3.Text);
             if (name.Length == 0 ||
-                job.Length == 0 ||
+                position.Length == 0 ||
                 tel.Length == 0)
             {
                 MessageBox.Show("dfgf");
@@ -89,8 +89,8 @@ namespace DekstopClient
 
             if (radioButton1.Checked)
             {
-
-                _employerRepository.CreateEmployer(name, job, tel);
+                var employer = new Employer() {Name = name, Position = position, Tel = tel};
+                _employerRepository.CreateEmployer(employer);
 
                 var table = _employerRepository.GetItems();
                 dataGridView2.DataSource = table;
@@ -101,10 +101,10 @@ namespace DekstopClient
 
                 var currentRow = dataGridView2.CurrentCell.RowIndex;
                 var currentColumn = dataGridView2.CurrentCell.ColumnIndex;
-                var id = (int)dataGridView2["Id", currentRow].Value;
+                var id = (uint)dataGridView2["Id", currentRow].Value;
+                var employer = new Employer() {Id = id, Name = name, Position = position, Tel = tel};
 
-
-                _employerRepository.СhangeEmployer(id, name, job, tel);
+                _employerRepository.СhangeEmployer(employer);
 
                 var table = _employerRepository.GetItems();
                 dataGridView2.DataSource = table;
@@ -149,7 +149,7 @@ namespace DekstopClient
             try
             {
                 var currentRow = dataGridView3.CurrentCell.RowIndex;
-                var id = (int)dataGridView3["Id", currentRow].Value;
+                var id = (uint)dataGridView3["Id", currentRow].Value;
 
                 DialogResult result = MessageBox.Show(
                     "Вы действительно хотите удалить устройсво?",
