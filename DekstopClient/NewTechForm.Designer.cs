@@ -47,6 +47,7 @@
             this.button4 = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.button5 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -130,7 +131,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(797, 351);
+            this.button1.Location = new System.Drawing.Point(807, 391);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(98, 23);
             this.button1.TabIndex = 12;
@@ -193,9 +194,9 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(572, 337);
+            this.button4.Location = new System.Drawing.Point(602, 266);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(75, 50);
+            this.button4.Size = new System.Drawing.Size(90, 23);
             this.button4.TabIndex = 19;
             this.button4.Text = "Import Image";
             this.button4.UseVisualStyleBackColor = true;
@@ -213,12 +214,23 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(729, 266);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(90, 23);
+            this.button5.TabIndex = 21;
+            this.button5.Text = "delete image";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.DeleteClick);
+            // 
             // NewTechForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.ClientSize = new System.Drawing.Size(917, 426);
+            this.Controls.Add(this.button5);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.checkBox1);
@@ -267,5 +279,6 @@
         private Button button4;
         private PictureBox pictureBox1;
         private OpenFileDialog openFileDialog1;
+        private Button button5;
     }
 }

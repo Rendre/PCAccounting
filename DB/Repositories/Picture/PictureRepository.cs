@@ -1,5 +1,4 @@
 ﻿using Dapper;
-
 namespace DB.Repositories.Picture;
 using Entities;
 
@@ -17,9 +16,10 @@ public class PictureRepository : IPictureRepository
         var parameters = new DynamicParameters();
         parameters.Add("@CompID", picture.ComputerId);
         parameters.Add("@Path", picture.Path);
+        parameters.Add("@Name", picture.Name);
 
-        var sqlExpression = "INSERT INTO files (CompID, Path) " +
-                            "VALUES (@CompID, @Path)";
+        var sqlExpression = "INSERT INTO files (CompID, Path, FileName) " +
+                            "VALUES (@CompID, @Path, @Name)";
         _databaseContext.ExecuteByQuery(sqlExpression, parameters);
         var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
@@ -39,25 +39,46 @@ public class PictureRepository : IPictureRepository
         return pictureFromDb;
     }
 
-    public List<Picture> GetItems(uint computerId = 0)
+    public List<Picture> GetItems(uint computerId = 0, string? orderBy = null, bool desc = false, int limitSkip = 0, int limitTake = 0)
     {
+        List<Picture> picturesList;
         var parameters = new DynamicParameters();
-        var conditions = new List<string>(2) {"IsDeleted=0"};
+        var conditions = new List<string>(2) { "IsDeleted=0" };
 
         if (computerId > 0)
         {
             conditions.Add("CompID=@CompID");
             parameters.Add("@CompID", computerId);
         }
-
-        var sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)}";
-        var picturesList = _databaseContext.GetAllByQuery<Picture>(sqlExpression, parameters);
+        //SELECT * FROM mytable ORDER BY column1 ASC, column2 DESC, column3 ASC
+        string? sqlExpression;
+        // переписать - на использование ордер бай + деск и лимит + скип + тейк
+        if (!string.IsNullOrEmpty(orderBy))
+        {
+            parameters.Add("@limitSkip", limitSkip);
+            parameters.Add("@limitTake", limitTake);
+            // убывание
+            if (desc)
+            {
+                sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)} " +
+                                "ORDER BY ID DESC LIMIT @limitSkip, @limitTake";
+                picturesList = _databaseContext.GetAllByQuery<Picture>(sqlExpression, parameters);
+                return picturesList;
+            }
+            // возрастание
+            sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)} " +
+                            "ORDER BY ID ASC LIMIT @limitSkip, @limitTake";
+            picturesList = _databaseContext.GetAllByQuery<Picture>(sqlExpression, parameters);
+            return picturesList;
+        }
+        sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)}";
+        picturesList = _databaseContext.GetAllByQuery<Picture>(sqlExpression, parameters);
         return picturesList;
     }
 
     public uint DeleteItem(uint id)
     {
-        if(id == 0) return 0;
+        if (id == 0) return 0;
 
         var parameters = new DynamicParameters();
         parameters.Add("@ID", id);
