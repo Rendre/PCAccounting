@@ -6,7 +6,7 @@ using MySql.Data.MySqlClient;
 
 public class MySQLDatabaseContext : IDisposable
 {
-    private const string ConnectionString = "server=127.0.0.1; database=retraincorp; charset=utf8; user id=root; password=root; pooling=false;";
+    public const string ConnectionString = "server=127.0.0.1; database=retraincorp; charset=utf8; user id=root; password=root; pooling=false;";
     private readonly MySqlConnection _connection;
 
     public MySQLDatabaseContext()
@@ -31,10 +31,10 @@ public class MySQLDatabaseContext : IDisposable
         var user = new User()
         {
             //маппинг
-            Id = reader.GetUInt32(0),
+            ID = reader.GetUInt32(0),
             IsDeleted = reader.GetBoolean(1),
             Login = reader.GetString(2),
-            Password = reader.GetString(3),
+            Pass = reader.GetString(3),
             EmployerId = reader.GetUInt32(4),
         };
         reader.Close();
@@ -50,10 +50,10 @@ public class MySQLDatabaseContext : IDisposable
         {
             var user = new User()
             {
-                Id = reader.GetUInt32(0),
+                ID = reader.GetUInt32(0),
                 IsDeleted = reader.GetBoolean(1),
                 Login = reader.GetString(2),
-                Password = reader.GetString(3),
+                Pass = reader.GetString(3),
                 EmployerId = reader.GetUInt32(4),
             };
             users.Add(user);
@@ -73,7 +73,7 @@ public class MySQLDatabaseContext : IDisposable
 
         var computer = new Computer()
         {
-            Id = reader.GetUInt32(0),
+            ID = reader.GetUInt32(0),
             IsDeleted = reader.GetBoolean(1),
             Name = reader.GetString(2),
             StatusID = reader.GetUInt32(3),
@@ -95,7 +95,7 @@ public class MySQLDatabaseContext : IDisposable
         {
             var computer = new Computer()
             {
-                Id = reader.GetUInt32(0),
+                ID = reader.GetUInt32(0),
                 IsDeleted = reader.GetBoolean(1),
                 Name = reader.GetString(2),
                 StatusID = reader.GetUInt32(3),
@@ -123,7 +123,7 @@ public class MySQLDatabaseContext : IDisposable
 
         var employer = new Employer()
         {
-            Id = reader.GetUInt32(0),
+            ID = reader.GetUInt32(0),
             IsDeleted = reader.GetBoolean(1),
             Name = reader.GetString(2),
             Position = reader.GetString(3),
@@ -153,7 +153,7 @@ public class MySQLDatabaseContext : IDisposable
         {
             var employer = new Employer()
             {
-                Id = reader.GetUInt32(0),
+                ID = reader.GetUInt32(0),
                 IsDeleted = reader.GetBoolean(1),
                 Name = reader.GetString(2),
                 Position = reader.GetString(3),

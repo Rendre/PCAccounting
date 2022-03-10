@@ -5,7 +5,7 @@ namespace SharedKernel.Services;
 
 public class DekstopSave : IPictureSave
 {
-    private readonly IPictureRepository _pictureRepository = new PictureRepository();
+    private readonly IPictureRepository _pictureRepository = new PictureDapperRepository();
     
     public dynamic SaveItem(uint computerId, string filePath, string pathForSavePicture, out Picture picture)
     {

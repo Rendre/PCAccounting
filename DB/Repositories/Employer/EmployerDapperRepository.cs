@@ -2,11 +2,11 @@
 namespace DB.Repositories.Employer;
 using Entities;
 
-public class EmployerRepositoryDapper : IEmployerRepository
+public class EmployerDapperRepository : IEmployerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public EmployerRepositoryDapper()
+    public EmployerDapperRepository()
     {
         _databaseContext = new MySQLDatabaseContext();
     }
@@ -93,7 +93,7 @@ public class EmployerRepositoryDapper : IEmployerRepository
     public uint СhangeEmployer(Employer employer)
     {
         var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
-                            $" WHERE ID = {employer.Id}";
+                            $" WHERE ID = {employer.ID}";
         var success = (uint)_databaseContext.ExecuteByQuery(sqlExpression);
         return success;
     }

@@ -7,12 +7,12 @@ public interface IUserRepository : IDisposable
 
     public List<User> GetItems();
 
-    public User? GetItem(string login);
+    public User? GetItem(string? login);
 
     public uint DeleteItem(uint id);
 
-    public uint CreateUser(string login, string password, uint employerId);
+    public uint CreateUser(string? login, string? password, uint employerId);
 
-    public uint ChangeUser(uint id, string login, string password, uint employerID);
+    public uint ChangeUser(uint id, string? login, string? password, uint employerID);
 
 }

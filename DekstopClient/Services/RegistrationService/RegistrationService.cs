@@ -11,7 +11,7 @@ public class RegistrationService : IRegistrationService
         _userRepository = userRepository;
     }
 
-    public bool Registration(string login, string password)
+    public bool Registration(string? login, string? password)
     {
         using (_userRepository)
         {

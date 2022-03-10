@@ -37,7 +37,7 @@ public partial class MainForm : Form
     private void AddNewTechClick(object sender, EventArgs e)
     {
         //íà êíîïêó ïðîñìîòð
-        var newTechForm = new NewTechForm(new ComputerRepositoryDefault(), new EmployerRepositoryDapper(), new PictureRepository());
+        var newTechForm = new NewTechForm(new ComputerDefaultRepository(), new EmployerDapperRepository(), new PictureDapperRepository());
         var result = newTechForm.ShowDialog();
         if (result == DialogResult.OK)
         {
@@ -47,7 +47,7 @@ public partial class MainForm : Form
 
     private void ShowTechClick(object sender, EventArgs e)
     {
-        var newTechForm = new NewTechForm(new ComputerRepositoryDapper(), new EmployerRepositoryDapper(), new PictureRepository());
+        var newTechForm = new NewTechForm(new ComputerDapperRepository(), new EmployerDapperRepository(), new PictureDapperRepository());
         try
         {
             var currentRow = dataGridView3.CurrentCell.RowIndex;
@@ -103,7 +103,7 @@ public partial class MainForm : Form
             var currentRow = dataGridView2.CurrentCell.RowIndex;
             var currentColumn = dataGridView2.CurrentCell.ColumnIndex;
             var id = (uint)dataGridView2["Id", currentRow].Value;
-            var employer = new Employer() {Id = id, Name = name, Position = position, Tel = tel};
+            var employer = new Employer() {ID = id, Name = name, Position = position, Tel = tel};
 
             _employerRepository.ÑhangeEmployer(employer);
 

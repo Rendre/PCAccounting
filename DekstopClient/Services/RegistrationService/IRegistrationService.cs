@@ -2,5 +2,5 @@
 
 public interface IRegistrationService
 {
-    public bool Registration(string login, string password);
+    public bool Registration(string? login, string? password);
 }

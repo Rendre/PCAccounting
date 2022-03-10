@@ -6,11 +6,11 @@ using Entities;
 
 
 
-public class ComputerRepositoryDapper : IComputerRepository
+public class ComputerDapperRepository : IComputerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public ComputerRepositoryDapper()
+    public ComputerDapperRepository()
     {
         _databaseContext = new MySQLDatabaseContext();
     }
@@ -22,7 +22,7 @@ public class ComputerRepositoryDapper : IComputerRepository
         var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteByQuery(sqlExpression);
         var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
-        computer.Id = id;
+        computer.ID = id;
     }
 
     public dynamic ChangeComputer(Computer computer)
@@ -33,7 +33,7 @@ public class ComputerRepositoryDapper : IComputerRepository
                             $"DateCreated = '{computer.DateCreated:yyyy-MM-dd HH:mm:ss}', " +
                             $"Cpu = '{computer.Cpu}', " +
                             $"Price = '{computer.Price.ToString(CultureInfo.InvariantCulture)}' " +
-                            $"WHERE ID = {computer.Id}";
+                            $"WHERE ID = {computer.ID}";
         var success = _databaseContext.ExecuteByQuery(sqlExpression);
         return success;
     }

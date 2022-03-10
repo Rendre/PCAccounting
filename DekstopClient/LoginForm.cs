@@ -36,9 +36,9 @@ public partial class LoginForm : Form
         var password = Util.Encode(textBox2.Text);
         var user = service.Login(login);
         if (user != null &&
-            (user.Password.Equals(password)))
+            (user.Pass.Equals(password)))
         {
-            var mainForm = new MainForm(new EmployerRepositoryDapper(), new ComputerRepositoryDefault());
+            var mainForm = new MainForm(new EmployerDapperRepository(), new ComputerDefaultRepository());
             mainForm.User = user;
             mainForm.LoginForm = this;
             mainForm.Show();
@@ -68,7 +68,7 @@ public partial class LoginForm : Form
 
     private void RegistrationClick(object sender, EventArgs e)
     {
-        IRegistrationService registrationService = new RegistrationService(new UserRepositoryDefault());
+        IRegistrationService registrationService = new RegistrationService(new UserDefaultRepository());
         Registration(registrationService);
 
     }

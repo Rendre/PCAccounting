@@ -1,11 +1,11 @@
 ﻿namespace DB.Repositories.Employer;
 using Entities;
 
-public class EmployerRepositoryDefault : IEmployerRepository
+public class EmployerDefaultRepository : IEmployerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public EmployerRepositoryDefault()
+    public EmployerDefaultRepository()
     {
         _databaseContext = new MySQLDatabaseContext();
     }
@@ -49,7 +49,7 @@ public class EmployerRepositoryDefault : IEmployerRepository
     public uint СhangeEmployer(Employer employer)
     {
         var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
-                            $" WHERE ID = {employer.Id}";
+                            $" WHERE ID = {employer.ID}";
         var success = (uint) _databaseContext.ExecuteExp(sqlExpression);
         return success;
     }

@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <Folder Include="Jobs\" />
+    <Folder Include="Utils\" />
   </ItemGroup>
 
   <ItemGroup>

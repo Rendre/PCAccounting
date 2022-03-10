@@ -3,154 +3,150 @@ using DB.Repositories.User;
 using DB.Utils;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebClient.Controllers
+namespace WebClient.Controllers;
+
+[Route("[controller]")]
+public class UserController : Controller
 {
-    [Route("[controller]")]
-    public class UserController : Controller
+    private readonly IUserRepository _userRepository;
+
+    public UserController()
     {
-        private readonly IUserRepository _userRepository;
+        _userRepository = new UserDapperRepository();
+    }
 
-        public UserController()
+    [HttpGet("{id:int}")]
+    public dynamic GetUser(uint id)
+    {
+        var responseErrObj = new
         {
-            _userRepository = new UserRepositoryDapper();
+            success = 0
+        };
+        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+        if (!isValid) return responseErrObj;
+
+        var user = _userRepository.GetItem(id);
+        if (user != null)
+        {
+            var responseObj = new
+            {
+                success = 1,
+                login = user.Login,
+                employerId = user.EmployerId
+            };
+            return responseObj;
+
         }
 
-        [HttpGet("{id:int}")]
-        public dynamic GetUser(uint id)
+        return responseErrObj;
+    }
+        
+    [HttpGet]
+    public dynamic GetUsers()
+    {
+        var responseErrObj = new
         {
-            var user = _userRepository.GetItem(id);
-            if (user != null)
-            {
-                var responseObj = new
-                {
-                    success = 1,
-                    login = user.Login,
-                    employerId = user.EmployerId
-                };
-                return responseObj;
+            success = 0
+        };
+        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+        if (!isValid) return responseErrObj;
 
-            }
-            else
+        var userList = _userRepository.GetItems();
+        var outUserList = new List<dynamic>();
+        foreach (var user in userList)
+        {
+            var outUser = new
             {
-                var responseObj = new
-                {
-                    success = 0
-                };
-                return responseObj;
-
-            }
+                id = user.ID,
+                login = user.Login,
+                employerId = user.EmployerId
+            };
+            outUserList.Add(outUser);
         }
-
-        //[HttpGet]
-        //public dynamic GetUserByLogin([FromBody] JsonElement userJsn)
-        //{
-        //    var login = userJsn.GetProperty("login").GetString();
-        //    var user = _userRepository.GetItem(login);
-        //    if (user != null)
-        //    {
-        //        var responseObj = new
-        //        {
-        //            success = 1,
-        //            login = user.Login,
-        //            employerId = user.EmployerId
-        //        };
-        //        return responseObj;
-
-        //    }
-        //    else
-        //    {
-        //        var responseObj = new
-        //        {
-        //            success = 0
-        //        };
-        //        return responseObj;
-
-        //    }
-        //}
-
-        [HttpGet]
-        public dynamic GetUsers()
+        if (outUserList.Count > 0)
         {
-            var userList = _userRepository.GetItems();
-            var outUserList = new List<dynamic>();
-            foreach (var user in userList)
+            var responseObj = new
             {
-                var outUser = new
-                {
-                    id = user.Id,
-                    login = user.Login,
-                    employerId = user.EmployerId
-                };
-                outUserList.Add(outUser);
-            }
-            if (outUserList.Count > 0)
-            {
-                var responseObj = new
-                {
-                    success = 1,
-                    users = outUserList
-                };
-                return responseObj;
-            }
-            else
-            {
-                var responseObj = new
-                {
-                    success = 0
-                };
-                return responseObj;
-            }
+                success = 1,
+                users = outUserList
+            };
+            return responseObj;
         }
-
-        [HttpDelete("{id:int}")]
-        public dynamic DeleteUser(uint id)
+        else
         {
-            var deleteObjectCounts = _userRepository.DeleteItem(id);
+            var responseObj = new
+            {
+                success = 0
+            };
+            return responseObj;
+        }
+    }
+
+    [HttpDelete("{id:int}")]
+    public dynamic DeleteUser(uint id)
+    {
+        var responseErrObj = new
+        {
+            success = 0
+        };
+        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+        if (!isValid) return responseErrObj;
+
+        var deleteObjectCounts = _userRepository.DeleteItem(id);
+        var resultObj = new
+        {
+            success = deleteObjectCounts
+        };
+
+        return resultObj;
+    }
+
+    [HttpPost]
+    public dynamic CreateUser([FromBody] JsonElement userJsn)
+    {
+        var responseErrObj = new
+        {
+            success = 0
+        };
+        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+        if (!isValid) return responseErrObj;
+
+        var login = userJsn.GetProperty("login").GetString();
+        var password = userJsn.GetProperty("password").GetString();
+        password = Util.Encode(password);
+        var employerId = userJsn.GetProperty("employerId").GetUInt32();
+        var userId = _userRepository.CreateUser(login, password, employerId);
+        if (userId <= 0)
+        {
+            return responseErrObj;
+        }
+        else
+        {
             var resultObj = new
             {
-                success = deleteObjectCounts
+                success = 1
             };
-
             return resultObj;
         }
-
-        [HttpPost]
-        public dynamic CreateUser([FromBody] JsonElement userJsn)
-        {
-            var login = userJsn.GetProperty("login").GetString();
-            var password = userJsn.GetProperty("password").GetString();
-            password = Util.Encode(password);
-            var employerId = userJsn.GetProperty("employerId").GetUInt32();
-            var userId = _userRepository.CreateUser(login, password, employerId);
-            if (userId <= 0)
-            {
-                var resultObj = new
-                {
-                    success = 0
-                };
-                return resultObj;
-            }
-            else
-            {
-                var resultObj = new
-                {
-                    success = 1
-                };
-                return resultObj;
-            }
-        }
-
-        [HttpPut]
-        public dynamic ChangeUser([FromBody] JsonElement userJsn)
-        {
-            var id = userJsn.GetProperty("id").GetUInt32();
-            var login = userJsn.GetProperty("login").GetString();
-            var password = userJsn.GetProperty("password").GetString();
-            password = Util.Encode(password);
-            var employerId = userJsn.GetProperty("employerId").GetUInt32();
-            var success = _userRepository.ChangeUser(id, login, password, employerId);
-            return JsonSerializer.Serialize(success);
-        }
-
     }
+
+    [HttpPut]
+    public dynamic ChangeUser([FromBody] JsonElement userJsn)
+    {
+        var responseErrObj = new
+        {
+            success = 0
+        };
+        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+        if (!isValid) return responseErrObj;
+
+        var id = userJsn.GetProperty("id").GetUInt32();
+        var login = userJsn.GetProperty("login").GetString();
+        var password = userJsn.GetProperty("password").GetString();
+        password = Util.Encode(password);
+        var employerId = userJsn.GetProperty("employerId").GetUInt32();
+        var success = _userRepository.ChangeUser(id, login, password, employerId);
+        return JsonSerializer.Serialize(success);
+    }
+
 }

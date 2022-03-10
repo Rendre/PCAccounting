@@ -2,11 +2,11 @@
 
 namespace DB.Repositories.User;
 
-public class UserRepositoryDapper : IUserRepository
+public class UserDapperRepository : IUserRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public UserRepositoryDapper()
+    public UserDapperRepository()
     {
         _databaseContext = new MySQLDatabaseContext();
     }
@@ -27,7 +27,7 @@ public class UserRepositoryDapper : IUserRepository
         return users;
     }
 
-    public Entities.User GetItem(string login)
+    public Entities.User GetItem(string? login)
     {
         var parameters = new DynamicParameters();
         parameters.Add("@Login", login);
@@ -46,7 +46,7 @@ public class UserRepositoryDapper : IUserRepository
 
     }
 
-    public uint CreateUser(string login, string password, uint employerId)
+    public uint CreateUser(string? login, string? password, uint employerId)
     {
         var sqlExpression = "INSERT INTO users (Login, Pass, EmployerId)" +
                             $"VALUES ('{login}', '{password}', {employerId})";
@@ -56,7 +56,7 @@ public class UserRepositoryDapper : IUserRepository
         return id;
     }
 
-    public uint ChangeUser(uint id, string login, string password, uint employerID)
+    public uint ChangeUser(uint id, string? login, string? password, uint employerID)
     {
         var sqlExpression = $"UPDATE users SET Login = '{login}', " +
                             $"Pass = '{password}', EmployerId = {employerID} " +

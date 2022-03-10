@@ -4,11 +4,11 @@ using Dapper;
 namespace DB.Repositories.Computer;
 using Entities;
 
-public class ComputerRepositoryDefault : IComputerRepository
+public class ComputerDefaultRepository : IComputerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public ComputerRepositoryDefault()
+    public ComputerDefaultRepository()
     {
         _databaseContext = new MySQLDatabaseContext();
     }
@@ -20,7 +20,7 @@ public class ComputerRepositoryDefault : IComputerRepository
         var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
         var id = _databaseContext.ExecuteScalar(sqlExpressionForId);
-        computer.Id = id;
+        computer.ID = id;
     }
 
     public dynamic ChangeComputer(Computer computer)
@@ -31,7 +31,7 @@ public class ComputerRepositoryDefault : IComputerRepository
                             $"DateCreated = '{computer.DateCreated:yyyy-MM-dd HH:mm:ss}', " +
                             $"Cpu = '{computer.Cpu}', " +
                             $"Price = '{computer.Price.ToString(CultureInfo.InvariantCulture)}' " +
-                            $"WHERE ID = {computer.Id}";
+                            $"WHERE ID = {computer.ID}";
         var success = _databaseContext.ExecuteExp(sqlExpression);
         return success;
     }
@@ -63,7 +63,7 @@ public class ComputerRepositoryDefault : IComputerRepository
         GC.SuppressFinalize(this);
     }
 
-    public List<Computer> GetFilterComputers(string name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null, string cpu = null, decimal price = 0)
+    public List<Computer> GetFilterComputers(string? name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null, string? cpu = null, decimal price = 0)
     {
         throw new NotImplementedException();
     }

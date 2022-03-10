@@ -2,11 +2,11 @@
 namespace DB.Repositories.Picture;
 using Entities;
 
-public class PictureRepository : IPictureRepository
+public class PictureDapperRepository : IPictureRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public PictureRepository()
+    public PictureDapperRepository()
     {
         _databaseContext = new MySQLDatabaseContext();
     }
@@ -23,7 +23,7 @@ public class PictureRepository : IPictureRepository
         _databaseContext.ExecuteByQuery(sqlExpression, parameters);
         var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
-        picture.Id = id;
+        picture.ID = id;
     }
 
     public Picture? GetItem(uint id)
@@ -39,9 +39,8 @@ public class PictureRepository : IPictureRepository
         return pictureFromDb;
     }
 
-    public List<Picture> GetItems(uint computerId = 0, string? orderBy = null, bool desc = false, int limitSkip = 0, int limitTake = 0)
+    public List<Picture> GetItems(uint computerId = 0, string? orderBy = null, bool desc = false, uint limitSkip = 0, uint limitTake = 0)
     {
-        List<Picture> picturesList;
         var parameters = new DynamicParameters();
         var conditions = new List<string>(2) { "IsDeleted=0" };
 
@@ -50,29 +49,19 @@ public class PictureRepository : IPictureRepository
             conditions.Add("CompID=@CompID");
             parameters.Add("@CompID", computerId);
         }
-        //SELECT * FROM mytable ORDER BY column1 ASC, column2 DESC, column3 ASC
-        string? sqlExpression;
-        // переписать - на использование ордер бай + деск и лимит + скип + тейк
-        if (!string.IsNullOrEmpty(orderBy))
+        var sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)}";
+        if (!string.IsNullOrEmpty(orderBy) )
         {
+            sqlExpression += $" ORDER BY {orderBy} {(desc ? "DESC" : "ASC")}";
+        }
+
+        if (limitTake > 0)
+        {
+            sqlExpression += " LIMIT @limitSkip, @limitTake";
             parameters.Add("@limitSkip", limitSkip);
             parameters.Add("@limitTake", limitTake);
-            // убывание
-            if (desc)
-            {
-                sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)} " +
-                                "ORDER BY ID DESC LIMIT @limitSkip, @limitTake";
-                picturesList = _databaseContext.GetAllByQuery<Picture>(sqlExpression, parameters);
-                return picturesList;
-            }
-            // возрастание
-            sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)} " +
-                            "ORDER BY ID ASC LIMIT @limitSkip, @limitTake";
-            picturesList = _databaseContext.GetAllByQuery<Picture>(sqlExpression, parameters);
-            return picturesList;
         }
-        sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)}";
-        picturesList = _databaseContext.GetAllByQuery<Picture>(sqlExpression, parameters);
+        var picturesList = _databaseContext.GetAllByQuery<Picture>(sqlExpression, parameters);
         return picturesList;
     }
 

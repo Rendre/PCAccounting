@@ -1,11 +1,11 @@
 ﻿namespace DB.Repositories.User;
 using Entities;
 
-public class UserRepositoryDefault : IUserRepository
+public class UserDefaultRepository : IUserRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public UserRepositoryDefault()
+    public UserDefaultRepository()
     {
         _databaseContext = new MySQLDatabaseContext();
     }
@@ -25,7 +25,7 @@ public class UserRepositoryDefault : IUserRepository
 
     }
 
-    public User? GetItem(string login)
+    public User? GetItem(string? login)
     {
         var sqlExpression = $"SELECT * FROM Users WHERE Login = '{login}' AND IsDeleted = 0 LIMIT 1";
         var user = _databaseContext.GetUser(sqlExpression);
@@ -35,12 +35,12 @@ public class UserRepositoryDefault : IUserRepository
     public uint DeleteItem(uint id)
     {
         var sqlExpression = $"UPDATE users SET IsDeleted = 1 WHERE ID = {id}";
-        var result = (uint) _databaseContext.ExecuteExp(sqlExpression);
+        var result = _databaseContext.ExecuteExp(sqlExpression);
         return result;
 
     }
 
-    public uint CreateUser(string login, string password, uint employerId)
+    public uint CreateUser(string? login, string? password, uint employerId)
     {
         var sqlExpression = $"INSERT INTO users (Login, Pass, EmployerId)" +
                             $"VALUES ('{login}', '{password}', {employerId})";
@@ -50,7 +50,7 @@ public class UserRepositoryDefault : IUserRepository
         return id;
     }
 
-    public uint ChangeUser(uint id, string login, string password, uint employerID)
+    public uint ChangeUser(uint id, string? login, string? password, uint employerID)
     {
         var sqlExpression = $"UPDATE users SET Login = '{login}', " +
                             $"Pass = '{password}', EmployerId = {employerID} " +

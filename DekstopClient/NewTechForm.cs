@@ -13,7 +13,7 @@ public partial class NewTechForm : Form
     private byte[] _pictureBytes;
     private byte[] _reservePictureBytes;
     private Picture _picture;
-    private bool _isChanged = false;
+    private bool _isChanged;
     private string? _filePath;
     private readonly IComputerRepository _computerRepository;
     private readonly IEmployerRepository _employerRepository;
@@ -29,9 +29,10 @@ public partial class NewTechForm : Form
     private void NewTechForm_Load(object sender, EventArgs e)
     {
         comboBox1.Items.AddRange(new object[] { StatusEnum.Defective, StatusEnum.Properly, StatusEnum.UnderRepair, StatusEnum.Null });
-        comboBox2.Items.Add(new Employer() { Id = 0, Name = "null" });
+        comboBox2.Items.Add(new Employer() { ID = 0, Name = "null" });
         var employerList = _employerRepository.GetItems(null, null, null);
         comboBox2.Items.AddRange(employerList.ToArray());
+
 
         if (ComputerID == 0)
         {
@@ -55,7 +56,7 @@ public partial class NewTechForm : Form
         textBox1.Text = _computer.Name;
         var index = comboBox1.Items.IndexOf((StatusEnum)_computer.StatusID);
         comboBox1.SelectedIndex = index;
-        var employers = comboBox2.Items.Cast<Employer>().First(e => e.Id == _computer.EmployerId);
+        var employers = comboBox2.Items.Cast<Employer>().First(e => e.ID == _computer.EmployerId);
         index = comboBox2.Items.IndexOf(employers);
         comboBox2.SelectedIndex = index;
         dateTimePicker1.Value = _computer.DateCreated;
@@ -63,7 +64,7 @@ public partial class NewTechForm : Form
         textBox6.Text = _computer.Price.ToString();
 
         //вывод картинки при просмотре компа
-        var pictures = _pictureRepository.GetItems(ComputerID, "true", true, 0, 1);
+        var pictures = _pictureRepository.GetItems(ComputerID, "ID", true, 0, 1);
         if (pictures.Count > 0)
         {
             _picture = pictures[0];
@@ -95,7 +96,7 @@ public partial class NewTechForm : Form
             {
                 _computer.Name = name;
                 _computer.StatusID = status;
-                _computer.EmployerId = employer.Id;
+                _computer.EmployerId = employer.ID;
                 _computer.DateCreated = date;
                 _computer.Cpu = cpu;
                 _computer.Price = Convert.ToDecimal(price);
@@ -109,7 +110,7 @@ public partial class NewTechForm : Form
                     var dekstopSave = new DekstopSave();
                     var directory = Environment.CurrentDirectory;
                     var pathForSavePicture = directory + "../../../../../Images/";
-                    dekstopSave.SaveItem(_computer.Id, _filePath, pathForSavePicture, out _picture);
+                    dekstopSave.SaveItem(_computer.ID, _filePath, pathForSavePicture, out _picture);
                 }
                 DialogResult = DialogResult.OK;
                 MessageBox.Show("Данные успешно добавлены.");
@@ -125,7 +126,7 @@ public partial class NewTechForm : Form
         var currComputer = _computerRepository.GetComputer(ComputerID);
         currComputer.Name = textBox1.Text;
         currComputer.StatusID = (uint)(StatusEnum)comboBox1.SelectedItem;
-        currComputer.EmployerId = ((Employer)comboBox2.SelectedItem).Id;
+        currComputer.EmployerId = ((Employer)comboBox2.SelectedItem).ID;
         currComputer.DateCreated = dateTimePicker1.Value;
         currComputer.Cpu = textBox5.Text;
         currComputer.Price = Convert.ToDecimal(textBox6.Text);
@@ -135,7 +136,7 @@ public partial class NewTechForm : Form
             var dekstopSave = new DekstopSave();
             var directory = Environment.CurrentDirectory;
             var pathForSavePicture = directory + "../../../../../Images/";
-            dekstopSave.SaveItem(_computer.Id, _filePath, pathForSavePicture, out _picture);
+            dekstopSave.SaveItem(_computer.ID, _filePath, pathForSavePicture, out _picture);
             button5.Show();
         }
         _computerRepository.ChangeComputer(currComputer);
@@ -168,7 +169,7 @@ public partial class NewTechForm : Form
         {
             button2.Show();
             button4.Show();
-            if (_picture is { Id: > 0 })
+            if (_picture is { ID: > 0 })
             {
                 button5.Show();
             }
@@ -180,7 +181,7 @@ public partial class NewTechForm : Form
             var index = comboBox1.Items.IndexOf((StatusEnum)_computer.StatusID);
             comboBox1.SelectedIndex = index;
             // из сотрудников, хранящихся в комбобоксе - берем того, у которого индекс совпадает с искомым
-            var employers = comboBox2.Items.Cast<Employer>().First(e => e.Id == _computer.EmployerId);
+            var employers = comboBox2.Items.Cast<Employer>().First(e => e.ID == _computer.EmployerId);
             index = comboBox2.Items.IndexOf(employers);
             comboBox2.SelectedIndex = index;
             dateTimePicker1.Value = _computer.DateCreated;
@@ -230,9 +231,9 @@ public partial class NewTechForm : Form
 
         if (result == DialogResult.OK)
         {
-            _pictureRepository.DeleteItem(_picture.Id);
+            _pictureRepository.DeleteItem(_picture.ID);
             // этот код дублируется - потом прибери его
-            var pictures = _pictureRepository.GetItems(ComputerID, "true", true, 0, 1);
+            var pictures = _pictureRepository.GetItems(ComputerID, "ID", true, 0, 1);
             if (pictures.Count > 0)
             {
                 _picture = pictures[0];
@@ -250,5 +251,3 @@ public partial class NewTechForm : Form
         }
     }
 }
-
-//после удаления ласт картинки - убирать кнопку делит

@@ -11,8 +11,8 @@ public interface IComputerRepository : IDisposable
 
     public List<Computer> GetComputers();
 
-    public List<Computer> GetFilterComputers(string name = null, uint statusId = 0, uint employerId = 0,
-        DateTime? date = null, string cpu = null, decimal price = 0);
+    public List<Computer> GetFilterComputers(string? name = null, uint statusId = 0, uint employerId = 0,
+        DateTime? date = null, string? cpu = null, decimal price = 0);
 
     public dynamic DeleteComputer(uint id);
 }
