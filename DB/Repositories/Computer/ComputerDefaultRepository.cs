@@ -1,6 +1,4 @@
 ﻿using System.Globalization;
-using Dapper;
-
 namespace DB.Repositories.Computer;
 using Entities;
 
@@ -17,13 +15,13 @@ public class ComputerDefaultRepository : IComputerRepository
     {
         var sqlExpression = "INSERT INTO technick (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
                             $"VALUES ('{computer.Name}', {computer.StatusID}, {computer.EmployerId}, '{computer.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
-        var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
+        const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
         var id = _databaseContext.ExecuteScalar(sqlExpressionForId);
         computer.ID = id;
     }
 
-    public dynamic ChangeComputer(Computer computer)
+    public bool ChangeComputer(Computer computer)
     {
         var sqlExpression = $"UPDATE technick SET Name = '{computer.Name}', " +
                             $"StatusID = {computer.StatusID}, " +
@@ -33,7 +31,7 @@ public class ComputerDefaultRepository : IComputerRepository
                             $"Price = '{computer.Price.ToString(CultureInfo.InvariantCulture)}' " +
                             $"WHERE ID = {computer.ID}";
         var success = _databaseContext.ExecuteExp(sqlExpression);
-        return success;
+        return success > 0;
     }
 
     public Computer? GetComputer(uint id)
@@ -43,18 +41,11 @@ public class ComputerDefaultRepository : IComputerRepository
         return computer;
     }
 
-    public List<Computer> GetComputers()
-    {
-        var sqlExpression = $"SELECT * FROM technick WHERE IsDeleted = 0";
-        var computers = _databaseContext.GetComputers(sqlExpression);
-        return computers;
-    }
-
-    public dynamic DeleteComputer(uint id)
+    public bool DeleteComputer(uint id)
     {
         var sqlExpression = $"UPDATE technick SET IsDeleted = 1 WHERE ID = {id}";
         var result = _databaseContext.ExecuteExp(sqlExpression);
-        return result;
+        return result > 0;
     }
 
     public void Dispose()

@@ -5,18 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebClient.Controllers;
 
-[Route("[controller]")]
 public class ComputerController : Controller
 {
     private readonly IComputerRepository _computerRepository;
 
     public ComputerController()
     {
-        _computerRepository = new ComputerDapperRepository();
+        _computerRepository = new ComputerEFRepository();
     }
 
     [HttpPost]
-    public dynamic ComputerTest([FromBody] JsonElement json)
+    [Route("ParseComp")]
+    public dynamic ParseComp([FromBody] JsonElement json)
     {
         var responseErrObj = new
         {
@@ -64,10 +64,7 @@ public class ComputerController : Controller
             return JsonSerializer.Serialize(resultObj);
         }
 
-        if (computer == null)
-        {
-            computer = new Computer();
-        }
+        computer ??= new Computer();
 
         if (jsonElementComp.TryGetProperty("name", out var nameElement))
         {

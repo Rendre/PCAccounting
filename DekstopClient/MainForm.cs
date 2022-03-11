@@ -14,12 +14,15 @@ public partial class MainForm : Form
     private readonly IEmployerRepository _employerRepository;
     private readonly IComputerRepository _computerRepository;
 
-    public MainForm(IEmployerRepository employerRepository, IComputerRepository computerRepository)
+    public MainForm(IEmployerRepository employerRepository, IComputerRepository computerRepository,
+        User user, LoginForm loginForm)
     {
         InitializeComponent();
         radioButton1.Checked = true;
         _employerRepository = employerRepository;
         _computerRepository = computerRepository;
+        User = user;
+        LoginForm = loginForm;
     }
 
     private void MainForm_Shown(object sender, EventArgs e)
@@ -58,7 +61,7 @@ public partial class MainForm : Form
                 RefreshDb();
             }
         }
-        catch (NullReferenceException ex)
+        catch (NullReferenceException)
         {
             MessageBox.Show("Обновите состояние базы данных и выбереите устройство для просмотра!");
         }
@@ -72,7 +75,6 @@ public partial class MainForm : Form
         dataGridView2.DataSource = employers;
         dataGridView2.Columns["Id"]!.DisplayIndex = 0;
         dataGridView2.Columns["IsDeleted"]!.Visible = false;
-
     }
 
     private void AddOrChangeClick(object sender, EventArgs e)
@@ -152,7 +154,7 @@ public partial class MainForm : Form
             var currentRow = dataGridView3.CurrentCell.RowIndex;
             var id = (uint)dataGridView3["Id", currentRow].Value;
 
-            DialogResult result = MessageBox.Show(
+            var result = MessageBox.Show(
                 "Вы действительно хотите удалить устройсво?",
                 "Внимание",
                 MessageBoxButtons.YesNo,
@@ -175,11 +177,10 @@ public partial class MainForm : Form
     private void RefreshDb()
     {
         dataGridView3.DataSource = null;
-        var table = _computerRepository.GetComputers();
+        var table = _computerRepository.GetFilterComputers();
         dataGridView3.DataSource = table;
-        dataGridView3.Columns["ID"]!.DisplayIndex = 0; 
+        dataGridView3.Columns["ID"]!.DisplayIndex = 0;
         dataGridView3.Columns["IsDeleted"]!.Visible = false;
-
     }
 
     private void MainForm_FormClosed(object sender, FormClosedEventArgs e)

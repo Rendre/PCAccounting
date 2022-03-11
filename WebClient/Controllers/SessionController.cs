@@ -71,11 +71,13 @@ public class SessionController : ControllerBase
             if (user != null &&
                 (user.Pass.Equals(password)))
             {
-                session = new Session();
-                session.Token = Guid.NewGuid().ToString("D");
-                session.Time = DateTime.UtcNow;
-                session.UserID = user.ID;
-                session.UserIP = HttpContext.Connection.RemoteIpAddress?.ToString();
+                session = new Session
+                {
+                    Token = Guid.NewGuid().ToString("D"),
+                    Time = DateTime.UtcNow,
+                    UserID = user.ID,
+                    UserIP = HttpContext.Connection.RemoteIpAddress?.ToString()
+                };
 
                 _db.Session.Add(session);
                 _db.SaveChanges();
@@ -116,7 +118,7 @@ public class SessionController : ControllerBase
         var user = _db.Users.FirstOrDefault(p => p.ID == session.UserID);
         if (user == null) return responceErrObj;
 
-        var responceOkObj = new 
+        var responceOkObj = new
         {
             login = user.Login,
             employerId = user.EmployerId
@@ -162,7 +164,6 @@ public class SessionController : ControllerBase
         var user = new User() { Login = login, Pass = password, EmployerId = 0 };
         _db.Users.Add(user);
         _db.SaveChanges();
-
         return responceOkObj;
     }
 
@@ -193,8 +194,6 @@ public class SessionController : ControllerBase
         {
             return responceErrObj;
         }
-
-        session.IsDeleted = true;
         _db.Session.Update(session);
         _db.SaveChanges();
 
