@@ -9,9 +9,4 @@ public class SessionEFRepository : ISessionRepository
     {
         _databaseContext = new MySQLDatabaseContext();
     }
-
-
-
-
-
 }

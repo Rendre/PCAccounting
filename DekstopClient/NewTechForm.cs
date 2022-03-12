@@ -1,4 +1,5 @@
-﻿using DB.Entities;
+﻿using DB;
+using DB.Entities;
 using DB.Repositories.Computer;
 using DB.Repositories.Employer;
 using DB.Repositories.Picture;
@@ -56,7 +57,7 @@ public partial class NewTechForm : Form
         textBox1.Text = _computer.Name;
         var index = comboBox1.Items.IndexOf((StatusEnum)_computer.StatusID);
         comboBox1.SelectedIndex = index;
-        var employers = comboBox2.Items.Cast<Employer>().First(e => e.ID == _computer.EmployerId);
+        var employers = comboBox2.Items.Cast<Employer>().First(p => p.ID == _computer.EmployerId);
         index = comboBox2.Items.IndexOf(employers);
         comboBox2.SelectedIndex = index;
         dateTimePicker1.Value = _computer.DateCreated;
@@ -65,13 +66,12 @@ public partial class NewTechForm : Form
 
         //вывод картинки при просмотре компа
         var pictures = _pictureRepository.GetItems(ComputerID, "ID", true, 0, 1);
-        if (pictures.Count > 0)
-        {
-            _picture = pictures[0];
-            _reservePictureBytes = File.ReadAllBytes(_picture.Path);
-            pictureBox1.Image = Image.FromStream(new MemoryStream(_reservePictureBytes));
-            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-        }
+        if (pictures.Count <= 0) return;
+
+        _picture = pictures[0];
+        _reservePictureBytes = File.ReadAllBytes(_picture.Path);
+        pictureBox1.Image = Image.FromStream(new MemoryStream(_reservePictureBytes));
+        pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
 
     }
 
@@ -124,22 +124,27 @@ public partial class NewTechForm : Form
 
         //изменения компуктера
         var currComputer = _computerRepository.GetComputer(ComputerID);
-        currComputer.Name = textBox1.Text;
-        currComputer.StatusID = (uint)(StatusEnum)comboBox1.SelectedItem;
-        currComputer.EmployerId = ((Employer)comboBox2.SelectedItem).ID;
-        currComputer.DateCreated = dateTimePicker1.Value;
-        currComputer.Cpu = textBox5.Text;
-        currComputer.Price = Convert.ToDecimal(textBox6.Text);
-        // сохр картинки в изменении компа
-        if (!string.IsNullOrEmpty(_filePath))
+        if (currComputer != null)
         {
-            var dekstopSave = new DekstopSave();
-            var directory = Environment.CurrentDirectory;
-            var pathForSavePicture = directory + "../../../../../Images/";
-            dekstopSave.SaveItem(_computer.ID, _filePath, pathForSavePicture, out _picture);
-            button5.Show();
+            currComputer.Name = textBox1.Text;
+            currComputer.StatusID = (uint) (StatusEnum) comboBox1.SelectedItem;
+            currComputer.EmployerId = ((Employer) comboBox2.SelectedItem).ID;
+            currComputer.DateCreated = dateTimePicker1.Value;
+            currComputer.Cpu = textBox5.Text;
+            currComputer.Price = Convert.ToDecimal(textBox6.Text);
+            // сохр картинки в изменении компа
+            if (!string.IsNullOrEmpty(_filePath))
+            {
+                var dekstopSave = new DekstopSave();
+                var directory = Environment.CurrentDirectory;
+                var pathForSavePicture = directory + "../../../../../Images/";
+                dekstopSave.SaveItem(_computer.ID, _filePath, pathForSavePicture, out _picture);
+                button5.Show();
+            }
+
+            _computerRepository.ChangeComputer(currComputer);
         }
-        _computerRepository.ChangeComputer(currComputer);
+
         _isChanged = true;
     }
 
@@ -237,7 +242,7 @@ public partial class NewTechForm : Form
             if (pictures.Count > 0)
             {
                 _picture = pictures[0];
-                _reservePictureBytes = File.ReadAllBytes(_picture.Path);
+                if (_picture.Path != null) _reservePictureBytes = File.ReadAllBytes(_picture.Path);
                 pictureBox1.Image = Image.FromStream(new MemoryStream(_reservePictureBytes));
                 pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
                 _reservePictureBytes = null;

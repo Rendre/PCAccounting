@@ -11,7 +11,7 @@ public class EmployerDapperRepository : IEmployerRepository
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public Employer GetItem(uint id)
+    public Employer? GetItem(uint id)
     {
         if (id == 0)
         {
@@ -19,10 +19,13 @@ public class EmployerDapperRepository : IEmployerRepository
         }
 
         var parameters = new DynamicParameters();
-        var conditions = new List<string>(2) { "IsDeleted = 0" };
+        var conditions = new List<string>(2)
+        {
+            "IsDeleted = 0",
+            "ID = @ID"
+        };
 
 
-        conditions.Add("ID = @ID");
         parameters.Add("@ID", id);
 
 
@@ -58,7 +61,7 @@ public class EmployerDapperRepository : IEmployerRepository
         }
 
         var sqlExpression = $"SELECT * FROM employers WHERE {string.Join(" AND ", conditions)}";
-        var employers = (List<Employer>)_databaseContext.GetAllByQuery<Employer>(sqlExpression, parameters);
+        var employers = _databaseContext.GetAllByQuery<Employer>(sqlExpression, parameters);
         return employers;
     }
 
@@ -70,9 +73,11 @@ public class EmployerDapperRepository : IEmployerRepository
         }
 
         var parameters = new DynamicParameters();
-        var conditions = new List<string>(1) { };
+        var conditions = new List<string>(1)
+        {
+            "ID = @ID"
+        };
 
-        conditions.Add("ID = @ID");
         parameters.Add("@ID", id);
 
 
@@ -84,7 +89,7 @@ public class EmployerDapperRepository : IEmployerRepository
     {
         var sqlExpression = $"INSERT INTO employers (Name, Position, Tel)" +
                             $"VALUES ('{employer.Name}', '{employer.Position}', '{employer.Tel}')";
-        var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
+        const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteByQuery(sqlExpression);
         var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
         return id;
@@ -94,7 +99,7 @@ public class EmployerDapperRepository : IEmployerRepository
     {
         var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
                             $" WHERE ID = {employer.ID}";
-        var success = (uint)_databaseContext.ExecuteByQuery(sqlExpression);
+        var success = _databaseContext.ExecuteByQuery(sqlExpression);
         return success;
     }
 

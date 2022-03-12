@@ -35,10 +35,9 @@ public partial class LoginForm : Form
         var login = textBox1.Text;
         var password = Util.Encode(textBox2.Text);
         var user = service.Login(login);
-        if (user != null &&
-            (user.Pass.Equals(password)))
+        if (user is {Pass: { }} && (user.Pass.Equals(password)))
         {
-            var mainForm = new MainForm(new EmployerDapperRepository(), new ComputerDefaultRepository(), user, this);
+            var mainForm = new MainForm(new EmployerDapperRepository(), new ComputerDapperRepository(), user, this);
             mainForm.Show();
             Hide();
         }

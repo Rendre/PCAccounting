@@ -19,7 +19,7 @@ public class UserDefaultRepository : IUserRepository
 
     public List<User> GetItems()
     {
-        var sqlExpression = $"SELECT * FROM Users WHERE IsDeleted = 0";
+        const string sqlExpression = $"SELECT * FROM Users WHERE IsDeleted = 0";
         var users = _databaseContext.GetUsers(sqlExpression);
         return users;
 
@@ -44,7 +44,7 @@ public class UserDefaultRepository : IUserRepository
     {
         var sqlExpression = $"INSERT INTO users (Login, Pass, EmployerId)" +
                             $"VALUES ('{login}', '{password}', {employerId})";
-        var sqlExpressionForId = $"SELECT LAST_INSERT_ID()";
+        const string sqlExpressionForId = $"SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
         var id = _databaseContext.ExecuteScalar(sqlExpressionForId);
         return id;
@@ -55,7 +55,7 @@ public class UserDefaultRepository : IUserRepository
         var sqlExpression = $"UPDATE users SET Login = '{login}', " +
                             $"Pass = '{password}', EmployerId = {employerID} " +
                             $"WHERE ID = {id}";
-        var success = (uint) _databaseContext.ExecuteExp(sqlExpression);
+        var success = _databaseContext.ExecuteExp(sqlExpression);
         return success;
     }
 

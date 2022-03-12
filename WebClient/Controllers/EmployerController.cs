@@ -14,7 +14,7 @@ public class EmployerController : ControllerBase
     {
         _employerRepository = new EmployerDapperRepository();
     }
-        
+
     [HttpPost]
     public dynamic Employer([FromBody] JsonElement emp)
     {
@@ -52,7 +52,7 @@ public class EmployerController : ControllerBase
 
         }
     }
-        
+
     [HttpPut]
     public dynamic PutEmployer([FromBody] JsonElement emp)
     {

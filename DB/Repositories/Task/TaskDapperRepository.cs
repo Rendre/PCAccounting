@@ -1,7 +1,7 @@
 ﻿namespace DB.Repositories.Task;
 using Dapper;
 using Entities;
-using TaskStatus = DB.Entities.TaskStatus;
+using TaskStatus = TaskStatus;
 
 public class TaskDapperRepository : ITaskRepository
 {

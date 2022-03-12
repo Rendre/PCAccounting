@@ -40,7 +40,7 @@ public class UserController : Controller
 
         return responseErrObj;
     }
-        
+
     [HttpGet]
     public dynamic GetUsers()
     {

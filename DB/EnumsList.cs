@@ -1,4 +1,4 @@
-﻿namespace DB.Entities;
+﻿namespace DB;
 
 public enum StatusEnum
 {

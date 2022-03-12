@@ -4,7 +4,7 @@
 [Serializable]
 public class Task : BaseEntity
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     public byte Type { get; set; }
 
@@ -12,5 +12,5 @@ public class Task : BaseEntity
 
     public byte Status { get; set; }
 
-    public string Json { get; set; }
+    public string? Json { get; set; }
 }

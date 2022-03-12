@@ -40,7 +40,7 @@ public partial class MainForm : Form
     private void AddNewTechClick(object sender, EventArgs e)
     {
         //на кнопку просмотр
-        var newTechForm = new NewTechForm(new ComputerDefaultRepository(), new EmployerDapperRepository(), new PictureDapperRepository());
+        var newTechForm = new NewTechForm(new ComputerDapperRepository(), new EmployerDapperRepository(), new PictureDapperRepository());
         var result = newTechForm.ShowDialog();
         if (result == DialogResult.OK)
         {

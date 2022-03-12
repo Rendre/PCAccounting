@@ -18,10 +18,10 @@ public class PictureDapperRepository : IPictureRepository
         parameters.Add("@Path", picture.Path);
         parameters.Add("@Name", picture.Name);
 
-        var sqlExpression = "INSERT INTO files (CompID, Path, FileName) " +
-                            "VALUES (@CompID, @Path, @Name)";
+        const string sqlExpression = "INSERT INTO files (CompID, Path, FileName) " +
+                                     "VALUES (@CompID, @Path, @Name)";
         _databaseContext.ExecuteByQuery(sqlExpression, parameters);
-        var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
+        const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
         picture.ID = id;
     }
@@ -33,7 +33,7 @@ public class PictureDapperRepository : IPictureRepository
         var parameters = new DynamicParameters();
         parameters.Add("@ID", id);
 
-        var sqlExpression = "SELECT * FROM files WHERE ID = @ID AND IsDeleted = 0";
+        const string sqlExpression = "SELECT * FROM files WHERE ID = @ID AND IsDeleted = 0";
         var pictureFromDb = _databaseContext.GetByQuery<Picture>(sqlExpression, parameters);
 
         return pictureFromDb;
@@ -71,7 +71,7 @@ public class PictureDapperRepository : IPictureRepository
 
         var parameters = new DynamicParameters();
         parameters.Add("@ID", id);
-        var sqlExpressions = "UPDATE files SET IsDeleted = 1 WHERE ID = @ID";
+        const string sqlExpressions = "UPDATE files SET IsDeleted = 1 WHERE ID = @ID";
         var success = _databaseContext.ExecuteByQuery(sqlExpressions, parameters);
         return success;
     }

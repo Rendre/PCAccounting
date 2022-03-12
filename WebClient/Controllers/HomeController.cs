@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using DB.Entities;
+﻿namespace WebClient.Controllers;
+using DB;
+using Microsoft.AspNetCore.Mvc;
 using DB.Repositories.Task;
-
-namespace WebClient.Controllers;
 
 [Route("[controller]")]
 public class HomeController : ControllerBase

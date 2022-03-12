@@ -19,7 +19,7 @@ public class EmployerDefaultRepository : IEmployerRepository
 
     public List<Employer> GetItems()
     {
-        var sqlExpression = $"SELECT * FROM employers WHERE IsDeleted = 0";
+        const string sqlExpression = $"SELECT * FROM employers WHERE IsDeleted = 0";
         //var employers = _databaseContext.GetEmployers(sqlExpression);
         var employers = _databaseContext.GetEmployers(sqlExpression);
         return employers;
@@ -33,14 +33,14 @@ public class EmployerDefaultRepository : IEmployerRepository
     public uint DeleteItem(uint id)
     {
         var sqlExpression = $"UPDATE employers SET IsDeleted = 1 WHERE ID = {id}";
-        return (uint) _databaseContext.ExecuteExp(sqlExpression);
+        return _databaseContext.ExecuteExp(sqlExpression);
     }
 
     public uint CreateEmployer(Employer employer)
     {
         var sqlExpression = $"INSERT INTO employers (Name, Position, Tel)" +
                             $"VALUES ('{employer.Name}', '{employer.Position}', '{employer.Tel}')";
-        var sqlExpressionForId = "SELECT LAST_INSERT_ID()";
+        const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
         var id = _databaseContext.ExecuteScalar(sqlExpressionForId);
         return id;
@@ -50,7 +50,7 @@ public class EmployerDefaultRepository : IEmployerRepository
     {
         var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
                             $" WHERE ID = {employer.ID}";
-        var success = (uint) _databaseContext.ExecuteExp(sqlExpression);
+        var success = _databaseContext.ExecuteExp(sqlExpression);
         return success;
     }
 
