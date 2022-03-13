@@ -1,4 +1,5 @@
-﻿using DB.Repositories.Computer;
+﻿using DB.Entities;
+using DB.Repositories.Computer;
 using DB.Repositories.Employer;
 using DB.Repositories.User;
 using DB.Utils;
@@ -73,7 +74,8 @@ public partial class LoginForm : Form
     {
         var login = textBox1.Text;
         var password = Util.Encode(textBox2.Text);
-        var isSuccess = registrationService.Registration(login, password);
+        var user = new User() {Login = login, Pass = password};
+        var isSuccess = registrationService.Registration(user);
 
         if (isSuccess)
         {

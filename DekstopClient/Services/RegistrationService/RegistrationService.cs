@@ -1,4 +1,5 @@
-﻿using DB.Repositories.User;
+﻿using DB.Entities;
+using DB.Repositories.User;
 
 namespace DekstopClient.Services.RegistrationService;
 
@@ -11,14 +12,14 @@ public class RegistrationService : IRegistrationService
         _userRepository = userRepository;
     }
 
-    public bool Registration(string? login, string? password)
+    public bool Registration(User user)
     {
         using (_userRepository)
         {
-            var user = _userRepository.GetItem(login);
-            if (user != null) return false;
+            var userFromDb = _userRepository.GetItem(user.Login);
+            if (userFromDb != null) return false;
 
-            _userRepository.CreateItem(login, password, 0);
+            _userRepository.CreateItem(user);
             return true;
         }
     }

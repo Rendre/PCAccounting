@@ -1,6 +1,8 @@
-﻿namespace DekstopClient.Services.RegistrationService;
+﻿using DB.Entities;
+
+namespace DekstopClient.Services.RegistrationService;
 
 public interface IRegistrationService
 {
-    public bool Registration(string? login, string? password);
+    public bool Registration(User user);
 }

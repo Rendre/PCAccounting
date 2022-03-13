@@ -1,5 +1,5 @@
-﻿using Dapper;
-namespace DB.Repositories.Picture;
+﻿namespace DB.Repositories.Picture;
+using Dapper;
 using Entities;
 
 public class PictureDapperRepository : IPictureRepository
