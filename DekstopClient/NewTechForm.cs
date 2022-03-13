@@ -53,7 +53,7 @@ public partial class NewTechForm : Form
         comboBox2.Enabled = false;
         dateTimePicker1.Enabled = false;
 
-        _computer = _computerRepository.GetComputer(ComputerID);
+        _computer = _computerRepository.GetItem(ComputerID);
         textBox1.Text = _computer.Name;
         var index = comboBox1.Items.IndexOf((StatusEnum)_computer.StatusID);
         comboBox1.SelectedIndex = index;
@@ -101,7 +101,7 @@ public partial class NewTechForm : Form
                 _computer.Cpu = cpu;
                 _computer.Price = Convert.ToDecimal(price);
 
-                _computerRepository.CreateComputer(_computer);
+                _computerRepository.CreateItem(_computer);
 
                 // тут у нового компа появился айди
                 // сохр картинку
@@ -123,7 +123,7 @@ public partial class NewTechForm : Form
         }
 
         //изменения компуктера
-        var currComputer = _computerRepository.GetComputer(ComputerID);
+        var currComputer = _computerRepository.GetItem(ComputerID);
         if (currComputer != null)
         {
             currComputer.Name = textBox1.Text;
@@ -142,7 +142,7 @@ public partial class NewTechForm : Form
                 button5.Show();
             }
 
-            _computerRepository.ChangeComputer(currComputer);
+            _computerRepository.ChangeItem(currComputer);
         }
 
         _isChanged = true;

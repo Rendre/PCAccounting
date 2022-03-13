@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using DB.Entities;
 using DB.Repositories.User;
 using DB.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,53 @@ public class UserController : Controller
     public UserController()
     {
         _userRepository = new UserDapperRepository();
+    }
+
+    [HttpPost]
+    public dynamic CreateUser([FromBody] JsonElement userJsn)
+    {
+        var responseErrObj = new
+        {
+            success = 0
+        };
+        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+        if (!isValid) return responseErrObj;
+
+        var login = userJsn.GetProperty("login").GetString();
+        var password = userJsn.GetProperty("password").GetString();
+        password = Util.Encode(password);
+        var employerId = userJsn.GetProperty("employerId").GetUInt32();
+        var user = new User() {Login = login, Pass = password, EmployerId = employerId};
+        _userRepository.CreateItem(user);
+        if (user.ID <= 0)
+        {
+            return responseErrObj;
+        }
+
+        var resultObj = new
+        {
+            success = 1
+        };
+        return resultObj;
+    }
+
+    [HttpPut]
+    public dynamic ChangeUser([FromBody] JsonElement userJsn)
+    {
+        var responseErrObj = new
+        {
+            success = 0
+        };
+        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+        if (!isValid) return responseErrObj;
+
+        var id = userJsn.GetProperty("id").GetUInt32();
+        var login = userJsn.GetProperty("login").GetString();
+        var password = userJsn.GetProperty("password").GetString();
+        password = Util.Encode(password);
+        var employerId = userJsn.GetProperty("employerId").GetUInt32();
+        var success = _userRepository.ChangeItem(id, login, password, employerId);
+        return JsonSerializer.Serialize(success);
     }
 
     [HttpGet("{id:int}")]
@@ -100,53 +148,4 @@ public class UserController : Controller
 
         return resultObj;
     }
-
-    [HttpPost]
-    public dynamic CreateUser([FromBody] JsonElement userJsn)
-    {
-        var responseErrObj = new
-        {
-            success = 0
-        };
-        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
-
-        var login = userJsn.GetProperty("login").GetString();
-        var password = userJsn.GetProperty("password").GetString();
-        password = Util.Encode(password);
-        var employerId = userJsn.GetProperty("employerId").GetUInt32();
-        var userId = _userRepository.CreateUser(login, password, employerId);
-        if (userId <= 0)
-        {
-            return responseErrObj;
-        }
-        else
-        {
-            var resultObj = new
-            {
-                success = 1
-            };
-            return resultObj;
-        }
-    }
-
-    [HttpPut]
-    public dynamic ChangeUser([FromBody] JsonElement userJsn)
-    {
-        var responseErrObj = new
-        {
-            success = 0
-        };
-        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
-
-        var id = userJsn.GetProperty("id").GetUInt32();
-        var login = userJsn.GetProperty("login").GetString();
-        var password = userJsn.GetProperty("password").GetString();
-        password = Util.Encode(password);
-        var employerId = userJsn.GetProperty("employerId").GetUInt32();
-        var success = _userRepository.ChangeUser(id, login, password, employerId);
-        return JsonSerializer.Serialize(success);
-    }
-
 }

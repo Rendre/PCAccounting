@@ -3,6 +3,10 @@ using Entities;
 
 public interface IUserRepository : IDisposable
 {
+    public void CreateItem(User user);
+
+    public bool ChangeItem(uint id, string? login, string? password, uint employerID);
+
     public User? GetItem(uint id);
 
     public List<User> GetItems();
@@ -10,9 +14,4 @@ public interface IUserRepository : IDisposable
     public User? GetItem(string? login);
 
     public uint DeleteItem(uint id);
-
-    public uint CreateUser(string? login, string? password, uint employerId);
-
-    public uint ChangeUser(uint id, string? login, string? password, uint employerID);
-
 }

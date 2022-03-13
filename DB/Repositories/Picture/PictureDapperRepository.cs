@@ -75,5 +75,4 @@ public class PictureDapperRepository : IPictureRepository
         var success = _databaseContext.ExecuteByQuery(sqlExpressions, parameters);
         return success;
     }
-
 }

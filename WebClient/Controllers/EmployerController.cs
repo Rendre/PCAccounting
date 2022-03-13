@@ -16,7 +16,7 @@ public class EmployerController : ControllerBase
     }
 
     [HttpPost]
-    public dynamic Employer([FromBody] JsonElement emp)
+    public dynamic CreateEmployer([FromBody] JsonElement emp)
     {
         var responseErrObj = new
         {
@@ -31,8 +31,8 @@ public class EmployerController : ControllerBase
 
         var employer = new Employer() {Name = name, Position = position, Tel = tel};
 
-        var empId = _employerRepository.CreateEmployer(employer);
-        if (empId <= 0)
+        _employerRepository.CreateItem(employer);
+        if (employer.ID <= 0)
         {
             var responceObj = new
             {
@@ -46,7 +46,7 @@ public class EmployerController : ControllerBase
             var responceObj = new
             {
                 success = 1,
-                id = empId
+                id = employer.ID
             };
             return JsonSerializer.Serialize(responceObj);
 
@@ -54,7 +54,7 @@ public class EmployerController : ControllerBase
     }
 
     [HttpPut]
-    public dynamic PutEmployer([FromBody] JsonElement emp)
+    public dynamic СhangeEmployer([FromBody] JsonElement emp)
     {
         var responseErrObj = new
         {
@@ -69,8 +69,8 @@ public class EmployerController : ControllerBase
         var tel = emp.GetProperty("tel").GetString();
         var employer = new Employer() {ID = id, Name = name, Position = position, Tel = tel };
 
-        var success = _employerRepository.СhangeEmployer(employer);
-        if (success > 0)
+        var success = _employerRepository.СhangeItem(employer);
+        if (success)
         {
             var resultObj = new
             {
@@ -91,7 +91,7 @@ public class EmployerController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    public dynamic Employer(uint id)
+    public dynamic DeleteEmployer(uint id)
     {
         var responseErrObj = new
         {

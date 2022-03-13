@@ -48,7 +48,7 @@ public class ComputerController : Controller
         if (jsonElementComp.TryGetProperty("id", out var idElement))
         {
             var id = idElement.GetUInt32();
-            computer = _computerRepository.GetComputer(id);
+            computer = _computerRepository.GetItem(id);
             if (computer == null) return JsonSerializer.Serialize(errorObj);
         }
 
@@ -56,7 +56,7 @@ public class ComputerController : Controller
         {
             if (computer == null) return JsonSerializer.Serialize(errorObj);
 
-            var result = _computerRepository.DeleteComputer(computer.ID);
+            var result = _computerRepository.DeleteItem(computer.ID);
             var resultObj = new
             {
                 success = result
@@ -93,7 +93,7 @@ public class ComputerController : Controller
 
         if (computer.ID == 0)
         {
-            _computerRepository.CreateComputer(computer);
+            _computerRepository.CreateItem(computer);
             var resultObj = new
             {
                 success = 1,
@@ -103,7 +103,7 @@ public class ComputerController : Controller
         }
         else
         {
-            var result = _computerRepository.ChangeComputer(computer);
+            var result = _computerRepository.ChangeItem(computer);
             var resultObj = new
             {
                 success = result
@@ -114,7 +114,7 @@ public class ComputerController : Controller
 
     private dynamic GetComputer(uint id)
     {
-        var computer = _computerRepository.GetComputer(id);
+        var computer = _computerRepository.GetItem(id);
         if (computer != null)
         {
             var outComp = new
@@ -179,7 +179,7 @@ public class ComputerController : Controller
             price = priceElement.GetDecimal();
         }
 
-        var computers = _computerRepository.GetFilterComputers(name, status, employerId, date, cpu, price);
+        var computers = _computerRepository.GetFilterItems(name, status, employerId, date, cpu, price);
         var outComputerList = new List<dynamic>();
 
         foreach (var computer in computers)

@@ -14,20 +14,20 @@ public class ComputerEFRepository : IComputerRepository
         _db = new ApplicationContextEF(opt.Options);
     }
 
-    public void CreateComputer(Computer computer)
+    public void CreateItem(Computer computer)
     {
         _db.Technick.Add(computer);
         _db.SaveChanges();
     }
 
-    public bool ChangeComputer(Computer computer)
+    public bool ChangeItem(Computer computer)
     {
         _db.Technick.Update(computer);
         var rowsChanges = _db.SaveChanges();
         return rowsChanges > 0;
     }
 
-    public Computer? GetComputer(uint id)
+    public Computer? GetItem(uint id)
     {
         if (id == 0) return null;
 
@@ -35,7 +35,7 @@ public class ComputerEFRepository : IComputerRepository
         return computer;
     }
 
-    public List<Computer> GetFilterComputers(string? name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null,
+    public List<Computer> GetFilterItems(string? name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null,
         string? cpu = null, decimal price = 0)
     {
         var computers = _db.Technick.Where(p => p.IsDeleted == false);
@@ -72,7 +72,7 @@ public class ComputerEFRepository : IComputerRepository
         return computers.ToList();
     }
 
-    public bool DeleteComputer(uint id)
+    public bool DeleteItem(uint id)
     {
         var computer = _db.Technick.FirstOrDefault(p => p.ID == id);
         if (computer == null) return false;

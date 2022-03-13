@@ -3,6 +3,10 @@ using Entities;
 
 public interface IEmployerRepository : IDisposable
 {
+    public void CreateItem(Employer employer);
+
+    public bool СhangeItem(Employer employer);
+
     public Employer? GetItem(uint id);
 
     public List<Employer> GetItems();
@@ -11,7 +15,4 @@ public interface IEmployerRepository : IDisposable
 
     public uint DeleteItem(uint id);
 
-    public uint CreateEmployer(Employer employer);
-
-    public uint СhangeEmployer(Employer employer);
 }

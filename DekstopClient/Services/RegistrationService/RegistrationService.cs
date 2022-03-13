@@ -18,7 +18,7 @@ public class RegistrationService : IRegistrationService
             var user = _userRepository.GetItem(login);
             if (user != null) return false;
 
-            _userRepository.CreateUser(login, password, 0);
+            _userRepository.CreateItem(login, password, 0);
             return true;
         }
     }

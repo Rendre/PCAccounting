@@ -11,6 +11,24 @@ public class EmployerDapperRepository : IEmployerRepository
         _databaseContext = new MySQLDatabaseContext();
     }
 
+    public void CreateItem(Employer employer)
+    {
+        var sqlExpression = $"INSERT INTO employers (Name, Position, Tel)" +
+                            $"VALUES ('{employer.Name}', '{employer.Position}', '{employer.Tel}')";
+        const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
+        _databaseContext.ExecuteByQuery(sqlExpression);
+        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
+        employer.ID = id;
+    }
+
+    public bool СhangeItem(Employer employer)
+    {
+        var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
+                            $" WHERE ID = {employer.ID}";
+        var success = _databaseContext.ExecuteByQuery(sqlExpression);
+        return success > 0;
+    }
+
     public Employer? GetItem(uint id)
     {
         if (id == 0)
@@ -84,25 +102,7 @@ public class EmployerDapperRepository : IEmployerRepository
         var sqlExpression = $"UPDATE employers SET IsDeleted = 1 WHERE {string.Join(" ", conditions)}";
         return _databaseContext.ExecuteByQuery(sqlExpression, parameters);
     }
-
-    public uint CreateEmployer(Employer employer)
-    {
-        var sqlExpression = $"INSERT INTO employers (Name, Position, Tel)" +
-                            $"VALUES ('{employer.Name}', '{employer.Position}', '{employer.Tel}')";
-        const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
-        _databaseContext.ExecuteByQuery(sqlExpression);
-        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
-        return id;
-    }
-
-    public uint СhangeEmployer(Employer employer)
-    {
-        var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
-                            $" WHERE ID = {employer.ID}";
-        var success = _databaseContext.ExecuteByQuery(sqlExpression);
-        return success;
-    }
-
+    
     public void Dispose()
     {
         _databaseContext.Dispose();

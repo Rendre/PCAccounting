@@ -169,7 +169,7 @@ public class SessionController : ControllerBase
 
     [HttpPost]
     [Route("LogOut")]
-    public dynamic Delete([FromBody] JsonElement json)
+    public dynamic LogOut([FromBody] JsonElement json)
     {
         string? token = null;
         var responceErrObj = new

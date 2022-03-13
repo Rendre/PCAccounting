@@ -11,7 +11,7 @@ public class ComputerDefaultRepository : IComputerRepository
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public void CreateComputer(Computer computer)
+    public void CreateItem(Computer computer)
     {
         var sqlExpression = "INSERT INTO technick (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
                             $"VALUES ('{computer.Name}', {computer.StatusID}, {computer.EmployerId}, '{computer.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
@@ -21,7 +21,7 @@ public class ComputerDefaultRepository : IComputerRepository
         computer.ID = id;
     }
 
-    public bool ChangeComputer(Computer computer)
+    public bool ChangeItem(Computer computer)
     {
         var sqlExpression = $"UPDATE technick SET Name = '{computer.Name}', " +
                             $"StatusID = {computer.StatusID}, " +
@@ -34,14 +34,14 @@ public class ComputerDefaultRepository : IComputerRepository
         return success > 0;
     }
 
-    public Computer? GetComputer(uint id)
+    public Computer? GetItem(uint id)
     {
         var sqlExpression = $"SELECT * FROM technick WHERE ID = {id} AND IsDeleted = 0 LIMIT 1";
         var computer = _databaseContext.GetComputer(sqlExpression);
         return computer;
     }
 
-    public bool DeleteComputer(uint id)
+    public bool DeleteItem(uint id)
     {
         var sqlExpression = $"UPDATE technick SET IsDeleted = 1 WHERE ID = {id}";
         var result = _databaseContext.ExecuteExp(sqlExpression);
@@ -54,7 +54,7 @@ public class ComputerDefaultRepository : IComputerRepository
         GC.SuppressFinalize(this);
     }
 
-    public List<Computer> GetFilterComputers(string? name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null, string? cpu = null, decimal price = 0)
+    public List<Computer> GetFilterItems(string? name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null, string? cpu = null, decimal price = 0)
     {
         throw new NotImplementedException();
     }

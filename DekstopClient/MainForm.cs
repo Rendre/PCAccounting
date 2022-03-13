@@ -93,7 +93,7 @@ public partial class MainForm : Form
         if (radioButton1.Checked)
         {
             var employer = new Employer() {Name = name, Position = position, Tel = tel};
-            _employerRepository.CreateEmployer(employer);
+            _employerRepository.CreateItem(employer);
 
             var table = _employerRepository.GetItems();
             dataGridView2.DataSource = table;
@@ -107,7 +107,7 @@ public partial class MainForm : Form
             var id = (uint)dataGridView2["Id", currentRow].Value;
             var employer = new Employer() {ID = id, Name = name, Position = position, Tel = tel};
 
-            _employerRepository.ÑhangeEmployer(employer);
+            _employerRepository.ÑhangeItem(employer);
 
             var table = _employerRepository.GetItems();
             dataGridView2.DataSource = table;
@@ -164,7 +164,7 @@ public partial class MainForm : Form
 
             if (result == DialogResult.Yes)
             {
-                _computerRepository.DeleteComputer(id);
+                _computerRepository.DeleteItem(id);
                 RefreshDb();
             }
         }
@@ -177,7 +177,7 @@ public partial class MainForm : Form
     private void RefreshDb()
     {
         dataGridView3.DataSource = null;
-        var table = _computerRepository.GetFilterComputers();
+        var table = _computerRepository.GetFilterItems();
         dataGridView3.DataSource = table;
         dataGridView3.Columns["ID"]!.DisplayIndex = 0;
         dataGridView3.Columns["IsDeleted"]!.Visible = false;

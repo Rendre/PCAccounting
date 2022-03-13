@@ -36,22 +36,22 @@ public class EmployerDefaultRepository : IEmployerRepository
         return _databaseContext.ExecuteExp(sqlExpression);
     }
 
-    public uint CreateEmployer(Employer employer)
+    public void CreateItem(Employer employer)
     {
         var sqlExpression = $"INSERT INTO employers (Name, Position, Tel)" +
                             $"VALUES ('{employer.Name}', '{employer.Position}', '{employer.Tel}')";
         const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
         var id = _databaseContext.ExecuteScalar(sqlExpressionForId);
-        return id;
+        employer.ID = id;
     }
 
-    public uint СhangeEmployer(Employer employer)
+    public bool СhangeItem(Employer employer)
     {
         var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
                             $" WHERE ID = {employer.ID}";
         var success = _databaseContext.ExecuteExp(sqlExpression);
-        return success;
+        return success > 0;
     }
 
     public void Dispose()

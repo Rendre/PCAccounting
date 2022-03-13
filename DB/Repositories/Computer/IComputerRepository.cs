@@ -3,14 +3,14 @@ using Entities;
 
 public interface IComputerRepository : IDisposable
 {
-    public void CreateComputer(Computer computer);
+    public void CreateItem(Computer computer);
 
-    public bool ChangeComputer(Computer computer);
+    public bool ChangeItem(Computer computer);
 
-    public Computer? GetComputer(uint id);
+    public Computer? GetItem(uint id);
 
-    public List<Computer> GetFilterComputers(string? name = null, uint statusId = 0, uint employerId = 0,
+    public List<Computer> GetFilterItems(string? name = null, uint statusId = 0, uint employerId = 0,
         DateTime? date = null, string? cpu = null, decimal price = 0);
 
-    public bool DeleteComputer(uint id);
+    public bool DeleteItem(uint id);
 }
