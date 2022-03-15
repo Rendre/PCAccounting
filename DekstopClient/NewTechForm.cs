@@ -110,7 +110,8 @@ public partial class NewTechForm : Form
                     var dekstopSave = new DekstopSave();
                     var directory = Environment.CurrentDirectory;
                     var pathForSavePicture = directory + "../../../../../Images/";
-                    dekstopSave.SaveItem(_computer.ID, _filePath, pathForSavePicture, out _picture);
+                    var pictureBytes = File.ReadAllBytes(_filePath);
+                    dekstopSave.SaveItem(_computer.ID, pictureBytes, _filePath, pathForSavePicture, out _picture);
                 }
                 DialogResult = DialogResult.OK;
                 MessageBox.Show("Данные успешно добавлены.");
@@ -137,8 +138,9 @@ public partial class NewTechForm : Form
             {
                 var dekstopSave = new DekstopSave();
                 var directory = Environment.CurrentDirectory;
-                var pathForSavePicture = directory + "../../../../../Images/";
-                dekstopSave.SaveItem(_computer.ID, _filePath, pathForSavePicture, out _picture);
+                var pathForSavePicture = directory + "/../../../../../Images/";
+                var pictureBytes = File.ReadAllBytes(_filePath);
+                dekstopSave.SaveItem(_computer.ID, pictureBytes, _filePath, pathForSavePicture, out _picture);
                 button5.Show();
             }
 
