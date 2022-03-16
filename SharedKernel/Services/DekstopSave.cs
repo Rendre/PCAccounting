@@ -1,6 +1,5 @@
 ﻿using DB.Entities;
 using DB.Repositories.Picture;
-
 namespace SharedKernel.Services;
 
 public class DekstopSave : IPictureSave
@@ -22,9 +21,5 @@ public class DekstopSave : IPictureSave
         fileStream.Write(pictureBytes);
         picture = new Picture() { ComputerId = computerId, Name = fileName, Path = pathForSavePicture };
         _pictureRepository.SaveItem(picture);
-
-        //return pictureBytes;
-
     }
-
 }

@@ -108,8 +108,8 @@ public partial class NewTechForm : Form
                 if (!string.IsNullOrEmpty(_filePath))
                 {
                     var dekstopSave = new DekstopSave();
-                    var directory = Environment.CurrentDirectory;
-                    var pathForSavePicture = directory + "../../../../../Images/";
+                    var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent?.Parent?.Parent?.Parent;
+                    var pathForSavePicture = directory + "\\Images\\";
                     var pictureBytes = File.ReadAllBytes(_filePath);
                     dekstopSave.SaveItem(_computer.ID, pictureBytes, _filePath, pathForSavePicture, out _picture);
                 }
@@ -136,10 +136,12 @@ public partial class NewTechForm : Form
             // сохр картинки в изменении компа
             if (!string.IsNullOrEmpty(_filePath))
             {
+                _reservePictureBytes = null!;
                 var dekstopSave = new DekstopSave();
-                var directory = Environment.CurrentDirectory;
-                var pathForSavePicture = directory + "/../../../../../Images/";
+                var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent?.Parent?.Parent?.Parent;
+                var pathForSavePicture = directory + "\\Images\\";
                 var pictureBytes = File.ReadAllBytes(_filePath);
+                //var kek = Convert.ToBase64String(pictureBytes);
                 dekstopSave.SaveItem(_computer.ID, pictureBytes, _filePath, pathForSavePicture, out _picture);
                 button5.Show();
             }

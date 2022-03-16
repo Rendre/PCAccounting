@@ -1,50 +1,63 @@
 ﻿using DB.Entities;
-using DB.Repositories.Picture;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Net.Http.Headers;
 using SharedKernel.Services;
-
 namespace WebClient.Controllers;
 
 [Route("[controller]")]
 public class PictureController : Controller
 {
     private readonly IPictureSave _pictureSave = new WebSave();
-    private readonly IWebHostEnvironment _appEnvironment;
-
-
-    public PictureController(IWebHostEnvironment appEnvironment)
-    {
-        _appEnvironment = appEnvironment;
-    }
 
     [HttpPost]
     public dynamic UploadPicture()
     {
+        var responseErrObj = new
+        {
+            success = 0
+        };
+
+        var resultObj = new
+        {
+            success = 1
+        };
+
         Picture picture;
         try
         {
-
-            var pic = HttpContext.Request.Form.Files["picture"];
+            byte[]? pictureBytes;
+            string fileName;
             var computerId = Convert.ToUInt32(HttpContext.Request.Form["computerId"]);
-            if (pic == null) return null;
+            if (computerId <= 0) return responseErrObj;
 
-            var ms = new MemoryStream();
-            pic.CopyTo(ms);
-            var pictureBytes = ms.ToArray();
+            if (HttpContext.Request.Form.ContainsKey("picture"))
+            {
+                var pic = HttpContext.Request.Form.Files["picture"];
+                if (pic == null) return responseErrObj;
 
-            var fileName = pic.FileName;
-            var directory = Environment.CurrentDirectory;
-            var pathForSavePicture = directory + "/../Images/";
+                var ms = new MemoryStream();
+                pic.CopyTo(ms);
+                pictureBytes = ms.ToArray();
+                fileName = pic.FileName;
+            }
+            else
+            {
+                HttpContext.Request.Form.TryGetValue("pictureByString", out var strImage);
+                fileName = HttpContext.Request.Form["fileName"];
+                if (string.IsNullOrEmpty(fileName) || string.IsNullOrEmpty(strImage)) return responseErrObj;
+
+                pictureBytes = Convert.FromBase64String(strImage);
+            }
+
+            var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent;
+            var pathForSavePicture = directory + "\\Images\\";
 
             _pictureSave.SaveItem(computerId, pictureBytes, fileName, pathForSavePicture, out picture);
         }
         catch (Exception)
         {
-            return 0;
+            return responseErrObj;
         }
-        return picture.ID == 0 ? 0 : 1;
+        return picture.ID == 0 ? responseErrObj : resultObj;
     }
 }
 

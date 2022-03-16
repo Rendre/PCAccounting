@@ -1,14 +1,12 @@
 ﻿using DB.Entities;
 using DB.Repositories.Picture;
-
 namespace SharedKernel.Services;
 
 public class WebSave : IPictureSave
 {
     private readonly IPictureRepository _pictureRepository = new PictureDapperRepository();
-
-    public void SaveItem(uint computerId, byte[] pictureBytes, string fileName, string pathForSavePicture,
-        out Picture picture)
+    //todo:
+    public void SaveItem(uint computerId, byte[] pictureBytes, string fileName, string pathForSavePicture, out Picture picture)
     {
         var guidFileName = Guid.NewGuid().ToString("N");
         var extension = Path.GetExtension(fileName);
