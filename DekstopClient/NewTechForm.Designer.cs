@@ -48,6 +48,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.button5 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -224,12 +225,23 @@
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.DeleteClick);
             // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(602, 363);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(90, 51);
+            this.button6.TabIndex = 22;
+            this.button6.Text = "test";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.TestClick);
+            // 
             // NewTechForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.ClientSize = new System.Drawing.Size(917, 426);
+            this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.button4);
@@ -280,5 +292,6 @@
         private PictureBox pictureBox1;
         private OpenFileDialog openFileDialog1;
         private Button button5;
+        private Button button6;
     }
 }

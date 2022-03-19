@@ -13,23 +13,20 @@ public class PictureController : Controller
     {
         var responseErrObj = new
         {
-            success = 0
+            success = 0,
+            pictureID = 0
         };
 
-        var resultObj = new
-        {
-            success = 1
-        };
-
-        Picture picture;
+        Picture? picture;
         try
         {
             byte[]? pictureBytes;
+            var pictureID = "";
             string fileName;
             var computerId = Convert.ToUInt32(HttpContext.Request.Form["computerId"]);
             if (computerId <= 0) return responseErrObj;
 
-            if (HttpContext.Request.Form.ContainsKey("picture"))
+            if (HttpContext.Request.Form.Files.Count > 0)
             {
                 var pic = HttpContext.Request.Form.Files["picture"];
                 if (pic == null) return responseErrObj;
@@ -43,6 +40,7 @@ public class PictureController : Controller
             {
                 HttpContext.Request.Form.TryGetValue("pictureByString", out var strImage);
                 fileName = HttpContext.Request.Form["fileName"];
+                pictureID = HttpContext.Request.Form["pictureId"];
                 if (string.IsNullOrEmpty(fileName) || string.IsNullOrEmpty(strImage)) return responseErrObj;
 
                 pictureBytes = Convert.FromBase64String(strImage);
@@ -50,14 +48,20 @@ public class PictureController : Controller
 
             var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent;
             var pathForSavePicture = directory + "\\Images\\";
+            _pictureSave.SaveItem(computerId, pictureBytes, fileName, pathForSavePicture, pictureID,out picture);
 
-            _pictureSave.SaveItem(computerId, pictureBytes, fileName, pathForSavePicture, out picture);
+            var resultObj = new
+            {
+                success = 1,
+                pictureID = picture.ID
+            };
+
+            return picture.ID == 0 ? responseErrObj : resultObj;
         }
         catch (Exception)
         {
             return responseErrObj;
         }
-        return picture.ID == 0 ? responseErrObj : resultObj;
     }
 }
 

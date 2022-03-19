@@ -1,8 +1,11 @@
-﻿using DB;
+﻿using System.Text.Json;
+using DB;
 using DB.Entities;
 using DB.Repositories.Computer;
 using DB.Repositories.Employer;
 using DB.Repositories.Picture;
+using Org.BouncyCastle.Asn1.Cms;
+using Shaitan;
 using SharedKernel.Services;
 namespace DekstopClient;
 
@@ -13,7 +16,7 @@ public partial class NewTechForm : Form
     private Computer _computer = new();
     private byte[] _pictureBytes;
     private byte[] _reservePictureBytes;
-    private Picture _picture;
+    private Picture? _picture;
     private bool _isChanged;
     private string? _filePath;
     private readonly IComputerRepository _computerRepository;
@@ -111,7 +114,7 @@ public partial class NewTechForm : Form
                     var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent?.Parent?.Parent?.Parent;
                     var pathForSavePicture = directory + "\\Images\\";
                     var pictureBytes = File.ReadAllBytes(_filePath);
-                    dekstopSave.SaveItem(_computer.ID, pictureBytes, _filePath, pathForSavePicture, out _picture);
+                    dekstopSave.SaveItem(_computer.ID, pictureBytes, _filePath, pathForSavePicture, "",out _picture);
                 }
                 DialogResult = DialogResult.OK;
                 MessageBox.Show("Данные успешно добавлены.");
@@ -142,7 +145,7 @@ public partial class NewTechForm : Form
                 var pathForSavePicture = directory + "\\Images\\";
                 var pictureBytes = File.ReadAllBytes(_filePath);
                 //var kek = Convert.ToBase64String(pictureBytes);
-                dekstopSave.SaveItem(_computer.ID, pictureBytes, _filePath, pathForSavePicture, out _picture);
+                dekstopSave.SaveItem(_computer.ID, pictureBytes, _filePath, pathForSavePicture, "",out _picture);
                 button5.Show();
             }
 
@@ -203,7 +206,6 @@ public partial class NewTechForm : Form
             {
                 pictureBox1.Image = Image.FromStream(new MemoryStream(_reservePictureBytes));
             }
-            
         }
 
         textBox1.ReadOnly = !isChecked;
@@ -216,16 +218,14 @@ public partial class NewTechForm : Form
 
     private void button4_Click(object sender, EventArgs e)
     {
-        if (openFileDialog1.ShowDialog() == DialogResult.OK)
-        {
-            _filePath = openFileDialog1.FileName;
-            if (!string.IsNullOrEmpty(_filePath))
-            {
-                _pictureBytes = File.ReadAllBytes(_filePath);
-                pictureBox1.Image = Image.FromStream(new MemoryStream(_pictureBytes));
-                pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            }
-        }
+        if (openFileDialog1.ShowDialog() != DialogResult.OK) return;
+
+        _filePath = openFileDialog1.FileName;
+        if (string.IsNullOrEmpty(_filePath)) return;
+
+        _pictureBytes = File.ReadAllBytes(_filePath);
+        pictureBox1.Image = Image.FromStream(new MemoryStream(_pictureBytes));
+        pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
     }
 
     private void DeleteClick(object sender, EventArgs e)
@@ -258,5 +258,42 @@ public partial class NewTechForm : Form
             _reservePictureBytes = null;
             pictureBox1.Image = null;
         }
+    }
+
+    private void TestClick(object sender, EventArgs e)
+    {
+        const string connectionAddress = "https://localhost:7204/Picture";
+
+        if (openFileDialog1.ShowDialog() != DialogResult.OK) return;
+
+        _filePath = openFileDialog1.FileName;
+        if (string.IsNullOrEmpty(_filePath)) return;
+
+        var fName = openFileDialog1.SafeFileName;
+
+        const int _count = 1024 * 1024;
+        var fileStream = new FileStream(_filePath, FileMode.Open, FileAccess.Read);
+        var buffer = new byte[_count];
+        var countOfReadBytes = 0;
+        var result = new ResultClass();
+        while ((countOfReadBytes = fileStream.Read(buffer, 0, _count)) != 0)
+        {
+            if (result.pictureID == 0)
+            {
+                var resultJson = Box.Kekw(countOfReadBytes, buffer, connectionAddress, fName, "21");
+                result = JsonSerializer.Deserialize<ResultClass>(resultJson);
+            }
+            else
+            {
+                var resultJson = Box.Kekw(countOfReadBytes, buffer, connectionAddress, fName, "21", result.pictureID.ToString());
+                result = JsonSerializer.Deserialize<ResultClass>(resultJson);
+            }
+        }
+    }
+
+    class ResultClass
+    {
+        public int success { get; set; }
+        public uint pictureID { get; set; }
     }
 }

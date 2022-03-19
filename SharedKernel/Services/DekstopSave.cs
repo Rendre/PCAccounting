@@ -6,7 +6,7 @@ public class DekstopSave : IPictureSave
 {
     private readonly IPictureRepository _pictureRepository = new PictureDapperRepository();
 
-    public void SaveItem(uint computerId, byte[] pictureBytes, string filePath, string pathForSavePicture, out Picture picture)
+    public void SaveItem(uint computerId, byte[] pictureBytes, string filePath, string pathForSavePicture, string pictureID, out Picture? picture)
     {
         var fileName = Path.GetFileName(filePath);
         var ext = Path.GetExtension(filePath);

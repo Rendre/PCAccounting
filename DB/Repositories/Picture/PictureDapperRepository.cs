@@ -11,7 +11,7 @@ public class PictureDapperRepository : IPictureRepository
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public void SaveItem(Picture picture)
+    public void SaveItem(Picture? picture)
     {
         var parameters = new DynamicParameters();
         parameters.Add("@CompID", picture.ComputerId);
@@ -39,7 +39,7 @@ public class PictureDapperRepository : IPictureRepository
         return pictureFromDb;
     }
 
-    public List<Picture> GetItems(uint computerId = 0, string? orderBy = null, bool desc = false, uint limitSkip = 0, uint limitTake = 0)
+    public List<Picture?> GetItems(uint computerId = 0, string? orderBy = null, bool desc = false, uint limitSkip = 0, uint limitTake = 0)
     {
         var parameters = new DynamicParameters();
         var conditions = new List<string>(2) { "IsDeleted=0" };
@@ -61,7 +61,7 @@ public class PictureDapperRepository : IPictureRepository
             parameters.Add("@limitSkip", limitSkip);
             parameters.Add("@limitTake", limitTake);
         }
-        var picturesList = _databaseContext.GetAllByQuery<Picture>(sqlExpression, parameters);
+        List<Picture?> picturesList = _databaseContext.GetAllByQuery<Picture>(sqlExpression, parameters);
         return picturesList;
     }
 
