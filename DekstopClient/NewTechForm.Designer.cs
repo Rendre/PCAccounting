@@ -227,13 +227,14 @@
             // 
             // button6
             // 
+            this.button6.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.button6.Location = new System.Drawing.Point(602, 363);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(90, 51);
             this.button6.TabIndex = 22;
-            this.button6.Text = "test";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.TestClick);
+            this.button6.Text = "UploadPictureByWeb";
+            this.button6.UseVisualStyleBackColor = false;
+            this.button6.Click += new System.EventHandler(this.UploadPictureByWebClick);
             // 
             // NewTechForm
             // 

@@ -4,8 +4,6 @@ using DB.Entities;
 using DB.Repositories.Computer;
 using DB.Repositories.Employer;
 using DB.Repositories.Picture;
-using Org.BouncyCastle.Asn1.Cms;
-using Shaitan;
 using SharedKernel.Services;
 namespace DekstopClient;
 
@@ -260,7 +258,7 @@ public partial class NewTechForm : Form
         }
     }
 
-    private void TestClick(object sender, EventArgs e)
+    private async void UploadPictureByWebClick(object sender, EventArgs e)
     {
         const string connectionAddress = "https://localhost:7204/Picture";
 
@@ -278,16 +276,19 @@ public partial class NewTechForm : Form
         var result = new ResultClass();
         while ((countOfReadBytes = fileStream.Read(buffer, 0, _count)) != 0)
         {
-            if (result.pictureID == 0)
-            {
-                var resultJson = Box.Kekw(countOfReadBytes, buffer, connectionAddress, fName, "21");
-                result = JsonSerializer.Deserialize<ResultClass>(resultJson);
-            }
-            else
-            {
-                var resultJson = Box.Kekw(countOfReadBytes, buffer, connectionAddress, fName, "21", result.pictureID.ToString());
-                result = JsonSerializer.Deserialize<ResultClass>(resultJson);
-            }
+            var picID = result.pictureID > 0 ? result.pictureID.ToString() : "";
+            var resultJson = Utils.Util.RequestHelper(buffer, connectionAddress, fName, ComputerID.ToString(), picID);
+            var strResult = await resultJson;
+            result = JsonSerializer.Deserialize<ResultClass>(strResult);
+        }
+        var pictures = _pictureRepository.GetItems(ComputerID, "ID", true, 0, 1);
+        if (pictures.Count > 0)
+        {
+            _picture = pictures[0];
+            if (_picture.Path != null) _reservePictureBytes = File.ReadAllBytes(_picture.Path);
+            pictureBox1.Image = Image.FromStream(new MemoryStream(_reservePictureBytes));
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+            _reservePictureBytes = null;
         }
     }
 
