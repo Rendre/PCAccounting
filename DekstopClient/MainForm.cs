@@ -1,8 +1,8 @@
 using DB.Entities;
-using DB.Repositories.Computer;
-using DB.Repositories.Employer;
-using DB.Repositories.File;
-using DB.Utils;
+using DB.Repositories.Computers;
+using DB.Repositories.Employers;
+using DB.Repositories.Files;
+using SharedKernel.Utils;
 
 namespace DekstopClient;
 

@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DB.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace DB.Repositories.Computer;
+namespace DB.Repositories.Computers;
 
 public class ComputerEFRepository : IComputerRepository
 {
@@ -13,20 +14,20 @@ public class ComputerEFRepository : IComputerRepository
         _db = new ApplicationContextEF(opt.Options);
     }
 
-    public void CreateItem(Entities.Computer computer)
+    public void CreateItem(Computer computer)
     {
         _db.Technick.Add(computer);
         _db.SaveChanges();
     }
 
-    public bool ChangeItem(Entities.Computer computer)
+    public bool ChangeItem(Computer computer)
     {
         _db.Technick.Update(computer);
         var rowsChanges = _db.SaveChanges();
         return rowsChanges > 0;
     }
 
-    public Entities.Computer? GetItem(uint id)
+    public Computer? GetItem(uint id)
     {
         if (id == 0) return null;
 
@@ -34,7 +35,7 @@ public class ComputerEFRepository : IComputerRepository
         return computer;
     }
 
-    public List<Entities.Computer> GetFilterItems(string? name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null,
+    public List<Computer> GetFilterItems(string? name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null,
         string? cpu = null, decimal price = 0)
     {
         var computers = _db.Technick.Where(p => p.IsDeleted == false);

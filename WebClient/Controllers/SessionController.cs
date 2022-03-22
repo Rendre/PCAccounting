@@ -1,9 +1,10 @@
 ﻿using System.Text.Json;
 using DB;
 using DB.Entities;
-using DB.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel.Utils;
+using WebClient.Models;
 
 namespace WebClient.Controllers;
 
@@ -20,22 +21,24 @@ public class SessionController : ControllerBase
 
     [HttpGet]
     [Route("login")]
-    public dynamic Login([FromBody] JsonElement json)
+    public string Login([FromBody] JsonElement json)
     {
         string? login = null;
         string? password = null;
         string? token;
         Session? session = null;
-        var responceErrObj = new
-        {
-            success = 0
-        };
+        var responceObj = new ResponceObject<Session>();
+        string responceJson;
 
         if (json.TryGetProperty("token", out var tokenElement))
         {
             token = tokenElement.GetString();
 
-            if (string.IsNullOrEmpty(token)) return responceErrObj;
+            if (string.IsNullOrEmpty(token))
+            {
+                responceJson = Utils.Util.SerializeToJson(responceObj);
+                return responceJson;
+            }
 
             session = _db.Session.FirstOrDefault(p => p.Token != null && p.Token.Equals(token));
             if (session != null)
@@ -46,8 +49,8 @@ public class SessionController : ControllerBase
                     session.IsDeleted = true;
                     _db.Session.Update(session);
                     _db.SaveChanges();
-                    return responceErrObj;
-
+                    responceJson = Utils.Util.SerializeToJson(responceObj);
+                    return responceJson;
                 }
             }
         }
@@ -65,7 +68,11 @@ public class SessionController : ControllerBase
             }
 
             if (string.IsNullOrEmpty(login) ||
-                string.IsNullOrEmpty(password)) return responceErrObj;
+                string.IsNullOrEmpty(password))
+            {
+                responceJson = Utils.Util.SerializeToJson(responceObj);
+                return responceJson;
+            }
 
             var user = _db.Users.FirstOrDefault(p => p.Login.Equals(login));
             if (user != null &&
@@ -86,26 +93,20 @@ public class SessionController : ControllerBase
 
         if (session != null)
         {
-            var responceOkObj = new
-            {
-                success = 1,
-                token = session.Token
-            };
-            return JsonSerializer.Serialize(responceOkObj);
-
+            responceObj.Success = 1;
+            responceObj.Data = session;
         }
-        return responceErrObj;
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
     [HttpGet]
     [Route("GetMe")]
-    public dynamic GetMe([FromBody] JsonElement json)
+    public string GetMe([FromBody] JsonElement json)
     {
         string? token = null;
-        var responceErrObj = new
-        {
-            success = 0
-        };
+        var responceObj = new ResponceObject<Session>();
+        string responceJson;
 
         if (json.TryGetProperty("token", out var tokenElement))
         {
@@ -113,36 +114,38 @@ public class SessionController : ControllerBase
         }
 
         var session = _db.Session.FirstOrDefault(p => p.Token != null && p.Token.Equals(token));
-        if (session == null) return responceErrObj;
+        if (session == null)
+        {
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var user = _db.Users.FirstOrDefault(p => p.ID == session.UserID);
-        if (user == null) return responceErrObj;
-
-        var responceOkObj = new
+        if (user == null)
         {
-            login = user.Login,
-            employerId = user.EmployerId
-        };
-        return responceOkObj;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
+        user.Pass = null;
+        var responceUserObj = new ResponceObject<User>
+        {
+            Success = 1,
+            Data = user
+        };
+
+        responceJson = Utils.Util.SerializeToJson(responceUserObj);
+        return responceJson;
     }
 
     [HttpPost]
     [Route("Registration")]
-    public dynamic Registration([FromBody] JsonElement json)
+    public string Registration([FromBody] JsonElement json)
     {
         string? login = null;
         string? password = null;
-        var responceErrObj = new
-        {
-            success = 0
-        };
-
-        var responceOkObj = new
-        {
-            success = 1
-        };
-
+        var responceObj = new ResponceObject<Session>();
+        string responceJson;
 
         if (json.TryGetProperty("login", out var loginElement))
         {
@@ -156,47 +159,58 @@ public class SessionController : ControllerBase
         }
 
         if (string.IsNullOrEmpty(login) ||
-            string.IsNullOrEmpty(password)) return responceErrObj;
+            string.IsNullOrEmpty(password))
+        {
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var check = _db.Users.FirstOrDefault(p => p.Login.Equals(login));
-        if (check != null) return responceErrObj;
+        if (check != null)
+        {
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var user = new User() { Login = login, Pass = password, EmployerId = 0 };
         _db.Users.Add(user);
         _db.SaveChanges();
-        return responceOkObj;
+
+        responceObj.Success = 1;
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
     [HttpPost]
     [Route("LogOut")]
-    public dynamic LogOut([FromBody] JsonElement json)
+    public string LogOut([FromBody] JsonElement json)
     {
         string? token = null;
-        var responceErrObj = new
-        {
-            success = 0
-        };
-
-        var responceOkObj = new
-        {
-            success = 1
-        };
+        var responceObj = new ResponceObject<Session>();
+        string responceJson;
 
         if (json.TryGetProperty("token", out var tokenElement))
         {
             token = tokenElement.GetString();
         }
 
-        if (string.IsNullOrEmpty(token)) return responceErrObj;
+        if (string.IsNullOrEmpty(token))
+        {
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var session = _db.Session.FirstOrDefault(p => p.Token != null && p.Token.Equals(token));
         if (session == null)
         {
-            return responceErrObj;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
         }
         _db.Session.Update(session);
         _db.SaveChanges();
 
-        return responceOkObj;
+        responceObj.Success = 1;
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 }

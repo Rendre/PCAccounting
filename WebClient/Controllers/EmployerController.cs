@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
 using DB.Entities;
-using DB.Repositories.Employer;
+using DB.Repositories.Employers;
 using Microsoft.AspNetCore.Mvc;
+using WebClient.Models;
 
 namespace WebClient.Controllers;
 
@@ -16,110 +17,84 @@ public class EmployerController : ControllerBase
     }
 
     [HttpPost]
-    public dynamic CreateEmployer([FromBody] JsonElement emp)
+    public string CreateEmployer([FromBody] JsonElement emp)
     {
-        var responseErrObj = new
-        {
-            success = 0
-        };
+        var responceObj = new ResponceObject<Employer>();
+        string responceJson;
+
         var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
+        if (!isValid)
+        {
+            responceObj.Access = 1;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var name = emp.GetProperty("name").GetString();
         var position = emp.GetProperty("position").GetString();
         var tel = emp.GetProperty("tel").GetString();
 
-        var employer = new Employer() {Name = name, Position = position, Tel = tel};
+        var employer = new Employer() { Name = name, Position = position, Tel = tel };
 
         _employerRepository.CreateItem(employer);
-        if (employer.ID <= 0)
+        if (employer.ID > 0)
         {
-            var responceObj = new
-            {
-                success = 0
-            };
-            return JsonSerializer.Serialize(responceObj);
-
+            responceObj.Success = 1;
+            responceObj.Data = new Employer() { ID = employer.ID };
         }
-        else
-        {
-            var responceObj = new
-            {
-                success = 1,
-                id = employer.ID
-            };
-            return JsonSerializer.Serialize(responceObj);
 
-        }
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
     [HttpPut]
-    public dynamic СhangeEmployer([FromBody] JsonElement emp)
+    public string СhangeEmployer([FromBody] JsonElement emp)
     {
-        var responseErrObj = new
-        {
-            success = 0
-        };
+        var responceObj = new ResponceObject<Employer>();
+        string responceJson;
+
         var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
+        if (!isValid)
+        {
+            responceObj.Access = 1;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var id = emp.GetProperty("id").GetUInt32();
         var name = emp.GetProperty("name").GetString();
         var position = emp.GetProperty("position").GetString();
         var tel = emp.GetProperty("tel").GetString();
-        var employer = new Employer() {ID = id, Name = name, Position = position, Tel = tel };
+        var employer = new Employer() { ID = id, Name = name, Position = position, Tel = tel };
 
         var success = _employerRepository.ChangeItem(employer);
         if (success)
         {
-            var resultObj = new
-            {
-                Success = success,
-                Id = id,
-            };
-            return JsonSerializer.Serialize(resultObj);
+            responceObj.Success = 1;
+            responceObj.Data = new Employer() { ID = employer.ID };
         }
-        else
-        {
-            var resultObj = new
-            {
-                Success = success,
-                Id = id,
-            };
-            return JsonSerializer.Serialize(resultObj);
-        }
-    }
 
-    [HttpDelete("{id:int}")]
-    public dynamic DeleteEmployer(uint id)
-    {
-        var responseErrObj = new
-        {
-            success = 0
-        };
-        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
-
-        var deleteObjCounts = _employerRepository.DeleteItem(id);
-        var responceObj = new
-        {
-            success = deleteObjCounts
-        };
-        return JsonSerializer.Serialize(responceObj);
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
     [HttpGet]
-    public dynamic GetEmployer([FromBody] JsonElement json)
+    public string GetEmployer([FromBody] JsonElement json)
     {
         string? name = null;
         string? position = null;
         string? tel = null;
-        var responseErrObj = new
-        {
-            success = 0
-        };
+
+        var responceObj = new ResponceObject<Employer>();
+        string responceJson;
+
         var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
+        if (!isValid)
+        {
+            responceObj.Access = 1;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         if (json.TryGetProperty("name", out var nameElement))
         {
@@ -137,69 +112,62 @@ public class EmployerController : ControllerBase
         }
 
         var employerList = _employerRepository.GetItems(name, position, tel);
-        var outEmployerList = new List<dynamic>();
-        foreach (var employer in employerList)
+        if (employerList.Count > 0)
         {
-            var outEmployer = new
-            {
-                id = employer.ID,
-                name = employer.Name,
-                position = employer.Position,
-                tel = employer.Tel
-            };
-            outEmployerList.Add(outEmployer);
+            responceObj.Success = 1;
+            responceObj.DataList = employerList;
         }
-        if (outEmployerList.Count > 0)
-        {
-            var responceObj = new
-            {
-                success = 1,
-                employers = outEmployerList
-            };
-            return JsonSerializer.Serialize(responceObj);
-        }
-        else
-        {
-            var responceObj = new
-            {
-                success = 0,
-            };
-            return JsonSerializer.Serialize(responceObj);
-        }
+
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
-
-
     [HttpGet("{id:int}")]
-    public dynamic GetEmployer(uint id)
+    public string GetEmployer(uint id)
     {
-        var responseErrObj = new
-        {
-            success = 0
-        };
+        var responceObj = new ResponceObject<Employer>();
+        string responceJson;
+
         var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
+        if (!isValid)
+        {
+            responceObj.Access = 1;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var employer = _employerRepository.GetItem(id);
         if (employer != null)
         {
-            var responceObj = new
-            {
-                success = 1,
-                name = employer.Name,
-                position = employer.Position,
-                tel = employer.Tel
-            };
-            return JsonSerializer.Serialize(responceObj);
+            responceObj.Success = 1;
+            responceObj.Data = employer;
         }
-        else
-        {
-            var responceObj = new
-            {
-                success = 0
-            };
-            return JsonSerializer.Serialize(responceObj);
-        }
+
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
+    [HttpDelete("{id:int}")]
+    public string DeleteEmployer(uint id)
+    {
+        var responceObj = new ResponceObject<Employer>();
+        string responceJson;
+
+        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+        if (!isValid)
+        {
+            responceObj.Access = 1;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
+
+        var deleteObjCounts = _employerRepository.DeleteItem(id);
+        if (deleteObjCounts > 0)
+        {
+            responceObj.Success = 1;
+        }
+
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
+    }
 }

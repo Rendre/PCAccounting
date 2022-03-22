@@ -1,4 +1,4 @@
-﻿namespace DB.Repositories.Session;
+﻿namespace DB.Repositories.Sessions;
 
 public class SessionEFRepository : ISessionRepository
 {

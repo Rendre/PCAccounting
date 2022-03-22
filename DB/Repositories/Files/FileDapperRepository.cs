@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using DB.Entities;
 
-namespace DB.Repositories.File;
+namespace DB.Repositories.Files;
 
 public class FileDapperRepository : IFileRepository
 {
@@ -12,7 +12,7 @@ public class FileDapperRepository : IFileRepository
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public void SaveItem(Files? file)
+    public void SaveItem(FileEntity? file)
     {
         var parameters = new DynamicParameters();
         parameters.Add("@CompID", file.ComputerId);
@@ -27,7 +27,7 @@ public class FileDapperRepository : IFileRepository
         file.ID = id;
     }
 
-    public Files? GetItem(uint id)
+    public FileEntity? GetItem(uint id)
     {
         if (id == 0) return null;
 
@@ -35,12 +35,12 @@ public class FileDapperRepository : IFileRepository
         parameters.Add("@ID", id);
 
         const string sqlExpression = "SELECT * FROM files WHERE ID = @ID AND IsDeleted = 0";
-        var fileFromDb = _databaseContext.GetByQuery<Files>(sqlExpression, parameters);
+        var fileFromDb = _databaseContext.GetByQuery<FileEntity>(sqlExpression, parameters);
 
         return fileFromDb;
     }
 
-    public List<Files?> GetItems(uint computerId = 0, string? orderBy = null, bool desc = false, uint limitSkip = 0, uint limitTake = 0)
+    public List<FileEntity?> GetItems(uint computerId = 0, string? orderBy = null, bool desc = false, uint limitSkip = 0, uint limitTake = 0)
     {
         var parameters = new DynamicParameters();
         var conditions = new List<string>(2) { "IsDeleted=0" };
@@ -62,7 +62,7 @@ public class FileDapperRepository : IFileRepository
             parameters.Add("@limitSkip", limitSkip);
             parameters.Add("@limitTake", limitTake);
         }
-        List<Files?> fileList = _databaseContext.GetAllByQuery<Files>(sqlExpression, parameters);
+        List<FileEntity?> fileList = _databaseContext.GetAllByQuery<FileEntity>(sqlExpression, parameters);
         return fileList;
     }
 

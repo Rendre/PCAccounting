@@ -1,5 +1,6 @@
-﻿namespace DB.Repositories.Employer;
-using Entities;
+﻿using DB.Entities;
+
+namespace DB.Repositories.Employers;
 
 public class EmployerDefaultRepository : IEmployerRepository
 {
@@ -25,7 +26,7 @@ public class EmployerDefaultRepository : IEmployerRepository
         return employers;
     }
 
-    public List<Employer> GetItems(string? name, string? position, string? tel)
+    public List<Employer> GetItems(string? name = null, string? position = null, string? tel = null)
     {
         throw new NotImplementedException();
     }
@@ -60,8 +61,8 @@ public class EmployerDefaultRepository : IEmployerRepository
         GC.SuppressFinalize(this);
     }
 
-    List<Employer> IEmployerRepository.GetItems()
-    {
-        throw new NotImplementedException();
-    }
+    //List<Employer> IEmployerRepository.GetItems()
+    //{
+    //    throw new NotImplementedException();
+    //}
 }

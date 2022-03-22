@@ -1,7 +1,9 @@
-﻿namespace WebClient.Controllers;
-using DB;
+﻿using System.Text.Json;
+using DB.Entities;
 using Microsoft.AspNetCore.Mvc;
-using DB.Repositories.Task;
+using WebClient.Models;
+
+namespace WebClient.Controllers;
 
 [Route("[controller]")]
 public class HomeController : ControllerBase
@@ -13,10 +15,12 @@ public class HomeController : ControllerBase
         _logger = logger;
     }
 
-    public string Index()
-    {
-        var taskRepository = new TaskDapperRepository();
-        var qq = taskRepository.GetItems(type: TaskType.Auth, name:"FirstTask");
-        return "123";
-    }
+    //public string Index()
+    //{
+    //    var qq = new ResultModelBuilder()
+    //        .WithSuccess(true)
+    //        .WithComputer(new Computer { ID = 1, Cpu = "Amd" })
+    //        .Build();
+    //    return JsonSerializer.Serialize(qq);
+    //}
 }

@@ -1,8 +1,9 @@
 ﻿using System.Globalization;
 using System.Text;
 using Dapper;
+using DB.Entities;
 
-namespace DB.Repositories.Computer;
+namespace DB.Repositories.Computers;
 
 public class ComputerDapperRepository : IComputerRepository
 {
@@ -13,7 +14,7 @@ public class ComputerDapperRepository : IComputerRepository
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public void CreateItem(Entities.Computer computer)
+    public void CreateItem(Computer computer)
     {
         var sqlExpression = "INSERT INTO technick (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
                             $"VALUES ('{computer.Name}', {computer.StatusID}, {computer.EmployerId}, '{computer.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
@@ -23,7 +24,7 @@ public class ComputerDapperRepository : IComputerRepository
         computer.ID = id;
     }
 
-    public bool ChangeItem(Entities.Computer computer)
+    public bool ChangeItem(Computer computer)
     {
         var sqlExpression = $"UPDATE technick SET Name = '{computer.Name}', " +
                             $"StatusID = {computer.StatusID}, " +
@@ -37,13 +38,13 @@ public class ComputerDapperRepository : IComputerRepository
     }
 
     //динамич запрос
-    public List<Entities.Computer> GetFilterItems(string? name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null,
+    public List<Computer> GetFilterItems(string? name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null,
         string? cpu = null, decimal price = 0)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM technick WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
         var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusId, employerId, date, cpu, price, parameters);
-        var computers = _databaseContext.GetAllByQuery<Entities.Computer>(sqlExpressionForQuery, parameters);
+        var computers = _databaseContext.GetAllByQuery<Computer>(sqlExpressionForQuery, parameters);
         return computers;
     }
 
@@ -89,7 +90,7 @@ public class ComputerDapperRepository : IComputerRepository
         return sqlExpression.ToString();
     }
 
-    public Entities.Computer? GetItem(uint id)
+    public Computer? GetItem(uint id)
     {
         if (id == 0) return null;
 
@@ -101,7 +102,7 @@ public class ComputerDapperRepository : IComputerRepository
         };
         parameters.Add("@ID", id);
         var sqlExpression = $"SELECT * FROM technick WHERE {string.Join(" AND ", conditions)}";
-        var computer = _databaseContext.GetByQuery<Entities.Computer>(sqlExpression, parameters);
+        var computer = _databaseContext.GetByQuery<Computer>(sqlExpression, parameters);
         return computer;
     }
 

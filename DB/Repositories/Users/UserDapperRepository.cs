@@ -1,6 +1,7 @@
 ﻿using Dapper;
+using DB.Entities;
 
-namespace DB.Repositories.User;
+namespace DB.Repositories.Users;
 
 public class UserDapperRepository : IUserRepository
 {
@@ -10,7 +11,7 @@ public class UserDapperRepository : IUserRepository
     {
         _databaseContext = new MySQLDatabaseContext();
     }
-    public void CreateItem(Entities.User user)
+    public void CreateItem(User user)
     {
         var sqlExpression = "INSERT INTO users (Login, Pass, EmployerId)" +
                             $"VALUES ('{user.Login}', '{user.Pass}', {user.EmployerId})";
@@ -25,32 +26,32 @@ public class UserDapperRepository : IUserRepository
         var sqlExpression = $"UPDATE users SET Login = '{login}', " +
                             $"Pass = '{password}', EmployerId = {employerID} " +
                             $"WHERE ID = {id}";
-        var success = _databaseContext.ExecuteByQuery(sqlExpression);
-        return success > 0;
+        var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
+        return rowsChanged > 0;
     }
 
-    public Entities.User? GetItem(uint id)
+    public User? GetItem(uint id)
     {
         var parameter = new DynamicParameters();
         parameter.Add("@ID", id);
         const string sqlExpression = "SELECT * FROM Users WHERE ID = @ID AND IsDeleted = 0 LIMIT 1";
-        var user = _databaseContext.GetByQuery<Entities.User>(sqlExpression, parameter);
+        var user = _databaseContext.GetByQuery<User>(sqlExpression, parameter);
         return user;
     }
 
-    public List<Entities.User> GetItems()
+    public List<User> GetItems()
     {
         const string sqlExpression = "SELECT * FROM Users WHERE IsDeleted = 0";
-        var users = _databaseContext.GetAllByQuery<Entities.User>(sqlExpression);
+        var users = _databaseContext.GetAllByQuery<User>(sqlExpression);
         return users;
     }
 
-    public Entities.User? GetItem(string? login)
+    public User? GetItem(string? login)
     {
         var parameters = new DynamicParameters();
         parameters.Add("@Login", login);
         const string sqlExpression = "SELECT * FROM Users WHERE Login = @Login AND IsDeleted = 0 LIMIT 1";
-        var user = _databaseContext.GetByQuery<Entities.User>(sqlExpression, parameters);
+        var user = _databaseContext.GetByQuery<User>(sqlExpression, parameters);
         return user;
     }
 

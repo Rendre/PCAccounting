@@ -1,5 +1,8 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using SharedKernel.Services;
+using WebClient.Models;
+
 namespace WebClient.Utils;
 
 public class Util
@@ -21,5 +24,23 @@ public class Util
         }
         var isValid = loginService.IsSessionValid(token);
         return isValid;
+    }
+
+    public static string SerializeToJson<T>(ResponceObject<T> responceObject)
+    {
+        var options = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = new LowerCaseNamingPolicy()
+        };
+
+        var result = JsonSerializer.Serialize(responceObject, options);
+        return result;
+    }
+
+    private class LowerCaseNamingPolicy : JsonNamingPolicy
+    {
+        public override string ConvertName(string name) =>
+            name.ToLower();
     }
 }

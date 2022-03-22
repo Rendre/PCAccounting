@@ -1,6 +1,7 @@
-﻿namespace DB.Repositories.Employer;
-using Dapper;
-using Entities;
+﻿using Dapper;
+using DB.Entities;
+
+namespace DB.Repositories.Employers;
 
 public class EmployerDapperRepository : IEmployerRepository
 {
@@ -25,8 +26,8 @@ public class EmployerDapperRepository : IEmployerRepository
     {
         var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
                             $" WHERE ID = {employer.ID}";
-        var success = _databaseContext.ExecuteByQuery(sqlExpression);
-        return success > 0;
+        var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
+        return rowsChanged > 0;
     }
 
     public Employer? GetItem(uint id)
@@ -53,7 +54,7 @@ public class EmployerDapperRepository : IEmployerRepository
     }
 
     //запрос с фильтром
-    public List<Employer> GetItems(string? name, string? position, string? tel)
+    public List<Employer> GetItems(string? name = null, string? position = null, string? tel = null)
     {
         var parameters = new DynamicParameters();
         var conditions = new List<string>(4) { "IsDeleted = 0" };
@@ -109,10 +110,10 @@ public class EmployerDapperRepository : IEmployerRepository
         GC.SuppressFinalize(this);
     }
 
-    public List<Employer> GetItems()
-    {
-        throw new NotImplementedException();
-    }
+    //public List<Employer> GetItems()
+    //{
+    //    throw new NotImplementedException();
+    //}
 }
 
 //public Employer GetItem(int id)

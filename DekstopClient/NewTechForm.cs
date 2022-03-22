@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
 using DB;
 using DB.Entities;
-using DB.Repositories.Computer;
-using DB.Repositories.Employer;
-using DB.Repositories.File;
+using DB.Repositories.Computers;
+using DB.Repositories.Employers;
+using DB.Repositories.Files;
 using SharedKernel.Services;
 using SharedKernel.Utils;
 
@@ -16,7 +16,7 @@ public partial class NewTechForm : Form
     private Computer _computer = new();
     private byte[] _fileBytes;
     private byte[] _reserveFileBytes;
-    private Files? _file;
+    private FileEntity? _file;
     private bool _isChanged;
     private string? _filePath;
     private readonly IComputerRepository _computerRepository;

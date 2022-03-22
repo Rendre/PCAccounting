@@ -1,4 +1,4 @@
-﻿namespace DB.Repositories.Task;
+﻿namespace DB.Repositories.Tasks;
 
 public class TaskEfRepository : ITaskRepository
 {

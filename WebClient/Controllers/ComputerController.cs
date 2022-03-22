@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
 using DB.Entities;
-using DB.Repositories.Computer;
+using DB.Repositories.Computers;
 using Microsoft.AspNetCore.Mvc;
+using WebClient.Models;
 
 namespace WebClient.Controllers;
 
@@ -16,52 +17,132 @@ public class ComputerController : Controller
 
     [HttpPost]
     [Route("ParseComp")]
-    public dynamic ParseComp([FromBody] JsonElement json)
+    public string ParseComp([FromBody] JsonElement json)
     {
-        var responseErrObj = new
-        {
-            success = 0
-        };
+        var responceObj = new ResponceObject<Computer>();
+        string responceJson;
+
         var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
+        if (!isValid)
+        {
+            responceObj.Access = 1;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         if (json.TryGetProperty("id", out var jsonElementId))
         {
             var id = jsonElementId.GetUInt32();
             return GetComputer(id);
         }
+
         if (json.TryGetProperty("list", out _))
         {
             return GetComputers(json);
         }
+
         if (json.TryGetProperty("comp", out var jsonElementComp))
         {
-            return ParseComp(jsonElementComp, responseErrObj);
+            return ParseComp(jsonElementComp, responceObj);
         }
-        return JsonSerializer.Serialize(responseErrObj);
+
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
-    private dynamic ParseComp(JsonElement jsonElementComp, dynamic errorObj)
+    private string GetComputer(uint id)
     {
+        var responceObj = new ResponceObject<Computer>();
+        string responceJson;
+
+        var computer = _computerRepository.GetItem(id);
+        if (computer != null)
+        {
+            responceObj.Success = 1;
+            responceObj.Data = computer;
+        }
+
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
+    }
+
+    private string GetComputers(JsonElement json)
+    {
+        string? name = null;
+        uint status = 0;
+        uint employerId = 0;
+        DateTime? date = null;
+        string? cpu = null;
+        decimal price = 0;
+
+        var responceObj = new ResponceObject<Computer>();
+        string responceJson;
+
+        if (json.TryGetProperty("name", out var nameElement))
+        {
+            name = nameElement.GetString();
+        }
+        if (json.TryGetProperty("status", out var statusElement))
+        {
+            status = statusElement.GetUInt32();
+        }
+        if (json.TryGetProperty("employerId", out var employerIdElement))
+        {
+            employerId = employerIdElement.GetUInt32();
+        }
+        if (json.TryGetProperty("date", out var dateElement))
+        {
+            date = dateElement.GetDateTime();
+        }
+        if (json.TryGetProperty("cpu", out var cpuElement))
+        {
+            cpu = cpuElement.GetString();
+        }
+        if (json.TryGetProperty("price", out var priceElement))
+        {
+            price = priceElement.GetDecimal();
+        }
+
+        var computers = _computerRepository.GetFilterItems(name, status, employerId, date, cpu, price);
+
+        if (computers.Count > 0)
+        {
+            responceObj.Success = 1;
+            responceObj.DataList = computers;
+        }
+
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
+    }
+
+    private string ParseComp(JsonElement jsonElementComp, ResponceObject<Computer> responceObj)
+    {
+        string responceJson;
         Computer? computer = null;
 
         if (jsonElementComp.TryGetProperty("id", out var idElement))
         {
             var id = idElement.GetUInt32();
             computer = _computerRepository.GetItem(id);
-            if (computer == null) return JsonSerializer.Serialize(errorObj);
+            if (computer == null)
+            {
+                responceJson = Utils.Util.SerializeToJson(responceObj);
+                return responceJson;
+            }
         }
 
         if (jsonElementComp.TryGetProperty("del", out _))
         {
-            if (computer == null) return JsonSerializer.Serialize(errorObj);
-
-            var result = _computerRepository.DeleteItem(computer.ID);
-            var resultObj = new
+            if (computer != null)
             {
-                success = result
-            };
-            return JsonSerializer.Serialize(resultObj);
+                var success = _computerRepository.DeleteItem(computer.ID);
+                if (success)
+                {
+                    responceObj.Success = 1;
+                }
+            }
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
         }
 
         computer ??= new Computer();
@@ -94,115 +175,19 @@ public class ComputerController : Controller
         if (computer.ID == 0)
         {
             _computerRepository.CreateItem(computer);
-            var resultObj = new
-            {
-                success = 1,
-                id = computer.ID
-            };
-            return JsonSerializer.Serialize(resultObj);
+            responceObj.Success = 1;
+            responceObj.Data = computer;
         }
         else
         {
-            var result = _computerRepository.ChangeItem(computer);
-            var resultObj = new
+            var success = _computerRepository.ChangeItem(computer);
+            if (success)
             {
-                success = result
-            };
-            return JsonSerializer.Serialize(resultObj);
+                responceObj.Success = 1;
+            }
         }
-    }
-
-    private dynamic GetComputer(uint id)
-    {
-        var computer = _computerRepository.GetItem(id);
-        if (computer != null)
-        {
-            var outComp = new
-            {
-                name = computer.Name,
-                status = computer.StatusID,
-                employerId = computer.EmployerId,
-                date = computer.DateCreated,
-                cpu = computer.Cpu,
-                price = computer.Price
-            };
-            var responseObj = new
-            {
-                success = 1,
-                comp = outComp
-
-            };
-            return JsonSerializer.Serialize(responseObj);
-        }
-        else
-        {
-            var responseObj = new
-            {
-                success = 0
-
-            };
-            return JsonSerializer.Serialize(responseObj);
-        }
-    }
-
-    private dynamic GetComputers(JsonElement json)
-    {
-        string? name = null;
-        uint status = 0;
-        uint employerId = 0;
-        DateTime? date = null;
-        string? cpu = null;
-        decimal price = 0;
-
-        if (json.TryGetProperty("name", out var nameElement))
-        {
-            name = nameElement.GetString();
-        }
-        if (json.TryGetProperty("status", out var statusElement))
-        {
-            status = statusElement.GetUInt32();
-        }
-        if (json.TryGetProperty("employerId", out var employerIdElement))
-        {
-            employerId = employerIdElement.GetUInt32();
-        }
-        if (json.TryGetProperty("date", out var dateElement))
-        {
-            date = dateElement.GetDateTime();
-        }
-        if (json.TryGetProperty("cpu", out var cpuElement))
-        {
-            cpu = cpuElement.GetString();
-        }
-        if (json.TryGetProperty("price", out var priceElement))
-        {
-            price = priceElement.GetDecimal();
-        }
-
-        var computers = _computerRepository.GetFilterItems(name, status, employerId, date, cpu, price);
-        var outComputerList = new List<dynamic>();
-
-        foreach (var computer in computers)
-        {
-            var outComp = new
-            {
-                id = computer.ID,
-                name = computer.Name,
-                status = computer.StatusID,
-                employerId = computer.EmployerId,
-                date = computer.DateCreated,
-                cpu = computer.Cpu,
-                price = computer.Price
-            };
-            outComputerList.Add(outComp);
-        }
-
-        var responseObj = new
-        {
-            success = 1,
-            comps = outComputerList
-        };
-        return JsonSerializer.Serialize(responseObj);
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
 }

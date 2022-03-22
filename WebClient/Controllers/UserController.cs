@@ -1,8 +1,9 @@
 ﻿using System.Text.Json;
 using DB.Entities;
-using DB.Repositories.User;
-using DB.Utils;
+using DB.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Utils;
+using WebClient.Models;
 
 namespace WebClient.Controllers;
 
@@ -17,14 +18,18 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public dynamic CreateUser([FromBody] JsonElement userJsn)
+    public string CreateUser([FromBody] JsonElement userJsn)
     {
-        var responseErrObj = new
-        {
-            success = 0
-        };
+        var responceObj = new ResponceObject<User>();
+        string responceJson;
+
         var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
+        if (!isValid)
+        {
+            responceObj.Access = 1;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var login = userJsn.GetProperty("login").GetString();
         var password = userJsn.GetProperty("password").GetString();
@@ -32,27 +37,28 @@ public class UserController : Controller
         var employerId = userJsn.GetProperty("employerId").GetUInt32();
         var user = new User() {Login = login, Pass = password, EmployerId = employerId};
         _userRepository.CreateItem(user);
-        if (user.ID <= 0)
+        if (user.ID > 0)
         {
-            return responseErrObj;
+            responceObj.Success = 1;
         }
 
-        var resultObj = new
-        {
-            success = 1
-        };
-        return resultObj;
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
     [HttpPut]
-    public dynamic ChangeUser([FromBody] JsonElement userJsn)
+    public string ChangeUser([FromBody] JsonElement userJsn)
     {
-        var responseErrObj = new
-        {
-            success = 0
-        };
+        var responceObj = new ResponceObject<User>();
+        string responceJson;
+
         var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
+        if (!isValid)
+        {
+            responceObj.Access = 1;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var id = userJsn.GetProperty("id").GetUInt32();
         var login = userJsn.GetProperty("login").GetString();
@@ -60,92 +66,92 @@ public class UserController : Controller
         password = Util.Encode(password);
         var employerId = userJsn.GetProperty("employerId").GetUInt32();
         var success = _userRepository.ChangeItem(id, login, password, employerId);
-        return JsonSerializer.Serialize(success);
+
+        if (success)
+        {
+            responceObj.Success = 1;
+        }
+
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
     [HttpGet("{id:int}")]
-    public dynamic GetUser(uint id)
+    public string GetUser(uint id)
     {
-        var responseErrObj = new
-        {
-            success = 0
-        };
+        var responceObj = new ResponceObject<User>();
+        string responceJson;
+
         var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
+        if (!isValid)
+        {
+            responceObj.Access = 1;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var user = _userRepository.GetItem(id);
         if (user != null)
         {
-            var responseObj = new
-            {
-                success = 1,
-                login = user.Login,
-                employerId = user.EmployerId
-            };
-            return responseObj;
-
+            user.Pass = null;
+            responceObj.Data = user;
+            responceObj.Success = 1;
         }
 
-        return responseErrObj;
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
     [HttpGet]
-    public dynamic GetUsers()
+    public string GetUsers()
     {
-        var responseErrObj = new
-        {
-            success = 0
-        };
+        var responceObj = new ResponceObject<User>();
+        string responceJson;
+
         var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
+        if (!isValid)
+        {
+            responceObj.Access = 1;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var userList = _userRepository.GetItems();
-        var outUserList = new List<dynamic>();
         foreach (var user in userList)
         {
-            var outUser = new
-            {
-                id = user.ID,
-                login = user.Login,
-                employerId = user.EmployerId
-            };
-            outUserList.Add(outUser);
+            user.Pass = null;
         }
-        if (outUserList.Count > 0)
+        if (userList.Count > 0)
         {
-            var responseObj = new
-            {
-                success = 1,
-                users = outUserList
-            };
-            return responseObj;
+            responceObj.Success = 1;
+            responceObj.DataList = userList;
         }
-        else
-        {
-            var responseObj = new
-            {
-                success = 0
-            };
-            return responseObj;
-        }
+
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 
     [HttpDelete("{id:int}")]
-    public dynamic DeleteUser(uint id)
+    public string DeleteUser(uint id)
     {
-        var responseErrObj = new
-        {
-            success = 0
-        };
+        var responceObj = new ResponceObject<User>();
+        string responceJson;
+
         var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid) return responseErrObj;
+        if (!isValid)
+        {
+            responceObj.Access = 1;
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
 
         var deleteObjectCounts = _userRepository.DeleteItem(id);
-        var resultObj = new
+        if (deleteObjectCounts > 0)
         {
-            success = deleteObjectCounts
-        };
+            responceObj.Success = 1;
+        }
 
-        return resultObj;
+        responceJson = Utils.Util.SerializeToJson(responceObj);
+        return responceJson;
     }
 }

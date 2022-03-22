@@ -1,10 +1,10 @@
 ﻿using DB.Entities;
-using DB.Repositories.Computer;
-using DB.Repositories.Employer;
-using DB.Repositories.User;
-using DB.Utils;
+using DB.Repositories.Computers;
+using DB.Repositories.Employers;
+using DB.Repositories.Users;
 using DekstopClient.Services.LoginService;
 using DekstopClient.Services.RegistrationService;
+using SharedKernel.Utils;
 
 namespace DekstopClient;
 

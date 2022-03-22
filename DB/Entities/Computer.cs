@@ -1,4 +1,6 @@
-﻿namespace DB.Entities;
+﻿using System.Text.Json.Serialization;
+
+namespace DB.Entities;
 
 public class Computer : BaseEntity
 {

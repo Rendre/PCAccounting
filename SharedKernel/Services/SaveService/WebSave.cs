@@ -1,5 +1,5 @@
 ﻿using DB.Entities;
-using DB.Repositories.File;
+using DB.Repositories.Files;
 
 namespace SharedKernel.Services;
 
@@ -7,7 +7,7 @@ public class WebSave : IFileSave
 {
     private readonly IFileRepository _fileRepository = new FileDapperRepository();
     //todo:
-    public void SaveItem(uint computerId, byte[] fileBytes, string fileName, string pathForSaveFile, string fileID,out Files? file)
+    public void SaveItem(uint computerId, byte[] fileBytes, string fileName, string pathForSaveFile, string fileID,out FileEntity? file)
     {
         if (string.IsNullOrEmpty(fileID))
         {
@@ -34,7 +34,7 @@ public class WebSave : IFileSave
         fileStream.Write(fileBytes);
         if (file == null)
         {
-            file = new Files() { ComputerId = computerId, Name = fileName, Path = pathForSaveFile };
+            file = new FileEntity() { ComputerId = computerId, Name = fileName, Path = pathForSaveFile };
             _fileRepository.SaveItem(file);
         }
     }

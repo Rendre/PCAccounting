@@ -1,5 +1,5 @@
 ﻿using DB.Entities;
-using DB.Repositories.User;
+using DB.Repositories.Users;
 
 namespace DekstopClient.Services.LoginService;
 
