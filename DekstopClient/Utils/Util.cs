@@ -4,20 +4,19 @@ internal class Util
 {
     private static readonly HttpClient Client = new();
 
-    public static async Task<string?> RequestHelper(byte[] buffer, string connectionAddress, string fileName, string pcID, string? pictureID)
+    public static async Task<string?> RequestHelper(byte[] buffer, string connectionAddress, string fileName, string pcID, string? fileID)
     {
         using var multipartFormContent = new MultipartFormDataContent();
-        var strPicture = Convert.ToBase64String(buffer);
-        multipartFormContent.Add(new StringContent(strPicture), name: "pictureByString");
+        var strFile = Convert.ToBase64String(buffer);
+        multipartFormContent.Add(new StringContent(strFile), name: "fileByString");
         multipartFormContent.Add(new StringContent(pcID), name: "computerId");
         multipartFormContent.Add(new StringContent(fileName), name: "fileName");
-        if (!string.IsNullOrEmpty(pictureID))
+        if (!string.IsNullOrEmpty(fileID))
         {
-            multipartFormContent.Add(new StringContent(pictureID), "pictureId");
+            multipartFormContent.Add(new StringContent(fileID), "fileId");
         }
 
         var response = await Client.PostAsync(connectionAddress, multipartFormContent).ConfigureAwait(false);
-        var kek = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-        return kek;
+        return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
     }
 }

@@ -1,17 +1,16 @@
 ﻿namespace DB.Repositories.Employer;
-using Entities;
 
 public interface IEmployerRepository : IDisposable
 {
-    public void CreateItem(Employer employer);
+    public void CreateItem(Entities.Employer employer);
 
-    public bool СhangeItem(Employer employer);
+    public bool ChangeItem(Entities.Employer employer);
 
-    public Employer? GetItem(uint id);
+    public Entities.Employer? GetItem(uint id);
 
-    public List<Employer> GetItems();
+    public List<Entities.Employer> GetItems();
 
-    public List<Employer> GetItems(string? name, string? position, string? tel);
+    public List<Entities.Employer> GetItems(string? name, string? position, string? tel);
 
     public uint DeleteItem(uint id);
 

@@ -1,7 +1,6 @@
-﻿namespace DB.Repositories.Task;
-using Dapper;
-using Entities;
-using TaskStatus = TaskStatus;
+﻿using Dapper;
+
+namespace DB.Repositories.Task;
 
 public class TaskDapperRepository : ITaskRepository
 {
@@ -12,18 +11,18 @@ public class TaskDapperRepository : ITaskRepository
         _context = new MySQLDatabaseContext();
     }
 
-    public Task? GetItem(ulong id)
+    public Entities.Task? GetItem(ulong id)
     {
         if (id == 0) return null;
 
         const string sqlExp = "SELECT * FROM Tasks WHERE ID=@ID AND IsDeleted=0";
         var parameters = new DynamicParameters();
         parameters.Add("@ID", id);
-        var task = _context.GetByQuery<Task>(sqlExp, parameters);
+        var task = _context.GetByQuery<Entities.Task>(sqlExp, parameters);
         return task;
     }
 
-    public IEnumerable<Task> GetItems(string? name = null, TaskType type = 0, DateTime? date = null,
+    public IEnumerable<Entities.Task> GetItems(string? name = null, TaskType type = 0, DateTime? date = null,
         TaskStatus status = TaskStatus.None)
     {
         //if (name == null &&
@@ -61,7 +60,7 @@ public class TaskDapperRepository : ITaskRepository
         }
 
         var sqlExp = $"SELECT * FROM Tasks WHERE {string.Join(" AND ", conditions)}";
-        var tasks = _context.GetAllByQuery<Task>(sqlExp, parameters);
+        var tasks = _context.GetAllByQuery<Entities.Task>(sqlExp, parameters);
         return tasks;
     }
 }

@@ -1,7 +1,7 @@
 using DB.Entities;
 using DB.Repositories.Computer;
 using DB.Repositories.Employer;
-using DB.Repositories.Picture;
+using DB.Repositories.File;
 using DB.Utils;
 
 namespace DekstopClient;
@@ -40,7 +40,7 @@ public partial class MainForm : Form
     private void AddNewTechClick(object sender, EventArgs e)
     {
         //на кнопку просмотр
-        var newTechForm = new NewTechForm(new ComputerDapperRepository(), new EmployerDapperRepository(), new PictureDapperRepository());
+        var newTechForm = new NewTechForm(new ComputerDapperRepository(), new EmployerDapperRepository(), new FileDapperRepository());
         var result = newTechForm.ShowDialog();
         if (result == DialogResult.OK)
         {
@@ -50,7 +50,7 @@ public partial class MainForm : Form
 
     private void ShowTechClick(object sender, EventArgs e)
     {
-        var newTechForm = new NewTechForm(new ComputerDapperRepository(), new EmployerDapperRepository(), new PictureDapperRepository());
+        var newTechForm = new NewTechForm(new ComputerDapperRepository(), new EmployerDapperRepository(), new FileDapperRepository());
         try
         {
             var currentRow = dataGridView3.CurrentCell.RowIndex;
@@ -107,7 +107,7 @@ public partial class MainForm : Form
             var id = (uint)dataGridView2["Id", currentRow].Value;
             var employer = new Employer() {ID = id, Name = name, Position = position, Tel = tel};
 
-            _employerRepository.СhangeItem(employer);
+            _employerRepository.ChangeItem(employer);
 
             var table = _employerRepository.GetItems();
             dataGridView2.DataSource = table;

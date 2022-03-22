@@ -1,9 +1,8 @@
 ﻿using DB;
 using Microsoft.EntityFrameworkCore;
-
 namespace SharedKernel.Services;
 
-public class LoginService
+public class LoginService : ILoginService
 {
     private readonly ApplicationContextEF _db;
 

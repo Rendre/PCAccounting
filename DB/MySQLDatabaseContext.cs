@@ -1,8 +1,8 @@
-﻿namespace DB;
+﻿using Dapper;
 using DB.Entities;
-using Dapper;
 using MySql.Data.MySqlClient;
 
+namespace DB;
 
 public class MySQLDatabaseContext : IDisposable
 {
@@ -28,7 +28,7 @@ public class MySQLDatabaseContext : IDisposable
         }
 
 
-        var user = new User()
+        var user = new User
         {
             //маппинг
             ID = reader.GetUInt32(0),
@@ -48,7 +48,7 @@ public class MySQLDatabaseContext : IDisposable
         var reader = command.ExecuteReader();
         while (reader.Read())
         {
-            var user = new User()
+            var user = new User
             {
                 ID = reader.GetUInt32(0),
                 IsDeleted = reader.GetBoolean(1),
@@ -71,7 +71,7 @@ public class MySQLDatabaseContext : IDisposable
         var reader = command.ExecuteReader();
         if (!reader.Read()) return null;
 
-        var computer = new Computer()
+        var computer = new Computer
         {
             ID = reader.GetUInt32(0),
             IsDeleted = reader.GetBoolean(1),
@@ -93,7 +93,7 @@ public class MySQLDatabaseContext : IDisposable
         var reader = command.ExecuteReader();
         while (reader.Read())
         {
-            var computer = new Computer()
+            var computer = new Computer
             {
                 ID = reader.GetUInt32(0),
                 IsDeleted = reader.GetBoolean(1),
@@ -121,7 +121,7 @@ public class MySQLDatabaseContext : IDisposable
         var reader = command.ExecuteReader();
         if (!reader.Read()) return null;
 
-        var employer = new Employer()
+        var employer = new Employer
         {
             ID = reader.GetUInt32(0),
             IsDeleted = reader.GetBoolean(1),
@@ -151,7 +151,7 @@ public class MySQLDatabaseContext : IDisposable
         var reader = command.ExecuteReader();
         while (reader.Read())
         {
-            var employer = new Employer()
+            var employer = new Employer
             {
                 ID = reader.GetUInt32(0),
                 IsDeleted = reader.GetBoolean(1),
@@ -164,7 +164,7 @@ public class MySQLDatabaseContext : IDisposable
         reader.Close();
         return employers;
     }
-    
+
     public List<T> GetAllByQuery<T>(string sqlExpression)
     {
         return _connection.Query<T>(sqlExpression).ToList();

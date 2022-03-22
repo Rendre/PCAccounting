@@ -69,7 +69,7 @@ public class EmployerController : ControllerBase
         var tel = emp.GetProperty("tel").GetString();
         var employer = new Employer() {ID = id, Name = name, Position = position, Tel = tel };
 
-        var success = _employerRepository.СhangeItem(employer);
+        var success = _employerRepository.ChangeItem(employer);
         if (success)
         {
             var resultObj = new

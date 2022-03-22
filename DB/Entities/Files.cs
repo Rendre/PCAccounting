@@ -1,6 +1,6 @@
 ﻿namespace DB.Entities;
 
-public class Picture : BaseEntity
+public class Files : BaseEntity
 {
     public uint ComputerId { get; set; }
     public string? Name { get; set; }

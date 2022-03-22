@@ -19,7 +19,7 @@ public class EmployerDefaultRepository : IEmployerRepository
 
     public List<Employer> GetItems()
     {
-        const string sqlExpression = $"SELECT * FROM employers WHERE IsDeleted = 0";
+        const string sqlExpression = "SELECT * FROM employers WHERE IsDeleted = 0";
         //var employers = _databaseContext.GetEmployers(sqlExpression);
         var employers = _databaseContext.GetEmployers(sqlExpression);
         return employers;
@@ -38,7 +38,7 @@ public class EmployerDefaultRepository : IEmployerRepository
 
     public void CreateItem(Employer employer)
     {
-        var sqlExpression = $"INSERT INTO employers (Name, Position, Tel)" +
+        var sqlExpression = "INSERT INTO employers (Name, Position, Tel)" +
                             $"VALUES ('{employer.Name}', '{employer.Position}', '{employer.Tel}')";
         const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
@@ -46,7 +46,7 @@ public class EmployerDefaultRepository : IEmployerRepository
         employer.ID = id;
     }
 
-    public bool СhangeItem(Employer employer)
+    public bool ChangeItem(Employer employer)
     {
         var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
                             $" WHERE ID = {employer.ID}";

@@ -1,17 +1,16 @@
 ﻿namespace DB.Repositories.User;
-using Entities;
 
 public interface IUserRepository : IDisposable
 {
-    public void CreateItem(User user);
+    public void CreateItem(Entities.User user);
 
     public bool ChangeItem(uint id, string? login, string? password, uint employerID);
 
-    public User? GetItem(uint id);
+    public Entities.User? GetItem(uint id);
 
-    public List<User> GetItems();
+    public List<Entities.User> GetItems();
 
-    public User? GetItem(string? login);
+    public Entities.User? GetItem(string? login);
 
     public uint DeleteItem(uint id);
 }

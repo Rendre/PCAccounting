@@ -1,5 +1,5 @@
-﻿using Dapper;
-namespace DB.Repositories.Employer;
+﻿namespace DB.Repositories.Employer;
+using Dapper;
 using Entities;
 
 public class EmployerDapperRepository : IEmployerRepository
@@ -13,7 +13,7 @@ public class EmployerDapperRepository : IEmployerRepository
 
     public void CreateItem(Employer employer)
     {
-        var sqlExpression = $"INSERT INTO employers (Name, Position, Tel)" +
+        var sqlExpression = "INSERT INTO employers (Name, Position, Tel)" +
                             $"VALUES ('{employer.Name}', '{employer.Position}', '{employer.Tel}')";
         const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteByQuery(sqlExpression);
@@ -21,7 +21,7 @@ public class EmployerDapperRepository : IEmployerRepository
         employer.ID = id;
     }
 
-    public bool СhangeItem(Employer employer)
+    public bool ChangeItem(Employer employer)
     {
         var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
                             $" WHERE ID = {employer.ID}";
@@ -102,7 +102,7 @@ public class EmployerDapperRepository : IEmployerRepository
         var sqlExpression = $"UPDATE employers SET IsDeleted = 1 WHERE {string.Join(" ", conditions)}";
         return _databaseContext.ExecuteByQuery(sqlExpression, parameters);
     }
-    
+
     public void Dispose()
     {
         _databaseContext.Dispose();

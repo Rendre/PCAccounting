@@ -1,5 +1,4 @@
 ﻿namespace DB.Repositories.User;
-using Entities;
 
 public class UserDefaultRepository : IUserRepository
 {
@@ -10,7 +9,7 @@ public class UserDefaultRepository : IUserRepository
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public void CreateItem(User user)
+    public void CreateItem(Entities.User user)
     {
         var sqlExpression = "INSERT INTO users (Login, Pass, EmployerId)" +
                             $"VALUES ('{user.Login}', '{user.Pass}', {user.EmployerId})";
@@ -29,22 +28,22 @@ public class UserDefaultRepository : IUserRepository
         return success > 0;
     }
 
-    public User? GetItem(uint id)
+    public Entities.User? GetItem(uint id)
     {
         var sqlExpression = $"SELECT * FROM Users WHERE ID = {id} AND IsDeleted = 0 LIMIT 1";
             var user = _databaseContext.GetUser(sqlExpression);
             return user;
     }
 
-    public List<User> GetItems()
+    public List<Entities.User> GetItems()
     {
-        const string sqlExpression = $"SELECT * FROM Users WHERE IsDeleted = 0";
+        const string sqlExpression = "SELECT * FROM Users WHERE IsDeleted = 0";
         var users = _databaseContext.GetUsers(sqlExpression);
         return users;
 
     }
 
-    public User? GetItem(string? login)
+    public Entities.User? GetItem(string? login)
     {
         var sqlExpression = $"SELECT * FROM Users WHERE Login = '{login}' AND IsDeleted = 0 LIMIT 1";
         var user = _databaseContext.GetUser(sqlExpression);

@@ -1,32 +1,33 @@
-﻿namespace DB.Repositories.Picture;
-using Dapper;
-using Entities;
+﻿using Dapper;
+using DB.Entities;
 
-public class PictureDapperRepository : IPictureRepository
+namespace DB.Repositories.File;
+
+public class FileDapperRepository : IFileRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public PictureDapperRepository()
+    public FileDapperRepository()
     {
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public void SaveItem(Picture? picture)
+    public void SaveItem(Files? file)
     {
         var parameters = new DynamicParameters();
-        parameters.Add("@CompID", picture.ComputerId);
-        parameters.Add("@Path", picture.Path);
-        parameters.Add("@Name", picture.Name);
+        parameters.Add("@CompID", file.ComputerId);
+        parameters.Add("@Path", file.Path);
+        parameters.Add("@Name", file.Name);
 
         const string sqlExpression = "INSERT INTO files (CompID, Path, FileName) " +
                                      "VALUES (@CompID, @Path, @Name)";
         _databaseContext.ExecuteByQuery(sqlExpression, parameters);
         const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
         var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
-        picture.ID = id;
+        file.ID = id;
     }
 
-    public Picture? GetItem(uint id)
+    public Files? GetItem(uint id)
     {
         if (id == 0) return null;
 
@@ -34,12 +35,12 @@ public class PictureDapperRepository : IPictureRepository
         parameters.Add("@ID", id);
 
         const string sqlExpression = "SELECT * FROM files WHERE ID = @ID AND IsDeleted = 0";
-        var pictureFromDb = _databaseContext.GetByQuery<Picture>(sqlExpression, parameters);
+        var fileFromDb = _databaseContext.GetByQuery<Files>(sqlExpression, parameters);
 
-        return pictureFromDb;
+        return fileFromDb;
     }
 
-    public List<Picture?> GetItems(uint computerId = 0, string? orderBy = null, bool desc = false, uint limitSkip = 0, uint limitTake = 0)
+    public List<Files?> GetItems(uint computerId = 0, string? orderBy = null, bool desc = false, uint limitSkip = 0, uint limitTake = 0)
     {
         var parameters = new DynamicParameters();
         var conditions = new List<string>(2) { "IsDeleted=0" };
@@ -61,8 +62,8 @@ public class PictureDapperRepository : IPictureRepository
             parameters.Add("@limitSkip", limitSkip);
             parameters.Add("@limitTake", limitTake);
         }
-        List<Picture?> picturesList = _databaseContext.GetAllByQuery<Picture>(sqlExpression, parameters);
-        return picturesList;
+        List<Files?> fileList = _databaseContext.GetAllByQuery<Files>(sqlExpression, parameters);
+        return fileList;
     }
 
     public uint DeleteItem(uint id)

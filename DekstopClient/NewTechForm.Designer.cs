@@ -234,7 +234,7 @@
             this.button6.TabIndex = 22;
             this.button6.Text = "UploadPictureByWeb";
             this.button6.UseVisualStyleBackColor = false;
-            this.button6.Click += new System.EventHandler(this.UploadPictureByWebClick);
+            this.button6.Click += new System.EventHandler(this.UploadFileByWebClick);
             // 
             // NewTechForm
             // 

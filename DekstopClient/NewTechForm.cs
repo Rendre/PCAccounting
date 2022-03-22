@@ -3,8 +3,10 @@ using DB;
 using DB.Entities;
 using DB.Repositories.Computer;
 using DB.Repositories.Employer;
-using DB.Repositories.Picture;
+using DB.Repositories.File;
 using SharedKernel.Services;
+using SharedKernel.Utils;
+
 namespace DekstopClient;
 
 public partial class NewTechForm : Form
@@ -12,20 +14,20 @@ public partial class NewTechForm : Form
     // посмотреть нужен ли вообще ComputerID
     public uint ComputerID { get; set; }//по этому айди делается запрос и заполняется форма
     private Computer _computer = new();
-    private byte[] _pictureBytes;
-    private byte[] _reservePictureBytes;
-    private Picture? _picture;
+    private byte[] _fileBytes;
+    private byte[] _reserveFileBytes;
+    private Files? _file;
     private bool _isChanged;
     private string? _filePath;
     private readonly IComputerRepository _computerRepository;
     private readonly IEmployerRepository _employerRepository;
-    private readonly IPictureRepository _pictureRepository;
-    public NewTechForm(IComputerRepository computerRepository, IEmployerRepository employerRepository, IPictureRepository pictureRepository)
+    private readonly IFileRepository _fileRepository;
+    public NewTechForm(IComputerRepository computerRepository, IEmployerRepository employerRepository, IFileRepository fileRepository)
     {
         InitializeComponent();
         _computerRepository = computerRepository;
         _employerRepository = employerRepository;
-        _pictureRepository = pictureRepository;
+        _fileRepository = fileRepository;
     }
 
     private void NewTechForm_Load(object sender, EventArgs e)
@@ -66,12 +68,12 @@ public partial class NewTechForm : Form
         textBox6.Text = _computer.Price.ToString();
 
         //вывод картинки при просмотре компа
-        var pictures = _pictureRepository.GetItems(ComputerID, "ID", true, 0, 1);
-        if (pictures.Count <= 0) return;
+        var files = _fileRepository.GetItems(ComputerID, "ID", true, 0, 1);
+        if (files.Count <= 0) return;
 
-        _picture = pictures[0];
-        _reservePictureBytes = File.ReadAllBytes(_picture.Path);
-        pictureBox1.Image = Image.FromStream(new MemoryStream(_reservePictureBytes));
+        _file = files[0];
+        _reserveFileBytes = File.ReadAllBytes(_file.Path);
+        pictureBox1.Image = Image.FromStream(new MemoryStream(_reserveFileBytes));
         pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
 
     }
@@ -110,9 +112,9 @@ public partial class NewTechForm : Form
                 {
                     var dekstopSave = new DekstopSave();
                     var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent?.Parent?.Parent?.Parent;
-                    var pathForSavePicture = directory + "\\Images\\";
-                    var pictureBytes = File.ReadAllBytes(_filePath);
-                    dekstopSave.SaveItem(_computer.ID, pictureBytes, _filePath, pathForSavePicture, "",out _picture);
+                    var pathForSaveFile = directory + "\\Images\\";
+                    var fileBytes = File.ReadAllBytes(_filePath);
+                    dekstopSave.SaveItem(_computer.ID, fileBytes, _filePath, pathForSaveFile, "",out _file);
                 }
                 DialogResult = DialogResult.OK;
                 MessageBox.Show("Данные успешно добавлены.");
@@ -137,13 +139,13 @@ public partial class NewTechForm : Form
             // сохр картинки в изменении компа
             if (!string.IsNullOrEmpty(_filePath))
             {
-                _reservePictureBytes = null!;
+                _reserveFileBytes = null!;
                 var dekstopSave = new DekstopSave();
                 var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent?.Parent?.Parent?.Parent;
-                var pathForSavePicture = directory + "\\Images\\";
-                var pictureBytes = File.ReadAllBytes(_filePath);
-                //var kek = Convert.ToBase64String(pictureBytes);
-                dekstopSave.SaveItem(_computer.ID, pictureBytes, _filePath, pathForSavePicture, "",out _picture);
+                var pathForSaveFile = directory + "\\Images\\";
+                var fileBytes = File.ReadAllBytes(_filePath);
+                //var kek = Convert.ToBase64String(fileBytes);
+                dekstopSave.SaveItem(_computer.ID, fileBytes, _filePath, pathForSaveFile, "",out _file);
                 button5.Show();
             }
 
@@ -179,7 +181,7 @@ public partial class NewTechForm : Form
         {
             button2.Show();
             button4.Show();
-            if (_picture is { ID: > 0 })
+            if (_file is { ID: > 0 })
             {
                 button5.Show();
             }
@@ -200,9 +202,9 @@ public partial class NewTechForm : Form
             // тут надо вернуть старую картинку если изменения не подтвердили
             button4.Hide();
             button5.Hide();
-            if (_reservePictureBytes != null)
+            if (_reserveFileBytes != null)
             {
-                pictureBox1.Image = Image.FromStream(new MemoryStream(_reservePictureBytes));
+                pictureBox1.Image = Image.FromStream(new MemoryStream(_reserveFileBytes));
             }
         }
 
@@ -221,8 +223,23 @@ public partial class NewTechForm : Form
         _filePath = openFileDialog1.FileName;
         if (string.IsNullOrEmpty(_filePath)) return;
 
-        _pictureBytes = File.ReadAllBytes(_filePath);
-        pictureBox1.Image = Image.FromStream(new MemoryStream(_pictureBytes));
+        if (!Util.CheckFileExtension(_filePath))
+        {
+            MessageBox.Show(
+                "Неверный формат изображения!\n" +
+                "Поддерживаемые форматы: jpg, jpeg, bmp, png",
+                "Внимание",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information,
+                MessageBoxDefaultButton.Button1,
+                MessageBoxOptions.DefaultDesktopOnly);
+
+            _filePath = "";
+            return;
+        }
+
+        _fileBytes = File.ReadAllBytes(_filePath);
+        pictureBox1.Image = Image.FromStream(new MemoryStream(_fileBytes));
         pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
     }
 
@@ -238,34 +255,49 @@ public partial class NewTechForm : Form
 
         if (result == DialogResult.OK)
         {
-            _pictureRepository.DeleteItem(_picture.ID);
+            _fileRepository.DeleteItem(_file.ID);
             // этот код дублируется - потом прибери его
-            var pictures = _pictureRepository.GetItems(ComputerID, "ID", true, 0, 1);
-            if (pictures.Count > 0)
+            var files = _fileRepository.GetItems(ComputerID, "ID", true, 0, 1);
+            if (files.Count > 0)
             {
-                _picture = pictures[0];
-                if (_picture.Path != null) _reservePictureBytes = File.ReadAllBytes(_picture.Path);
-                pictureBox1.Image = Image.FromStream(new MemoryStream(_reservePictureBytes));
+                _file = files[0];
+                if (_file.Path != null) _reserveFileBytes = File.ReadAllBytes(_file.Path);
+                pictureBox1.Image = Image.FromStream(new MemoryStream(_reserveFileBytes));
                 pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-                _reservePictureBytes = null;
+                _reserveFileBytes = null;
                 return;
             }
 
-            _picture = null;
+            _file = null;
             button5.Hide();
-            _reservePictureBytes = null;
+            _reserveFileBytes = null;
             pictureBox1.Image = null;
         }
     }
 
-    private async void UploadPictureByWebClick(object sender, EventArgs e)
+    private async void UploadFileByWebClick(object sender, EventArgs e)
     {
-        const string connectionAddress = "https://localhost:7204/Picture";
+        const string connectionAddress = "https://localhost:7204/File";
 
         if (openFileDialog1.ShowDialog() != DialogResult.OK) return;
 
         _filePath = openFileDialog1.FileName;
         if (string.IsNullOrEmpty(_filePath)) return;
+
+        if (!Util.CheckFileExtension(_filePath))
+        {
+            MessageBox.Show(
+                "Неверный формат изображения!\n" +
+                "Поддерживаемые форматы: jpg, jpeg, bmp, png",
+                "Внимание",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information,
+                MessageBoxDefaultButton.Button1,
+                MessageBoxOptions.DefaultDesktopOnly);
+
+            _filePath = "";
+            return;
+        }
 
         var fName = openFileDialog1.SafeFileName;
 
@@ -276,25 +308,25 @@ public partial class NewTechForm : Form
         var result = new ResultClass();
         while ((countOfReadBytes = fileStream.Read(buffer, 0, _count)) != 0)
         {
-            var picID = result.pictureID > 0 ? result.pictureID.ToString() : "";
-            var resultJson = Utils.Util.RequestHelper(buffer, connectionAddress, fName, ComputerID.ToString(), picID);
-            var strResult = await resultJson;
+            var fileID = result.fileID > 0 ? result.fileID.ToString() : "";
+            var resultJson = Utils.Util.RequestHelper(buffer, connectionAddress, fName, ComputerID.ToString(), fileID);
+            var strResult = await resultJson.ConfigureAwait(false);
             result = JsonSerializer.Deserialize<ResultClass>(strResult);
         }
-        var pictures = _pictureRepository.GetItems(ComputerID, "ID", true, 0, 1);
-        if (pictures.Count > 0)
+        var files = _fileRepository.GetItems(ComputerID, "ID", true, 0, 1);
+        if (files.Count > 0)
         {
-            _picture = pictures[0];
-            if (_picture.Path != null) _reservePictureBytes = File.ReadAllBytes(_picture.Path);
-            pictureBox1.Image = Image.FromStream(new MemoryStream(_reservePictureBytes));
+            _file = files[0];
+            if (_file.Path != null) _reserveFileBytes = File.ReadAllBytes(_file.Path);
+            pictureBox1.Image = Image.FromStream(new MemoryStream(_reserveFileBytes));
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            _reservePictureBytes = null;
+            _reserveFileBytes = null;
         }
     }
 
     class ResultClass
     {
         public int success { get; set; }
-        public uint pictureID { get; set; }
+        public uint fileID { get; set; }
     }
 }
