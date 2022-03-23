@@ -35,7 +35,7 @@ public class MySQLDatabaseContext : IDisposable
             IsDeleted = reader.GetBoolean(1),
             Login = reader.GetString(2),
             Pass = reader.GetString(3),
-            EmployerId = reader.GetUInt32(4),
+            EmployerID = reader.GetUInt32(4),
         };
         reader.Close();
         return user;
@@ -54,7 +54,7 @@ public class MySQLDatabaseContext : IDisposable
                 IsDeleted = reader.GetBoolean(1),
                 Login = reader.GetString(2),
                 Pass = reader.GetString(3),
-                EmployerId = reader.GetUInt32(4),
+                EmployerID = reader.GetUInt32(4),
             };
             users.Add(user);
         }
@@ -77,7 +77,7 @@ public class MySQLDatabaseContext : IDisposable
             IsDeleted = reader.GetBoolean(1),
             Name = reader.GetString(2),
             StatusID = reader.GetUInt32(3),
-            EmployerId = reader.GetUInt32(4),
+            EmployerID = reader.GetUInt32(4),
             DateCreated = reader.GetDateTime(5),
             Cpu = reader.GetString(6),
             Price = reader.GetDecimal(7)
@@ -99,7 +99,7 @@ public class MySQLDatabaseContext : IDisposable
                 IsDeleted = reader.GetBoolean(1),
                 Name = reader.GetString(2),
                 StatusID = reader.GetUInt32(3),
-                EmployerId = reader.GetUInt32(4),
+                EmployerID = reader.GetUInt32(4),
                 DateCreated = reader.GetDateTime(5),
                 Cpu = reader.GetString(6),
                 Price = reader.GetDecimal(7)

@@ -107,7 +107,7 @@ public partial class MainForm : Form
             var id = (uint)dataGridView2["Id", currentRow].Value;
             var employer = new Employer() {ID = id, Name = name, Position = position, Tel = tel};
 
-            _employerRepository.ChangeItem(employer);
+            _employerRepository.UpdateItem(employer);
 
             var table = _employerRepository.GetItems();
             dataGridView2.DataSource = table;

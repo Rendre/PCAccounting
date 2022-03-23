@@ -7,7 +7,7 @@ public class WebSave : IFileSave
 {
     private readonly IFileRepository _fileRepository = new FileDapperRepository();
     //todo:
-    public void SaveItem(uint computerId, byte[] fileBytes, string fileName, string pathForSaveFile, string fileID,out FileEntity? file)
+    public void SaveItem(uint computerID, byte[] fileBytes, string fileName, string pathForSaveFile, string fileID,out FileEntity? file)
     {
         if (string.IsNullOrEmpty(fileID))
         {
@@ -23,8 +23,8 @@ public class WebSave : IFileSave
         }
         else
         {
-            var kekid = Convert.ToUInt32(fileID);
-            file = _fileRepository.GetItem(kekid);
+            var kekID = Convert.ToUInt32(fileID);
+            file = _fileRepository.GetItem(kekID);
             if (file == null) return;
 
             pathForSaveFile = file.Path!;
@@ -34,8 +34,8 @@ public class WebSave : IFileSave
         fileStream.Write(fileBytes);
         if (file == null)
         {
-            file = new FileEntity() { ComputerId = computerId, Name = fileName, Path = pathForSaveFile };
-            _fileRepository.SaveItem(file);
+            file = new FileEntity() { ComputerID = computerID, Name = fileName, Path = pathForSaveFile };
+            _fileRepository.CreateItem(file);
         }
     }
 }

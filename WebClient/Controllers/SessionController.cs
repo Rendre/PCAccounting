@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
-using DB;
 using DB.Entities;
+using DB.Repositories.Sessions;
+using DB.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SharedKernel.Utils;
 using WebClient.Models;
 
@@ -10,14 +10,13 @@ namespace WebClient.Controllers;
 
 public class SessionController : ControllerBase
 {
-    private readonly ApplicationContextEF _db;
+    private readonly ISessionRepository _sessionRepository;
+    private readonly IUserRepository _userRepository;
     public SessionController()
     {
-        var opt = new DbContextOptionsBuilder<ApplicationContextEF>();
-        opt.UseMySql(MySQLDatabaseContext.ConnectionString, ApplicationContextEF.ServerVersion);
-        _db = new ApplicationContextEF(opt.Options);
+        _sessionRepository = new SessionEFRepository();
+        _userRepository = new UserEFRepository();
     }
-
 
     [HttpGet]
     [Route("login")]
@@ -40,15 +39,14 @@ public class SessionController : ControllerBase
                 return responceJson;
             }
 
-            session = _db.Session.FirstOrDefault(p => p.Token != null && p.Token.Equals(token));
+            session = _sessionRepository.GetItem(token);
             if (session != null)
             {
                 var isValid = session.Time.AddMinutes(20) > DateTime.UtcNow;
                 if (!isValid)
                 {
                     session.IsDeleted = true;
-                    _db.Session.Update(session);
-                    _db.SaveChanges();
+                    _sessionRepository.UpdateItem(session);
                     responceJson = Utils.Util.SerializeToJson(responceObj);
                     return responceJson;
                 }
@@ -74,9 +72,8 @@ public class SessionController : ControllerBase
                 return responceJson;
             }
 
-            var user = _db.Users.FirstOrDefault(p => p.Login.Equals(login));
-            if (user != null &&
-                (user.Pass.Equals(password)))
+            var user = _userRepository.GetItem(login);
+            if (user is {Pass: { }} && (user.Pass.Equals(password)))
             {
                 session = new Session
                 {
@@ -86,8 +83,7 @@ public class SessionController : ControllerBase
                     UserIP = HttpContext.Connection.RemoteIpAddress?.ToString()
                 };
 
-                _db.Session.Add(session);
-                _db.SaveChanges();
+                _sessionRepository.CreateItem(session);
             }
         }
 
@@ -113,14 +109,20 @@ public class SessionController : ControllerBase
             token = tokenElement.GetString();
         }
 
-        var session = _db.Session.FirstOrDefault(p => p.Token != null && p.Token.Equals(token));
+        if (string.IsNullOrEmpty(token))
+        {
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
+
+        var session = _sessionRepository.GetItem(token);
         if (session == null)
         {
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }
 
-        var user = _db.Users.FirstOrDefault(p => p.ID == session.UserID);
+        var user = _userRepository.GetItem(session.UserID);
         if (user == null)
         {
             responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -164,17 +166,15 @@ public class SessionController : ControllerBase
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }
-
-        var check = _db.Users.FirstOrDefault(p => p.Login.Equals(login));
-        if (check != null)
+        var userFromDb = _userRepository.GetItem(login);
+        if (userFromDb != null)
         {
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }
 
-        var user = new User() { Login = login, Pass = password, EmployerId = 0 };
-        _db.Users.Add(user);
-        _db.SaveChanges();
+        var user = new User() { Login = login, Pass = password, EmployerID = 0 };
+        _userRepository.CreateItem(user);
 
         responceObj.Success = 1;
         responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -200,14 +200,13 @@ public class SessionController : ControllerBase
             return responceJson;
         }
 
-        var session = _db.Session.FirstOrDefault(p => p.Token != null && p.Token.Equals(token));
+        var session = _sessionRepository.GetItem(token);
         if (session == null)
         {
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }
-        _db.Session.Update(session);
-        _db.SaveChanges();
+        _sessionRepository.UpdateItem(session);
 
         responceObj.Success = 1;
         responceJson = Utils.Util.SerializeToJson(responceObj);

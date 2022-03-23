@@ -16,13 +16,13 @@ public class EmployerDapperRepository : IEmployerRepository
     {
         var sqlExpression = "INSERT INTO employers (Name, Position, Tel)" +
                             $"VALUES ('{employer.Name}', '{employer.Position}', '{employer.Tel}')";
-        const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
+        const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteByQuery(sqlExpression);
-        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
+        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
         employer.ID = id;
     }
 
-    public bool ChangeItem(Employer employer)
+    public bool UpdateItem(Employer employer)
     {
         var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
                             $" WHERE ID = {employer.ID}";
@@ -44,9 +44,7 @@ public class EmployerDapperRepository : IEmployerRepository
             "ID = @ID"
         };
 
-
         parameters.Add("@ID", id);
-
 
         var sqlExpression = $"SELECT * FROM employers WHERE {string.Join(" AND ", conditions)}";
         var employer = _databaseContext.GetByQuery<Employer>(sqlExpression, parameters);
@@ -98,8 +96,6 @@ public class EmployerDapperRepository : IEmployerRepository
         };
 
         parameters.Add("@ID", id);
-
-
         var sqlExpression = $"UPDATE employers SET IsDeleted = 1 WHERE {string.Join(" ", conditions)}";
         return _databaseContext.ExecuteByQuery(sqlExpression, parameters);
     }

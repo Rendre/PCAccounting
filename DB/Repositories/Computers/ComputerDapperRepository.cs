@@ -17,18 +17,18 @@ public class ComputerDapperRepository : IComputerRepository
     public void CreateItem(Computer computer)
     {
         var sqlExpression = "INSERT INTO technick (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
-                            $"VALUES ('{computer.Name}', {computer.StatusID}, {computer.EmployerId}, '{computer.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
-        const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
+                            $"VALUES ('{computer.Name}', {computer.StatusID}, {computer.EmployerID}, '{computer.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
+        const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteByQuery(sqlExpression);
-        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
+        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
         computer.ID = id;
     }
 
-    public bool ChangeItem(Computer computer)
+    public bool UpdateItem(Computer computer)
     {
         var sqlExpression = $"UPDATE technick SET Name = '{computer.Name}', " +
                             $"StatusID = {computer.StatusID}, " +
-                            $"EmployerID = {computer.EmployerId}, " +
+                            $"EmployerID = {computer.EmployerID}, " +
                             $"DateCreated = '{computer.DateCreated:yyyy-MM-dd HH:mm:ss}', " +
                             $"Cpu = '{computer.Cpu}', " +
                             $"Price = '{computer.Price.ToString(CultureInfo.InvariantCulture)}' " +
@@ -37,18 +37,34 @@ public class ComputerDapperRepository : IComputerRepository
         return success > 0;
     }
 
+    public Computer? GetItem(uint id)
+    {
+        if (id == 0) return null;
+
+        var parameters = new DynamicParameters();
+        var conditions = new List<string>(2)
+        {
+            "IsDeleted = 0",
+            "ID = @ID"
+        };
+        parameters.Add("@ID", id);
+        var sqlExpression = $"SELECT * FROM technick WHERE {string.Join(" AND ", conditions)}";
+        var computer = _databaseContext.GetByQuery<Computer>(sqlExpression, parameters);
+        return computer;
+    }
+
     //динамич запрос
-    public List<Computer> GetFilterItems(string? name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null,
+    public List<Computer> GetFilterItems(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
         string? cpu = null, decimal price = 0)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM technick WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
-        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusId, employerId, date, cpu, price, parameters);
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusID, employerID, date, cpu, price, parameters);
         var computers = _databaseContext.GetAllByQuery<Computer>(sqlExpressionForQuery, parameters);
         return computers;
     }
 
-    private static string GetParamForExpression(StringBuilder sqlExpression, string? name, uint statusId, uint employerId, DateTime? date,
+    private static string GetParamForExpression(StringBuilder sqlExpression, string? name, uint statusID, uint employerID, DateTime? date,
         string? cpu, decimal price, DynamicParameters parameters)
     {
         if (name != null)
@@ -57,16 +73,16 @@ public class ComputerDapperRepository : IComputerRepository
             parameters.Add("@Name", name);
         }
 
-        if (statusId != 0)
+        if (statusID != 0)
         {
-            sqlExpression.Append(" AND StatusId = @StatusId");
-            parameters.Add("@StatusId", statusId);
+            sqlExpression.Append(" AND StatusID = @StatusID");
+            parameters.Add("@StatusID", statusID);
         }
 
-        if (employerId != 0)
+        if (employerID != 0)
         {
-            sqlExpression.Append(" AND EmployerId = @EmployerId");
-            parameters.Add("@EmployerId", employerId);
+            sqlExpression.Append(" AND EmployerID = @EmployerID");
+            parameters.Add("@EmployerID", employerID);
         }
 
         if (date != null)
@@ -88,22 +104,6 @@ public class ComputerDapperRepository : IComputerRepository
         }
 
         return sqlExpression.ToString();
-    }
-
-    public Computer? GetItem(uint id)
-    {
-        if (id == 0) return null;
-
-        var parameters = new DynamicParameters();
-        var conditions = new List<string>(2)
-        {
-            "IsDeleted = 0",
-            "ID = @ID"
-        };
-        parameters.Add("@ID", id);
-        var sqlExpression = $"SELECT * FROM technick WHERE {string.Join(" AND ", conditions)}";
-        var computer = _databaseContext.GetByQuery<Computer>(sqlExpression, parameters);
-        return computer;
     }
 
     public bool DeleteItem(uint id)

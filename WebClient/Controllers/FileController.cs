@@ -11,7 +11,7 @@ public class FileController : Controller
     private readonly IFileSave _fileSave = new WebSave();
 
     [HttpPost]
-    public string UploadFile()
+    public string CreateFile()
     {
         var responceObj = new ResponceObject<FileEntity>();
         string responceJson;
@@ -22,8 +22,8 @@ public class FileController : Controller
             byte[]? fileBytes;
             var fileID = "";
             string fileName;
-            var computerId = Convert.ToUInt32(HttpContext.Request.Form["computerId"]);
-            if (computerId <= 0)
+            var computerID = Convert.ToUInt32(HttpContext.Request.Form["computerID"]);
+            if (computerID <= 0)
             {
                 responceJson = Utils.Util.SerializeToJson(responceObj);
                 return responceJson;
@@ -47,7 +47,7 @@ public class FileController : Controller
             {
                 HttpContext.Request.Form.TryGetValue("fileByString", out var strFile);
                 fileName = HttpContext.Request.Form["fileName"];
-                fileID = HttpContext.Request.Form["fileId"];
+                fileID = HttpContext.Request.Form["fileID"];
                 if (string.IsNullOrEmpty(fileName) || string.IsNullOrEmpty(strFile))
                 {
                     responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -59,12 +59,12 @@ public class FileController : Controller
 
             var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent;
             var pathForSaveFile = directory + "\\Images\\";
-            _fileSave.SaveItem(computerId, fileBytes, fileName, pathForSaveFile, fileID, out file);
+            _fileSave.SaveItem(computerID, fileBytes, fileName, pathForSaveFile, fileID, out file);
             if (file.ID > 0)
             {
                 responceObj.Data = new FileEntity
                 {
-                    ComputerId = file.ComputerId,
+                    ComputerID = file.ComputerID,
                     ID = file.ID
                 };
                 responceObj.Success = 1;

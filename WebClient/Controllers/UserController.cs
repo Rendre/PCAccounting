@@ -34,8 +34,8 @@ public class UserController : Controller
         var login = userJsn.GetProperty("login").GetString();
         var password = userJsn.GetProperty("password").GetString();
         password = Util.Encode(password);
-        var employerId = userJsn.GetProperty("employerId").GetUInt32();
-        var user = new User() {Login = login, Pass = password, EmployerId = employerId};
+        var employerID = userJsn.GetProperty("employerID").GetUInt32();
+        var user = new User() {Login = login, Pass = password, EmployerID = employerID};
         _userRepository.CreateItem(user);
         if (user.ID > 0)
         {
@@ -47,7 +47,7 @@ public class UserController : Controller
     }
 
     [HttpPut]
-    public string ChangeUser([FromBody] JsonElement userJsn)
+    public string UpdateUser([FromBody] JsonElement userJsn)
     {
         var responceObj = new ResponceObject<User>();
         string responceJson;
@@ -64,8 +64,9 @@ public class UserController : Controller
         var login = userJsn.GetProperty("login").GetString();
         var password = userJsn.GetProperty("password").GetString();
         password = Util.Encode(password);
-        var employerId = userJsn.GetProperty("employerId").GetUInt32();
-        var success = _userRepository.ChangeItem(id, login, password, employerId);
+        var employerID = userJsn.GetProperty("employerID").GetUInt32();
+        var user = new User() {ID = id, Login = login, Pass = password, EmployerID = employerID};
+        var success = _userRepository.UpdateItem(user);
 
         if (success)
         {

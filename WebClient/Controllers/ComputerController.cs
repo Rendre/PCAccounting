@@ -30,9 +30,9 @@ public class ComputerController : Controller
             return responceJson;
         }
 
-        if (json.TryGetProperty("id", out var jsonElementId))
+        if (json.TryGetProperty("id", out var jsonElementID))
         {
-            var id = jsonElementId.GetUInt32();
+            var id = jsonElementID.GetUInt32();
             return GetComputer(id);
         }
 
@@ -70,7 +70,7 @@ public class ComputerController : Controller
     {
         string? name = null;
         uint status = 0;
-        uint employerId = 0;
+        uint employerID = 0;
         DateTime? date = null;
         string? cpu = null;
         decimal price = 0;
@@ -86,9 +86,9 @@ public class ComputerController : Controller
         {
             status = statusElement.GetUInt32();
         }
-        if (json.TryGetProperty("employerId", out var employerIdElement))
+        if (json.TryGetProperty("employerID", out var employerIDElement))
         {
-            employerId = employerIdElement.GetUInt32();
+            employerID = employerIDElement.GetUInt32();
         }
         if (json.TryGetProperty("date", out var dateElement))
         {
@@ -103,7 +103,7 @@ public class ComputerController : Controller
             price = priceElement.GetDecimal();
         }
 
-        var computers = _computerRepository.GetFilterItems(name, status, employerId, date, cpu, price);
+        var computers = _computerRepository.GetFilterItems(name, status, employerID, date, cpu, price);
 
         if (computers.Count > 0)
         {
@@ -155,9 +155,9 @@ public class ComputerController : Controller
         {
             computer.StatusID = statusElement.GetUInt32();
         }
-        if (jsonElementComp.TryGetProperty("employerId", out var employerIdElement))
+        if (jsonElementComp.TryGetProperty("employerID", out var employerIDElement))
         {
-            computer.EmployerId = employerIdElement.GetUInt32();
+            computer.EmployerID = employerIDElement.GetUInt32();
         }
         if (jsonElementComp.TryGetProperty("date", out var dateElement))
         {
@@ -180,7 +180,7 @@ public class ComputerController : Controller
         }
         else
         {
-            var success = _computerRepository.ChangeItem(computer);
+            var success = _computerRepository.UpdateItem(computer);
             if (success)
             {
                 responceObj.Success = 1;

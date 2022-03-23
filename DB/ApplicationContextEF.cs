@@ -5,7 +5,7 @@ namespace DB;
 
 public class ApplicationContextEF : DbContext
 {
-    public DbSet<Session> Session { get; set; }
+    public DbSet<Session?> Session { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Computer> Technick { get; set; }
     public DbSet<FileEntity> Files { get; set; }

@@ -4,9 +4,9 @@ namespace DB.Repositories.Users;
 
 public interface IUserRepository : IDisposable
 {
-    public void CreateItem(User user);
+    public bool CreateItem(User user);
 
-    public bool ChangeItem(uint id, string? login, string? password, uint employerID);
+    public bool UpdateItem(User user);
 
     public User? GetItem(uint id);
 

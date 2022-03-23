@@ -48,7 +48,7 @@ public class EmployerController : ControllerBase
     }
 
     [HttpPut]
-    public string СhangeEmployer([FromBody] JsonElement emp)
+    public string UpdateEmployer([FromBody] JsonElement emp)
     {
         var responceObj = new ResponceObject<Employer>();
         string responceJson;
@@ -67,7 +67,7 @@ public class EmployerController : ControllerBase
         var tel = emp.GetProperty("tel").GetString();
         var employer = new Employer() { ID = id, Name = name, Position = position, Tel = tel };
 
-        var success = _employerRepository.ChangeItem(employer);
+        var success = _employerRepository.UpdateItem(employer);
         if (success)
         {
             responceObj.Success = 1;

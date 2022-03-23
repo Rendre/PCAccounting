@@ -7,7 +7,7 @@ public class DekstopSave : IFileSave
 {
     private readonly IFileRepository _fileRepository = new FileDapperRepository();
 
-    public void SaveItem(uint computerId, byte[] fileBytes, string filePath, string pathForSaveFile, string fileID, out FileEntity? file)
+    public void SaveItem(uint computerID, byte[] fileBytes, string filePath, string pathForSaveFile, string fileID, out FileEntity? file)
     {
         var fileName = Path.GetFileName(filePath);
         var ext = Path.GetExtension(filePath);
@@ -20,7 +20,7 @@ public class DekstopSave : IFileSave
 
         using var fileStream = new FileStream(pathForSaveFile, FileMode.CreateNew);
         fileStream.Write(fileBytes);
-        file = new FileEntity() { ComputerId = computerId, Name = fileName, Path = pathForSaveFile };
-        _fileRepository.SaveItem(file);
+        file = new FileEntity() { ComputerID = computerID, Name = fileName, Path = pathForSaveFile };
+        _fileRepository.CreateItem(file);
     }
 }

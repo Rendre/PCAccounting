@@ -60,7 +60,7 @@ public partial class NewTechForm : Form
         textBox1.Text = _computer.Name;
         var index = comboBox1.Items.IndexOf((StatusEnum)_computer.StatusID);
         comboBox1.SelectedIndex = index;
-        var employers = comboBox2.Items.Cast<Employer>().First(p => p.ID == _computer.EmployerId);
+        var employers = comboBox2.Items.Cast<Employer>().First(p => p.ID == _computer.EmployerID);
         index = comboBox2.Items.IndexOf(employers);
         comboBox2.SelectedIndex = index;
         dateTimePicker1.Value = _computer.DateCreated;
@@ -99,7 +99,7 @@ public partial class NewTechForm : Form
             {
                 _computer.Name = name;
                 _computer.StatusID = status;
-                _computer.EmployerId = employer.ID;
+                _computer.EmployerID = employer.ID;
                 _computer.DateCreated = date;
                 _computer.Cpu = cpu;
                 _computer.Price = Convert.ToDecimal(price);
@@ -132,7 +132,7 @@ public partial class NewTechForm : Form
         {
             currComputer.Name = textBox1.Text;
             currComputer.StatusID = (uint) (StatusEnum) comboBox1.SelectedItem;
-            currComputer.EmployerId = ((Employer) comboBox2.SelectedItem).ID;
+            currComputer.EmployerID = ((Employer) comboBox2.SelectedItem).ID;
             currComputer.DateCreated = dateTimePicker1.Value;
             currComputer.Cpu = textBox5.Text;
             currComputer.Price = Convert.ToDecimal(textBox6.Text);
@@ -149,7 +149,7 @@ public partial class NewTechForm : Form
                 button5.Show();
             }
 
-            _computerRepository.ChangeItem(currComputer);
+            _computerRepository.UpdateItem(currComputer);
         }
 
         _isChanged = true;
@@ -193,7 +193,7 @@ public partial class NewTechForm : Form
             var index = comboBox1.Items.IndexOf((StatusEnum)_computer.StatusID);
             comboBox1.SelectedIndex = index;
             // из сотрудников, хранящихся в комбобоксе - берем того, у которого индекс совпадает с искомым
-            var employers = comboBox2.Items.Cast<Employer>().First(e => e.ID == _computer.EmployerId);
+            var employers = comboBox2.Items.Cast<Employer>().First(e => e.ID == _computer.EmployerID);
             index = comboBox2.Items.IndexOf(employers);
             comboBox2.SelectedIndex = index;
             dateTimePicker1.Value = _computer.DateCreated;

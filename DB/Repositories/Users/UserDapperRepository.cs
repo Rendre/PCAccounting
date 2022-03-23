@@ -11,21 +11,22 @@ public class UserDapperRepository : IUserRepository
     {
         _databaseContext = new MySQLDatabaseContext();
     }
-    public void CreateItem(User user)
+    public bool CreateItem(User user)
     {
         var sqlExpression = "INSERT INTO users (Login, Pass, EmployerId)" +
-                            $"VALUES ('{user.Login}', '{user.Pass}', {user.EmployerId})";
-        const string sqlExpressionForId = "SELECT LAST_INSERT_ID()";
+                            $"VALUES ('{user.Login}', '{user.Pass}', {user.EmployerID})";
+        const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteByQuery(sqlExpression);
-        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForId);
+        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
         user.ID = id;
+        return id > 0;
     }
 
-    public bool ChangeItem(uint id, string? login, string? password, uint employerID)
+    public bool UpdateItem(User user)
     {
-        var sqlExpression = $"UPDATE users SET Login = '{login}', " +
-                            $"Pass = '{password}', EmployerId = {employerID} " +
-                            $"WHERE ID = {id}";
+        var sqlExpression = $"UPDATE users SET Login = '{user.Login}', " +
+                            $"Pass = '{user.Pass}', EmployerID = {user.EmployerID} " +
+                            $"WHERE ID = {user.ID}";
         var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
         return rowsChanged > 0;
     }

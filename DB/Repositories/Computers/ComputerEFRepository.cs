@@ -20,7 +20,7 @@ public class ComputerEFRepository : IComputerRepository
         _db.SaveChanges();
     }
 
-    public bool ChangeItem(Computer computer)
+    public bool UpdateItem(Computer computer)
     {
         _db.Technick.Update(computer);
         var rowsChanges = _db.SaveChanges();
@@ -35,7 +35,7 @@ public class ComputerEFRepository : IComputerRepository
         return computer;
     }
 
-    public List<Computer> GetFilterItems(string? name = null, uint statusId = 0, uint employerId = 0, DateTime? date = null,
+    public List<Computer> GetFilterItems(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
         string? cpu = null, decimal price = 0)
     {
         var computers = _db.Technick.Where(p => p.IsDeleted == false);
@@ -44,14 +44,14 @@ public class ComputerEFRepository : IComputerRepository
             computers = computers.Where(p => p.Name != null && p.Name.Equals(name));
         }
 
-        if (statusId > 0)
+        if (statusID > 0)
         {
-            computers = computers.Where(p => p.StatusID == statusId);
+            computers = computers.Where(p => p.StatusID == statusID);
         }
 
-        if (employerId > 0)
+        if (employerID > 0)
         {
-            computers = computers.Where(p => p.EmployerId == employerId);
+            computers = computers.Where(p => p.EmployerID == employerID);
         }
 
         if (date != null)

@@ -6,7 +6,7 @@ public interface IEmployerRepository : IDisposable
 {
     public void CreateItem(Employer employer);
 
-    public bool ChangeItem(Employer employer);
+    public bool UpdateItem(Employer employer);
 
     public Employer? GetItem(uint id);
 

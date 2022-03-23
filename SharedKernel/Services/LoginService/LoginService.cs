@@ -17,7 +17,7 @@ public class LoginService : ILoginService
     {
         if (string.IsNullOrEmpty(token)) return false;
 
-        var session = _db.Session.FirstOrDefault(p => p.Token != null && p.Token.Equals(token));
+        var session = _db.Session.FirstOrDefault(p => p != null && p.Token != null && p.Token.Equals(token));
         if (session == null) return false;
 
         return session.Time.AddMinutes(20) >= DateTime.UtcNow;

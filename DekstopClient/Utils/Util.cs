@@ -9,11 +9,11 @@ internal class Util
         using var multipartFormContent = new MultipartFormDataContent();
         var strFile = Convert.ToBase64String(buffer);
         multipartFormContent.Add(new StringContent(strFile), name: "fileByString");
-        multipartFormContent.Add(new StringContent(pcID), name: "computerId");
+        multipartFormContent.Add(new StringContent(pcID), name: "computerID");
         multipartFormContent.Add(new StringContent(fileName), name: "fileName");
         if (!string.IsNullOrEmpty(fileID))
         {
-            multipartFormContent.Add(new StringContent(fileID), "fileId");
+            multipartFormContent.Add(new StringContent(fileID), "fileID");
         }
 
         var response = await Client.PostAsync(connectionAddress, multipartFormContent).ConfigureAwait(false);
