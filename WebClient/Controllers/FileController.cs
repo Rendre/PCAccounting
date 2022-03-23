@@ -19,6 +19,8 @@ public class FileController : Controller
         FileEntity? file;
         try
         {
+            throw new Exception();
+
             byte[]? fileBytes;
             var fileID = "";
             string fileName;
@@ -62,11 +64,7 @@ public class FileController : Controller
             _fileSave.SaveItem(computerID, fileBytes, fileName, pathForSaveFile, fileID, out file);
             if (file.ID > 0)
             {
-                responceObj.Data = new FileEntity
-                {
-                    ComputerID = file.ComputerID,
-                    ID = file.ID
-                };
+                responceObj.Data = file;
                 responceObj.Success = 1;
             }
 
@@ -74,8 +72,11 @@ public class FileController : Controller
             return responceJson;
 
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            // сюда пихнуть логгер
+
+
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }

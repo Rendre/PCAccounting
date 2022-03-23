@@ -65,6 +65,8 @@ public class EmployerController : ControllerBase
         var name = emp.GetProperty("name").GetString();
         var position = emp.GetProperty("position").GetString();
         var tel = emp.GetProperty("tel").GetString();
+        // взять по id эмплоера из бд
+        // те поля которые отличаются, не пустые не равны нулл.. засунуть в объект и апдейтнуть его
         var employer = new Employer() { ID = id, Name = name, Position = position, Tel = tel };
 
         var success = _employerRepository.UpdateItem(employer);

@@ -306,12 +306,16 @@ public partial class NewTechForm : Form
         var buffer = new byte[_count];
         var countOfReadBytes = 0;
         var result = new ResultClass();
+        var jsonDeserializeOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
         while ((countOfReadBytes = fileStream.Read(buffer, 0, _count)) != 0)
         {
-            var fileID = result.fileID > 0 ? result.fileID.ToString() : "";
+            var fileID = (result.Data != null && result.Data.ID > 0) ? result.Data.ID.ToString() : "";
             var resultJson = Utils.Util.RequestHelper(buffer, connectionAddress, fName, ComputerID.ToString(), fileID);
             var strResult = await resultJson.ConfigureAwait(false);
-            result = JsonSerializer.Deserialize<ResultClass>(strResult);
+            result = JsonSerializer.Deserialize<ResultClass>(strResult, jsonDeserializeOptions);
         }
         var files = _fileRepository.GetItems(ComputerID, "ID", true, 0, 1);
         if (files.Count > 0)
@@ -326,7 +330,7 @@ public partial class NewTechForm : Form
 
     class ResultClass
     {
-        public int success { get; set; }
-        public uint fileID { get; set; }
+        public int Success { get; set; }
+        public FileEntity? Data { get; set; }
     }
 }
