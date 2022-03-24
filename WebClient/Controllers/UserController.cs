@@ -35,7 +35,7 @@ public class UserController : Controller
         var password = userJsn.GetProperty("password").GetString();
         password = Util.Encode(password);
         var employerID = userJsn.GetProperty("employerID").GetUInt32();
-        var user = new User() {Login = login, Pass = password, EmployerID = employerID};
+        var user = new User() {Login = login, Password = password, EmployerID = employerID};
         _userRepository.CreateItem(user);
         if (user.ID > 0)
         {
@@ -65,7 +65,7 @@ public class UserController : Controller
         var password = userJsn.GetProperty("password").GetString();
         password = Util.Encode(password);
         var employerID = userJsn.GetProperty("employerID").GetUInt32();
-        var user = new User() {ID = id, Login = login, Pass = password, EmployerID = employerID};
+        var user = new User() {ID = id, Login = login, Password = password, EmployerID = employerID};
         var success = _userRepository.UpdateItem(user);
 
         if (success)
@@ -94,7 +94,7 @@ public class UserController : Controller
         var user = _userRepository.GetItem(id);
         if (user != null)
         {
-            user.Pass = null;
+            user.Password = null;
             responceObj.Data = user;
             responceObj.Success = 1;
         }
@@ -120,7 +120,7 @@ public class UserController : Controller
         var userList = _userRepository.GetItems();
         foreach (var user in userList)
         {
-            user.Pass = null;
+            user.Password = null;
         }
         if (userList.Count > 0)
         {

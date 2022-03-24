@@ -2,17 +2,17 @@
 
 namespace SharedKernel.Logger;
 
-internal class FileLogger : ILogger
+public class FileLogger : ILogger, IDisposable
 {
-    private string filePath;
-    private static object _lock = new();
+    private readonly string _filePath;
+    private static readonly object Lock = new();
     public FileLogger(string path)
     {
-        filePath = path;
+        _filePath = path;
     }
     public IDisposable BeginScope<TState>(TState state)
     {
-        return null;
+        return this;
     }
 
     public bool IsEnabled(LogLevel logLevel)
@@ -25,10 +25,14 @@ internal class FileLogger : ILogger
     {
         if (formatter != null)
         {
-            lock (_lock)
+            lock (Lock)
             {
-                File.AppendAllText(filePath, formatter(state, exception) + Environment.NewLine);
+                File.AppendAllText(_filePath, formatter(state, exception) + Environment.NewLine);
             }
         }
+    }
+
+    public void Dispose()
+    {
     }
 }

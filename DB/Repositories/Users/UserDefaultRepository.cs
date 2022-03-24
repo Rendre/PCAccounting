@@ -14,7 +14,7 @@ public class UserDefaultRepository : IUserRepository
     public bool CreateItem(User user)
     {
         var sqlExpression = "INSERT INTO users (Login, Pass, EmployerId)" +
-                            $"VALUES ('{user.Login}', '{user.Pass}', {user.EmployerID})";
+                            $"VALUES ('{user.Login}', '{user.Password}', {user.EmployerID})";
         const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
         var id = _databaseContext.ExecuteScalar(sqlExpressionForID);
@@ -25,7 +25,7 @@ public class UserDefaultRepository : IUserRepository
     public bool UpdateItem(User user)
     {
         var sqlExpression = $"UPDATE users SET Login = '{user.Login}', " +
-                            $"Pass = '{user.Pass}', EmployerID = {user.EmployerID} " +
+                            $"Pass = '{user.Password}', EmployerID = {user.EmployerID} " +
                             $"WHERE ID = {user.ID}";
         var rowsChanged = _databaseContext.ExecuteExp(sqlExpression);
         return rowsChanged > 0;

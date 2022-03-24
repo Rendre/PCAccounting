@@ -73,7 +73,7 @@ public class SessionController : ControllerBase
             }
 
             var user = _userRepository.GetItem(login);
-            if (user is {Pass: { }} && (user.Pass.Equals(password)))
+            if (user is {Password: { }} && (user.Password.Equals(password)))
             {
                 session = new Session
                 {
@@ -129,7 +129,7 @@ public class SessionController : ControllerBase
             return responceJson;
         }
 
-        user.Pass = null;
+        user.Password = null;
         var responceUserObj = new ResponceObject<User>
         {
             Success = 1,
@@ -173,7 +173,7 @@ public class SessionController : ControllerBase
             return responceJson;
         }
 
-        var user = new User() { Login = login, Pass = password, EmployerID = 0 };
+        var user = new User() { Login = login, Password = password, EmployerID = 0 };
         _userRepository.CreateItem(user);
 
         responceObj.Success = 1;

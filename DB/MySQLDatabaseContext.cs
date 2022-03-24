@@ -34,7 +34,7 @@ public class MySQLDatabaseContext : IDisposable
             ID = reader.GetUInt32(0),
             IsDeleted = reader.GetBoolean(1),
             Login = reader.GetString(2),
-            Pass = reader.GetString(3),
+            Password = reader.GetString(3),
             EmployerID = reader.GetUInt32(4),
         };
         reader.Close();
@@ -53,7 +53,7 @@ public class MySQLDatabaseContext : IDisposable
                 ID = reader.GetUInt32(0),
                 IsDeleted = reader.GetBoolean(1),
                 Login = reader.GetString(2),
-                Pass = reader.GetString(3),
+                Password = reader.GetString(3),
                 EmployerID = reader.GetUInt32(4),
             };
             users.Add(user);

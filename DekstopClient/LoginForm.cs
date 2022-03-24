@@ -25,9 +25,10 @@ public partial class LoginForm : Form
 
     }
 
-    private void EnterClick(object sender, EventArgs e)
+   private void EnterClick(object sender, EventArgs e)
     {
-        var simpleLoginService = new SimpleLoginService();
+        //var simpleLoginService = new SimpleLoginService();
+        ILoginService simpleLoginService = new SimpleLoginService();
         Login(simpleLoginService);
     }
 
@@ -36,7 +37,7 @@ public partial class LoginForm : Form
         var login = textBox1.Text;
         var password = Util.Encode(textBox2.Text);
         var user = service.Login(login);
-        if (user is {Pass: { }} && (user.Pass.Equals(password)))
+        if (user is {Password: { }} && (user.Password.Equals(password)))
         {
             var mainForm = new MainForm(new EmployerDapperRepository(), new ComputerDapperRepository(), user, this);
             mainForm.Show();
@@ -74,7 +75,7 @@ public partial class LoginForm : Form
     {
         var login = textBox1.Text;
         var password = Util.Encode(textBox2.Text);
-        var user = new User() {Login = login, Pass = password};
+        var user = new User() {Login = login, Password = password};
         var isSuccess = registrationService.Registration(user);
 
         if (isSuccess)

@@ -1,11 +1,12 @@
+using SharedKernel.Logger;
 using WebClient.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-//builder.Host.ConfigureLogging(p => p.)
-
+builder.Logging.AddFile("C:\\Users\\user\\Desktop\\log.txt");
+//builder.Logging.AddProvider(new FileLoggerProvider("C:\\Users\\user\\Desktop\\log.txt"));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

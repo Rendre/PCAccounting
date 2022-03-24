@@ -1,14 +1,20 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DB.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace SharedKernel.Logger;
 
-internal static class FileLoggerExtensions
+public static class FileLoggerExtensions
 {
-    public static ILoggerFactory AddFile(this ILoggerFactory factory,
+    public static ILoggingBuilder AddFile(this ILoggingBuilder builder,
         string filePath)
     {
-        factory.AddProvider(new FileLoggerProvider(filePath));
-        return factory;
+        builder.AddProvider(new FileLoggerProvider(filePath));
+        return builder;
     }
 
+    //public static Computer KEK(this Computer computer)
+    //{
+    //    computer.ID = 0;
+    //    return computer;
+    //}
 }

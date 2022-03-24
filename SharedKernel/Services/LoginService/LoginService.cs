@@ -5,6 +5,7 @@ namespace SharedKernel.Services;
 public class LoginService : ILoginService
 {
     private readonly ApplicationContextEF _db;
+    private const int TokenLifeTime = 100;
 
     public LoginService()
     {
@@ -15,11 +16,12 @@ public class LoginService : ILoginService
 
     public bool IsSessionValid(string? token)
     {
+
         if (string.IsNullOrEmpty(token)) return false;
 
         var session = _db.Session.FirstOrDefault(p => p != null && p.Token != null && p.Token.Equals(token));
         if (session == null) return false;
 
-        return session.Time.AddMinutes(20) >= DateTime.UtcNow;
+        return session.Time.AddMinutes(TokenLifeTime) >= DateTime.UtcNow;
     }
 }

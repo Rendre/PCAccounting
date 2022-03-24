@@ -304,24 +304,35 @@ public partial class NewTechForm : Form
         const int _count = 1024 * 1024;
         var fileStream = new FileStream(_filePath, FileMode.Open, FileAccess.Read);
         var buffer = new byte[_count];
-        var countOfReadBytes = 0;
         var result = new ResultClass();
         var jsonDeserializeOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
-        while ((countOfReadBytes = fileStream.Read(buffer, 0, _count)) != 0)
+        while (fileStream.Read(buffer, 0, _count) != 0)
         {
             var fileID = (result.Data != null && result.Data.ID > 0) ? result.Data.ID.ToString() : "";
             var resultJson = Utils.Util.RequestHelper(buffer, connectionAddress, fName, ComputerID.ToString(), fileID);
             var strResult = await resultJson.ConfigureAwait(false);
             result = JsonSerializer.Deserialize<ResultClass>(strResult, jsonDeserializeOptions);
+            if (result.Success == 0)
+            {
+                var answer = MessageBox.Show(
+                    "Ошибка при загрузке!",
+                    "Внимание",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error,
+                    MessageBoxDefaultButton.Button1,
+                    MessageBoxOptions.DefaultDesktopOnly);
+
+                if (answer == DialogResult.OK) return;
+            }
         }
         var files = _fileRepository.GetItems(ComputerID, "ID", true, 0, 1);
         if (files.Count > 0)
         {
             _file = files[0];
-            if (_file.Path != null) _reserveFileBytes = File.ReadAllBytes(_file.Path);
+            if (_file != null && _file.Path != null) _reserveFileBytes = File.ReadAllBytes(_file.Path);
             pictureBox1.Image = Image.FromStream(new MemoryStream(_reserveFileBytes));
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             _reserveFileBytes = null;

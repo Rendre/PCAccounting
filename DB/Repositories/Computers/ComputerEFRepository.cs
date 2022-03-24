@@ -16,13 +16,13 @@ public class ComputerEFRepository : IComputerRepository
 
     public void CreateItem(Computer computer)
     {
-        _db.Technick.Add(computer);
+        _db.Computers.Add(computer);
         _db.SaveChanges();
     }
 
     public bool UpdateItem(Computer computer)
     {
-        _db.Technick.Update(computer);
+        _db.Computers.Update(computer);
         var rowsChanges = _db.SaveChanges();
         return rowsChanges > 0;
     }
@@ -31,14 +31,14 @@ public class ComputerEFRepository : IComputerRepository
     {
         if (id == 0) return null;
 
-        var computer = _db.Technick.FirstOrDefault(p => p.ID == id);
+        var computer = _db.Computers.FirstOrDefault(p => p.ID == id);
         return computer;
     }
 
     public List<Computer> GetFilterItems(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
         string? cpu = null, decimal price = 0)
     {
-        var computers = _db.Technick.Where(p => p.IsDeleted == false);
+        var computers = _db.Computers.Where(p => p.IsDeleted == false);
         if (!string.IsNullOrEmpty(name))
         {
             computers = computers.Where(p => p.Name != null && p.Name.Equals(name));
@@ -74,11 +74,11 @@ public class ComputerEFRepository : IComputerRepository
 
     public bool DeleteItem(uint id)
     {
-        var computer = _db.Technick.FirstOrDefault(p => p.ID == id);
+        var computer = _db.Computers.FirstOrDefault(p => p.ID == id);
         if (computer == null) return false;
 
         computer.IsDeleted = true;
-        _db.Technick.Update(computer);
+        _db.Computers.Update(computer);
         var rowsChanges = _db.SaveChanges();
         return rowsChanges > 0;
     }

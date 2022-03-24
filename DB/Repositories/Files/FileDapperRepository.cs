@@ -15,12 +15,12 @@ public class FileDapperRepository : IFileRepository
     public void CreateItem(FileEntity? file)
     {
         var parameters = new DynamicParameters();
-        parameters.Add("@CompID", file.ComputerID);
+        parameters.Add("@ComputerID", file.ComputerID);
         parameters.Add("@Path", file.Path);
         parameters.Add("@Name", file.Name);
 
-        const string sqlExpression = "INSERT INTO files (CompID, Path, FileName) " +
-                                     "VALUES (@CompID, @Path, @Name)";
+        const string sqlExpression = "INSERT INTO files (ComputerID, Path, FileName) " +
+                                     "VALUES (@ComputerID, @Path, @Name)";
         _databaseContext.ExecuteByQuery(sqlExpression, parameters);
         const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
         var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
@@ -47,8 +47,8 @@ public class FileDapperRepository : IFileRepository
 
         if (computerID > 0)
         {
-            conditions.Add("CompID=@CompID");
-            parameters.Add("@CompID", computerID);
+            conditions.Add("ComputerID=@ComputerID");
+            parameters.Add("@ComputerID", computerID);
         }
         var sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)}";
         if (!string.IsNullOrEmpty(orderBy) )

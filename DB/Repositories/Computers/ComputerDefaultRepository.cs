@@ -14,7 +14,7 @@ public class ComputerDefaultRepository : IComputerRepository
 
     public void CreateItem(Computer computer)
     {
-        var sqlExpression = "INSERT INTO technick (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
+        var sqlExpression = "INSERT INTO computers (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
                             $"VALUES ('{computer.Name}', {computer.StatusID}, {computer.EmployerID}, '{computer.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
         const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
@@ -24,7 +24,7 @@ public class ComputerDefaultRepository : IComputerRepository
 
     public bool UpdateItem(Computer computer)
     {
-        var sqlExpression = $"UPDATE technick SET Name = '{computer.Name}', " +
+        var sqlExpression = $"UPDATE computers SET Name = '{computer.Name}', " +
                             $"StatusID = {computer.StatusID}, " +
                             $"EmployerID = {computer.EmployerID}, " +
                             $"DateCreated = '{computer.DateCreated:yyyy-MM-dd HH:mm:ss}', " +
@@ -37,7 +37,7 @@ public class ComputerDefaultRepository : IComputerRepository
 
     public Computer? GetItem(uint id)
     {
-        var sqlExpression = $"SELECT * FROM technick WHERE ID = {id} AND IsDeleted = 0 LIMIT 1";
+        var sqlExpression = $"SELECT * FROM computers WHERE ID = {id} AND IsDeleted = 0 LIMIT 1";
         var computer = _databaseContext.GetComputer(sqlExpression);
         return computer;
     }
@@ -49,7 +49,7 @@ public class ComputerDefaultRepository : IComputerRepository
 
     public bool DeleteItem(uint id)
     {
-        var sqlExpression = $"UPDATE technick SET IsDeleted = 1 WHERE ID = {id}";
+        var sqlExpression = $"UPDATE computers SET IsDeleted = 1 WHERE ID = {id}";
         var result = _databaseContext.ExecuteExp(sqlExpression);
         return result > 0;
     }

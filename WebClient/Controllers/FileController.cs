@@ -1,5 +1,6 @@
 ﻿using DB.Entities;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Logger;
 using SharedKernel.Services;
 using WebClient.Models;
 
@@ -9,6 +10,12 @@ namespace WebClient.Controllers;
 public class FileController : Controller
 {
     private readonly IFileSave _fileSave = new WebSave();
+    private readonly ILogger<FileController> _logger;
+
+    public FileController(ILogger<FileController> logger)
+    {
+        _logger = logger;
+    }
 
     [HttpPost]
     public string CreateFile()
@@ -19,8 +26,6 @@ public class FileController : Controller
         FileEntity? file;
         try
         {
-            throw new Exception();
-
             byte[]? fileBytes;
             var fileID = "";
             string fileName;
@@ -74,9 +79,7 @@ public class FileController : Controller
         }
         catch (Exception ex)
         {
-            // сюда пихнуть логгер
-
-
+            _logger.LogError(ex, ex.Message);
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }

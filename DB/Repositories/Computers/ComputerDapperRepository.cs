@@ -16,7 +16,7 @@ public class ComputerDapperRepository : IComputerRepository
 
     public void CreateItem(Computer computer)
     {
-        var sqlExpression = "INSERT INTO technick (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
+        var sqlExpression = "INSERT INTO computers (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
                             $"VALUES ('{computer.Name}', {computer.StatusID}, {computer.EmployerID}, '{computer.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
         const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteByQuery(sqlExpression);
@@ -26,7 +26,7 @@ public class ComputerDapperRepository : IComputerRepository
 
     public bool UpdateItem(Computer computer)
     {
-        var sqlExpression = $"UPDATE technick SET Name = '{computer.Name}', " +
+        var sqlExpression = $"UPDATE computers SET Name = '{computer.Name}', " +
                             $"StatusID = {computer.StatusID}, " +
                             $"EmployerID = {computer.EmployerID}, " +
                             $"DateCreated = '{computer.DateCreated:yyyy-MM-dd HH:mm:ss}', " +
@@ -48,7 +48,7 @@ public class ComputerDapperRepository : IComputerRepository
             "ID = @ID"
         };
         parameters.Add("@ID", id);
-        var sqlExpression = $"SELECT * FROM technick WHERE {string.Join(" AND ", conditions)}";
+        var sqlExpression = $"SELECT * FROM computers WHERE {string.Join(" AND ", conditions)}";
         var computer = _databaseContext.GetByQuery<Computer>(sqlExpression, parameters);
         return computer;
     }
@@ -57,7 +57,7 @@ public class ComputerDapperRepository : IComputerRepository
     public List<Computer> GetFilterItems(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
         string? cpu = null, decimal price = 0)
     {
-        var sqlExpression = new StringBuilder("SELECT * FROM technick WHERE IsDeleted = 0");
+        var sqlExpression = new StringBuilder("SELECT * FROM computers WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
         var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusID, employerID, date, cpu, price, parameters);
         var computers = _databaseContext.GetAllByQuery<Computer>(sqlExpressionForQuery, parameters);
@@ -110,7 +110,7 @@ public class ComputerDapperRepository : IComputerRepository
     {
         var parameters = new DynamicParameters();
         parameters.Add("@ID", id);
-        const string sqlExpression = "UPDATE technick SET IsDeleted = 1 WHERE ID = @ID";
+        const string sqlExpression = "UPDATE computers SET IsDeleted = 1 WHERE ID = @ID";
         var result = _databaseContext.ExecuteByQuery(sqlExpression, parameters);
         return result > 0;
     }

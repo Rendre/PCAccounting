@@ -2,7 +2,7 @@
 
 namespace SharedKernel.Logger;
 
-internal class FileLoggerProvider : ILoggerProvider
+public class FileLoggerProvider : ILoggerProvider
 {
     private string path;
     public FileLoggerProvider(string _path)
