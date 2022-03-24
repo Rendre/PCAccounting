@@ -35,8 +35,10 @@ public class Util
         "afZLuxKlPdV1EsdnQxFMALtZ",
     };
 
-    public static string CheckTelNumber(string strNumber)
+    public static string? CheckTelNumber(string? strNumber)
     {
+        if (strNumber == null) return "";
+
         if (strNumber.Length is < 10 or > 12) return "";
 
         if (strNumber.StartsWith("9") && strNumber.Length == 10)

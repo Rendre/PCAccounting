@@ -20,6 +20,7 @@ public class UserController : Controller
     [HttpPost]
     public string CreateUser([FromBody] JsonElement userJsn)
     {
+        User user;
         var responceObj = new ResponceObject<User>();
         string responceJson;
 
@@ -31,11 +32,20 @@ public class UserController : Controller
             return responceJson;
         }
 
-        var login = userJsn.GetProperty("login").GetString();
-        var password = userJsn.GetProperty("password").GetString();
-        password = Util.Encode(password);
-        var employerID = userJsn.GetProperty("employerID").GetUInt32();
-        var user = new User() {Login = login, Password = password, EmployerID = employerID};
+        try
+        {
+            var login = userJsn.GetProperty("login").GetString();
+            var password = userJsn.GetProperty("password").GetString();
+            password = Util.Encode(password);
+            var employerID = userJsn.GetProperty("employerID").GetUInt32();
+            user = new User() { Login = login, Password = password, EmployerID = employerID };
+        }
+        catch (Exception)
+        {
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
+
         _userRepository.CreateItem(user);
         if (user.ID > 0)
         {
@@ -65,7 +75,7 @@ public class UserController : Controller
         var password = userJsn.GetProperty("password").GetString();
         password = Util.Encode(password);
         var employerID = userJsn.GetProperty("employerID").GetUInt32();
-        var user = new User() {ID = id, Login = login, Password = password, EmployerID = employerID};
+        var user = new User() { ID = id, Login = login, Password = password, EmployerID = employerID };
         var success = _userRepository.UpdateItem(user);
 
         if (success)
