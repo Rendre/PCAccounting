@@ -7,7 +7,7 @@ namespace WebClient.Utils;
 
 public class Util
 {
-    public static bool CheckToken(JsonElement? json, IRequestCookieCollection cookieCollection)
+    public static bool CheckToken(JsonElement? json, IRequestCookieCollection? cookieCollection)
     {
     ILoginService loginService = new LoginService();
     string? token = null;
@@ -17,7 +17,7 @@ public class Util
         }
         else
         {
-            if (cookieCollection.ContainsKey("token"))
+            if (cookieCollection != null && cookieCollection.ContainsKey("token"))
             {
                 cookieCollection.TryGetValue("token", out token);
             }

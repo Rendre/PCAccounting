@@ -22,7 +22,6 @@ namespace DB.Repositories.Users
 
         public bool UpdateItem(User user)
         {
-            // ?
             _db.Users.Update(user);
             var stateCount = _db.SaveChanges();
             return stateCount > 0;
@@ -37,6 +36,12 @@ namespace DB.Repositories.Users
         public User? GetItem(string? login)
         {
             var user = _db.Users.FirstOrDefault(p => p.Login != null && p.Login.Equals(login));
+            return user;
+        }
+
+        public User? GetItemByEmail(string? email)
+        {
+            var user = _db.Users.FirstOrDefault(p => p.Email != null && p.Email.Equals(email));
             return user;
         }
 

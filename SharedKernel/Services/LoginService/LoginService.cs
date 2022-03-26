@@ -22,6 +22,8 @@ public class LoginService : ILoginService
         var session = _db.Session.FirstOrDefault(p => p != null && p.Token != null && p.Token.Equals(token));
         if (session == null) return false;
 
+        if (session.IsDeleted) return false;
+
         return session.Time.AddMinutes(TokenLifeTime) >= DateTime.UtcNow;
     }
 }

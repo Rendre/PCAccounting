@@ -13,8 +13,8 @@ public class UserDapperRepository : IUserRepository
     }
     public bool CreateItem(User user)
     {
-        var sqlExpression = "INSERT INTO users (Login, Pass, EmployerId)" +
-                            $"VALUES ('{user.Login}', '{user.Password}', {user.EmployerID})";
+        var sqlExpression = "INSERT INTO users (Login, Password, EmployerId, ActivationCode, Email)" +
+                            $"VALUES ('{user.Login}', '{user.Password}', {user.EmployerID}, '{user.ActivationCode}', '{user.Email}')";
         const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteByQuery(sqlExpression);
         var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
@@ -25,7 +25,8 @@ public class UserDapperRepository : IUserRepository
     public bool UpdateItem(User user)
     {
         var sqlExpression = $"UPDATE users SET Login = '{user.Login}', " +
-                            $"Pass = '{user.Password}', EmployerID = {user.EmployerID} " +
+                            $"Password = '{user.Password}', EmployerID = {user.EmployerID}," +
+                            $"IsActivated = {user.IsActivated}, ActivationCode = '{user.ActivationCode}', Email = '{user.Email}'" +
                             $"WHERE ID = {user.ID}";
         var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
         return rowsChanged > 0;
@@ -56,6 +57,16 @@ public class UserDapperRepository : IUserRepository
         return user;
     }
 
+
+    public User? GetItemByEmail(string? email)
+    {
+        var parameters = new DynamicParameters();
+        parameters.Add("@Email", email);
+        const string sqlExpression = "SELECT * FROM Users WHERE Email = @Email AND IsDeleted = 0 LIMIT 1";
+        var user = _databaseContext.GetByQuery<User>(sqlExpression, parameters);
+        return user;
+    }
+
     public uint DeleteItem(uint id)
     {
         var parameters = new DynamicParameters();
@@ -63,7 +74,6 @@ public class UserDapperRepository : IUserRepository
         const string sqlExpression = "UPDATE users SET IsDeleted = 1 WHERE ID = @ID";
         var result = _databaseContext.ExecuteByQuery(sqlExpression, parameters);
         return result;
-
     }
 
     public void Dispose()

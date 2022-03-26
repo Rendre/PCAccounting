@@ -14,6 +14,14 @@ public class Util
                ext.Equals(".bmp");
     }
 
+    public static bool CheckEmail(string? email)
+    {
+        if (email == null) return false;
+
+        return email.Contains('@') &&
+               email.Contains('.');
+    }
+
     public static string? Encode(string? text)
     {
         if (string.IsNullOrWhiteSpace(text)) return null;

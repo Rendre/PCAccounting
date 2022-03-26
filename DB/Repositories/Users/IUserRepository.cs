@@ -14,5 +14,7 @@ public interface IUserRepository : IDisposable
 
     public User? GetItem(string? login);
 
+    public User? GetItemByEmail(string? email);
+
     public uint DeleteItem(uint id);
 }

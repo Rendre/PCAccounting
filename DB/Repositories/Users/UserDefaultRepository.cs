@@ -13,8 +13,9 @@ public class UserDefaultRepository : IUserRepository
 
     public bool CreateItem(User user)
     {
-        var sqlExpression = "INSERT INTO users (Login, Pass, EmployerId)" +
-                            $"VALUES ('{user.Login}', '{user.Password}', {user.EmployerID})";
+        var sqlExpression = "INSERT INTO users (Login, Password, EmployerId, ActivationCode, Email)" +
+                            $"VALUES ('{user.Login}', '{user.Password}', {user.EmployerID}," +
+                            $"'{user.ActivationCode}', '{user.Email}')";
         const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteExp(sqlExpression);
         var id = _databaseContext.ExecuteScalar(sqlExpressionForID);
@@ -25,7 +26,8 @@ public class UserDefaultRepository : IUserRepository
     public bool UpdateItem(User user)
     {
         var sqlExpression = $"UPDATE users SET Login = '{user.Login}', " +
-                            $"Pass = '{user.Password}', EmployerID = {user.EmployerID} " +
+                            $"Password = '{user.Password}', EmployerID = {user.EmployerID}," +
+                            $"IsActivated = {user.IsActivated} , ActivationCode = '{user.ActivationCode}', Email = '{user.Email}' " +
                             $"WHERE ID = {user.ID}";
         var rowsChanged = _databaseContext.ExecuteExp(sqlExpression);
         return rowsChanged > 0;
@@ -49,6 +51,13 @@ public class UserDefaultRepository : IUserRepository
     public User? GetItem(string? login)
     {
         var sqlExpression = $"SELECT * FROM Users WHERE Login = '{login}' AND IsDeleted = 0 LIMIT 1";
+        var user = _databaseContext.GetUser(sqlExpression);
+        return user;
+    }
+
+    public User? GetItemByEmail(string? email)
+    {
+        var sqlExpression = $"SELECT * FROM Users WHERE Email = '{email}' AND IsDeleted = 0 LIMIT 1";
         var user = _databaseContext.GetUser(sqlExpression);
         return user;
     }

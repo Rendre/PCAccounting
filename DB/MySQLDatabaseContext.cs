@@ -36,6 +36,11 @@ public class MySQLDatabaseContext : IDisposable
             Login = reader.GetString(2),
             Password = reader.GetString(3),
             EmployerID = reader.GetUInt32(4),
+            IsActivated = reader.GetBoolean(5),
+            ActivationCode = reader.GetString(6),
+            Email = reader.GetString(7)
+
+
         };
         reader.Close();
         return user;
@@ -55,6 +60,8 @@ public class MySQLDatabaseContext : IDisposable
                 Login = reader.GetString(2),
                 Password = reader.GetString(3),
                 EmployerID = reader.GetUInt32(4),
+                IsActivated = reader.GetBoolean(5),
+                Email = reader.GetString(7)
             };
             users.Add(user);
         }

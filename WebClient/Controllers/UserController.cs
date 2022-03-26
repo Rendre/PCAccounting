@@ -14,7 +14,7 @@ public class UserController : Controller
 
     public UserController()
     {
-        _userRepository = new UserDapperRepository();
+        _userRepository = new UserEFRepository();
     }
 
     [HttpPost]
@@ -69,13 +69,14 @@ public class UserController : Controller
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }
-
+        // редко используется
         var id = userJsn.GetProperty("id").GetUInt32();
         var login = userJsn.GetProperty("login").GetString();
         var password = userJsn.GetProperty("password").GetString();
         password = Util.Encode(password);
         var employerID = userJsn.GetProperty("employerID").GetUInt32();
         var user = new User() { ID = id, Login = login, Password = password, EmployerID = employerID };
+
         var success = _userRepository.UpdateItem(user);
 
         if (success)
