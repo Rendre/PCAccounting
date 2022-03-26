@@ -13,6 +13,8 @@ public class ComputerController : Controller
     public ComputerController()
     {
         _computerRepository = new ComputerEFRepository();
+        //_computerRepository = new ComputerDapperRepository();
+        //_computerRepository = new ComputerDefaultRepository();
     }
 
     [HttpPost]

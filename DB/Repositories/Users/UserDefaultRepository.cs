@@ -62,11 +62,11 @@ public class UserDefaultRepository : IUserRepository
         return user;
     }
 
-    public uint DeleteItem(uint id)
+    public bool DeleteItem(uint id)
     {
         var sqlExpression = $"UPDATE users SET IsDeleted = 1 WHERE ID = {id}";
-        var result = _databaseContext.ExecuteExp(sqlExpression);
-        return result;
+        var rowsChanges = _databaseContext.ExecuteExp(sqlExpression);
+        return rowsChanges > 0;
 
     }
 

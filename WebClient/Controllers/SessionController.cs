@@ -14,12 +14,15 @@ public class SessionController : ControllerBase
 {
     private readonly ISessionRepository _sessionRepository;
     private readonly IUserRepository _userRepository;
+    private readonly ProjectProperties _projectProperties;
+
     public SessionController()
     {
         _sessionRepository = new SessionEFRepository();
-       // _userRepository = new UserEFRepository();
-       // _userRepository = new UserDefaultRepository();
-       _userRepository = new UserDapperRepository();
+        // _userRepository = new UserEFRepository();
+        // _userRepository = new UserDefaultRepository();
+        _userRepository = new UserDapperRepository();
+        _projectProperties = Util.GetProjectProperties()!;
     }
 
     [HttpGet]
@@ -228,14 +231,14 @@ public class SessionController : ControllerBase
         var user = new User() { Login = login, Password = password, EmployerID = 0, Email = userMail, IsActivated = false, ActivationCode = activationCode };
         _userRepository.CreateItem(user);
 
-        var from = new MailAddress("testlolkek1234@gmail.com", "Rendre");
+        var from = new MailAddress(_projectProperties.MyEmail, _projectProperties.SendersName);
         var to = new MailAddress(userMail);
         var mailMessage = new MailMessage(from, to);
         mailMessage.Subject = "Регистрация";
         mailMessage.Body = $"<h2>Код подтверждения регистрации: {activationCode}</h2>";
         mailMessage.IsBodyHtml = true;
-        var smtpClient = new SmtpClient("smtp.gmail.com", 587);
-        smtpClient.Credentials = new NetworkCredential("testlolkek1234@gmail.com", "bytdxcursbiylsug");
+        var smtpClient = new SmtpClient(_projectProperties.AddressSMTP, _projectProperties.PortSMTP);
+        smtpClient.Credentials = new NetworkCredential(_projectProperties.MyEmail, _projectProperties.PasswordForMyEmail);
         smtpClient.EnableSsl = true;
         smtpClient.Send(mailMessage);
 

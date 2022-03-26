@@ -47,12 +47,19 @@ namespace DB.Repositories.Users
 
         public List<User> GetItems()
         {
-            throw new NotImplementedException();
+            var users = _db.Users.Where(p => p.IsDeleted == false);
+            return users.ToList();
         }
 
-        public uint DeleteItem(uint id)
+        public bool DeleteItem(uint id)
         {
-            throw new NotImplementedException();
+            var user = _db.Users.FirstOrDefault(p => p.ID == id);
+            if (user == null) return false;
+
+            user.IsDeleted = true;
+            _db.Users.Update(user);
+            var rowsChanged = _db.SaveChanges();
+            return rowsChanged > 0;
         }
 
         public void Dispose()

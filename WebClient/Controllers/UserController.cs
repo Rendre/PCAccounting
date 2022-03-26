@@ -158,7 +158,7 @@ public class UserController : Controller
         }
 
         var deleteObjectCounts = _userRepository.DeleteItem(id);
-        if (deleteObjectCounts > 0)
+        if (deleteObjectCounts)
         {
             responceObj.Success = 1;
         }

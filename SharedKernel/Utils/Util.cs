@@ -1,10 +1,26 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using DB.Entities;
 
 namespace SharedKernel.Utils;
 
 public class Util
 {
+    private static ProjectProperties? ProjectProperties;
+
+    public static ProjectProperties? GetProjectProperties()
+    {
+        if (ProjectProperties != null) return ProjectProperties;
+
+        var directory = new DirectoryInfo(Environment.CurrentDirectory);
+        var path = directory + "\\Properties\\Properties.json";
+        var kek = File.ReadAllText(path);
+        ProjectProperties = JsonSerializer.Deserialize<ProjectProperties>(kek);
+
+        return ProjectProperties;
+    }
+
     public static bool CheckFileExtension(string filePath)
     {
         var ext = Path.GetExtension(filePath).ToLower();

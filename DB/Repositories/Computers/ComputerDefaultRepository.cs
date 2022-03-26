@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using System.Text;
+using Dapper;
 using DB.Entities;
 
 namespace DB.Repositories.Computers;
@@ -44,7 +46,9 @@ public class ComputerDefaultRepository : IComputerRepository
 
     public List<Computer> GetFilterItems(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null, string? cpu = null, decimal price = 0)
     {
-        throw new NotImplementedException();
+        var dapperRep = new ComputerDapperRepository();
+        var result = dapperRep.GetFilterItems(name, statusID, employerID, date, cpu, price);
+        return result;
     }
 
     public bool DeleteItem(uint id)

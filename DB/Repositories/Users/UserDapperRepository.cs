@@ -67,13 +67,13 @@ public class UserDapperRepository : IUserRepository
         return user;
     }
 
-    public uint DeleteItem(uint id)
+    public bool DeleteItem(uint id)
     {
         var parameters = new DynamicParameters();
         parameters.Add("@ID", id);
         const string sqlExpression = "UPDATE users SET IsDeleted = 1 WHERE ID = @ID";
-        var result = _databaseContext.ExecuteByQuery(sqlExpression, parameters);
-        return result;
+        var rowsChanges = _databaseContext.ExecuteByQuery(sqlExpression, parameters);
+        return rowsChanges > 0;
     }
 
     public void Dispose()
