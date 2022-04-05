@@ -1,6 +1,4 @@
 ﻿using System.Globalization;
-using System.Text;
-using Dapper;
 using DB.Entities;
 
 namespace DB.Repositories.Computers;

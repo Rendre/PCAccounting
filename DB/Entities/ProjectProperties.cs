@@ -1,5 +1,4 @@
 ﻿namespace DB.Entities;
-
 public class ProjectProperties
 {
     public string SendersName { get; set; }

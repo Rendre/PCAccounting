@@ -9,6 +9,6 @@ public interface IFileRepository
     public FileEntity? GetItem(uint id);
 
     public List<FileEntity?> GetItems(uint computerID = 0, string? orderBy = null, bool desc = false, uint limitSkip = 0, uint limitTake = 0);
-    
+
     public uint DeleteItem(uint id);
 }

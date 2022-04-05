@@ -14,6 +14,8 @@ public class FileDapperRepository : IFileRepository
 
     public void CreateItem(FileEntity? file)
     {
+        if (file == null) return;
+
         var parameters = new DynamicParameters();
         parameters.Add("@ComputerID", file.ComputerID);
         parameters.Add("@Path", file.Path);

@@ -54,14 +54,13 @@ public class SessionController : ControllerBase
     {
         string? login = null;
         string? password = null;
-        string? token;
         Session? session = null;
         var responceObj = new ResponceObject<Session>();
         string responceJson;
 
         if (json.TryGetProperty("token", out var tokenElement))
         {
-            token = tokenElement.GetString();
+            var token = tokenElement.GetString();
 
             if (string.IsNullOrEmpty(token))
             {
@@ -264,7 +263,7 @@ public class SessionController : ControllerBase
         //вынести проверку на уникальный логин и емейл - отдельно
 
         //вынести в шеред кернел
-        var user = new User() { Login = login, Password = password, EmployerID = 0, Email = userMail, IsActivated = false, ActivationCode = activationCode };
+        var user = new User { Login = login, Password = password, EmployerID = 0, Email = userMail, IsActivated = false, ActivationCode = activationCode };
         _userRepository.CreateItem(user);
 
         var from = new MailAddress(_projectProperties.MyEmail, _projectProperties.SendersName);

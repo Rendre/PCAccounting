@@ -1,5 +1,4 @@
 ﻿using DB.Entities;
-using K4os.Compression.LZ4.Streams;
 using Microsoft.EntityFrameworkCore;
 
 namespace DB.Repositories.Users
