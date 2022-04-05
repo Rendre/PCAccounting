@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Text;
+using Dapper;
 using DB.Entities;
 
 namespace DB.Repositories.Users;
@@ -11,25 +12,16 @@ public class UserDapperRepository : IUserRepository
     {
         _databaseContext = new MySQLDatabaseContext();
     }
-    public bool CreateItem(User user)
-    {
-        var sqlExpression = "INSERT INTO users (Login, Password, EmployerId, ActivationCode, Email)" +
-                            $"VALUES ('{user.Login}', '{user.Password}', {user.EmployerID}, '{user.ActivationCode}', '{user.Email}')";
-        const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
-        _databaseContext.ExecuteByQuery(sqlExpression);
-        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
-        user.ID = id;
-        return id > 0;
-    }
 
-    public bool UpdateItem(User user)
+    public bool SaveItem(User? item)
     {
-        var sqlExpression = $"UPDATE users SET Login = '{user.Login}', " +
-                            $"Password = '{user.Password}', EmployerID = {user.EmployerID}," +
-                            $"IsActivated = {user.IsActivated}, ActivationCode = '{user.ActivationCode}', Email = '{user.Email}'" +
-                            $"WHERE ID = {user.ID}";
-        var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
-        return rowsChanged > 0;
+        if (item == null) return false;
+
+        return item.ID switch
+        {
+            0 => CreateItem(item),
+            > 0 => UpdateItem(item)
+        };
     }
 
     public User? GetItem(uint id)
@@ -43,41 +35,90 @@ public class UserDapperRepository : IUserRepository
         return user;
     }
 
-    public List<User> GetItems()
+    public List<User> GetItems(string? login, string? email, uint employerID, bool isActivated, string? activationCode,
+                                uint skip, uint take)
     {
-        const string sqlExpression = "SELECT * FROM Users WHERE IsDeleted = 0";
-        var users = _databaseContext.GetAllByQuery<User>(sqlExpression);
+        var sqlExpression = new StringBuilder("SELECT * FROM users WHERE IsDeleted = 0");
+        var parameters = new DynamicParameters();
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, login, email, employerID,
+            isActivated, activationCode, skip, take);
+        var users = _databaseContext.GetAllByQuery<User>(sqlExpressionForQuery, parameters);
         return users;
     }
 
-    public User? GetItem(string? login)
+    public int GetItemsCount(string? login, string? email, uint employerID, bool isActivated, string? activationCode)
     {
-        if (string.IsNullOrEmpty(login)) return null;
-
+        const uint skip = 0;
+        const uint take = 0;
+        var sqlExpression = new StringBuilder("SELECT * FROM users WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
-        parameters.Add("@Login", login);
-        const string sqlExpression = "SELECT * FROM Users WHERE Login = @Login AND IsDeleted = 0 LIMIT 1";
-        var user = _databaseContext.GetByQuery<User>(sqlExpression, parameters);
-        return user;
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, login, email, employerID,
+            isActivated, activationCode, skip, take);
+        var users = _databaseContext.GetAllByQuery<User>(sqlExpressionForQuery, parameters);
+        return users.Count;
     }
 
-
-    public User? GetItemByEmail(string? email)
+    private bool CreateItem(User user)
     {
-        var parameters = new DynamicParameters();
-        parameters.Add("@Email", email);
-        const string sqlExpression = "SELECT * FROM Users WHERE Email = @Email AND IsDeleted = 0 LIMIT 1";
-        var user = _databaseContext.GetByQuery<User>(sqlExpression, parameters);
-        return user;
+        var sqlExpression = "INSERT INTO users (Login, Password, EmployerId, ActivationCode, Email)" +
+                            $"VALUES ('{user.Login}', '{user.Password}', {user.EmployerID}, '{user.ActivationCode}', '{user.Email}')";
+        const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
+        _databaseContext.ExecuteByQuery(sqlExpression);
+        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
+        user.ID = id;
+        return id > 0;
     }
 
-    public bool DeleteItem(uint id)
+    private bool UpdateItem(User user)
     {
-        var parameters = new DynamicParameters();
-        parameters.Add("@ID", id);
-        const string sqlExpression = "UPDATE users SET IsDeleted = 1 WHERE ID = @ID";
-        var rowsChanges = _databaseContext.ExecuteByQuery(sqlExpression, parameters);
-        return rowsChanges > 0;
+        var sqlExpression = $"UPDATE users SET Login = '{user.Login}', " +
+                            $"Password = '{user.Password}', EmployerID = {user.EmployerID}," +
+                            $"IsActivated = {user.IsActivated}, ActivationCode = '{user.ActivationCode}', Email = '{user.Email}'" +
+                            $"WHERE ID = {user.ID}";
+        var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
+        return rowsChanged > 0;
+    }
+
+    private static string GetParamForExpression(StringBuilder sqlExpression, DynamicParameters parameters, string? login, string? email,
+        uint employerID, bool isActivated, string? activationCode, uint skip, uint take)
+    {
+        if (!string.IsNullOrEmpty(login))
+        {
+            sqlExpression.Append(" AND Login = @Login");
+            parameters.Add("@Login", login);
+        }
+
+        if (!string.IsNullOrEmpty(email))
+        {
+            sqlExpression.Append(" AND Email = @Email");
+            parameters.Add("@Email", email);
+        }
+        if (employerID > 0)
+        {
+            sqlExpression.Append(" AND EmployerID = @EmployerID");
+            parameters.Add("@EmployerID", employerID);
+        }
+
+        sqlExpression.Append(" AND IsActivated = @IsActivated");
+        parameters.Add("@IsActivated", isActivated);
+
+        if (!string.IsNullOrEmpty(activationCode))
+        {
+            sqlExpression.Append(" AND ActivationCode = @ActivationCode");
+            parameters.Add("@ActivationCode", activationCode);
+        }
+
+        if (take > 0)
+        {
+            sqlExpression.Append(" LIMIT take = @take");
+            parameters.Add("@take", take);
+
+            sqlExpression.Append(" OFFSET skip = @skip");
+            parameters.Add("@skip", skip);
+        }
+
+
+        return sqlExpression.ToString();
     }
 
     public void Dispose()
@@ -98,5 +139,42 @@ public class UserDapperRepository : IUserRepository
 //{
 //    var sqlExpression = $"SELECT * FROM Users WHERE Login = '{login}' AND IsDeleted = 0 LIMIT 1";
 //    var user = _databaseContext.GetByQuery<User>(sqlExpression);
+//    return user;
+//}
+
+//public bool DeleteItem(uint id)
+//{
+//    var parameters = new DynamicParameters();
+//    parameters.Add("@ID", id);
+//    const string sqlExpression = "UPDATE users SET IsDeleted = 1 WHERE ID = @ID";
+//    var rowsChanges = _databaseContext.ExecuteByQuery(sqlExpression, parameters);
+//    return rowsChanges > 0;
+//}
+
+//public List<User> GetItems()
+//{
+//    const string sqlExpression = "SELECT * FROM Users WHERE IsDeleted = 0";
+//    var users = _databaseContext.GetAllByQuery<User>(sqlExpression);
+//    return users;
+//}
+
+//public User? GetItem(string? login)
+//{
+//    if (string.IsNullOrEmpty(login)) return null;
+
+//    var parameters = new DynamicParameters();
+//    parameters.Add("@Login", login);
+//    const string sqlExpression = "SELECT * FROM Users WHERE Login = @Login AND IsDeleted = 0 LIMIT 1";
+//    var user = _databaseContext.GetByQuery<User>(sqlExpression, parameters);
+//    return user;
+//}
+
+
+//public User? GetItemByEmail(string? email)
+//{
+//    var parameters = new DynamicParameters();
+//    parameters.Add("@Email", email);
+//    const string sqlExpression = "SELECT * FROM Users WHERE Email = @Email AND IsDeleted = 0 LIMIT 1";
+//    var user = _databaseContext.GetByQuery<User>(sqlExpression, parameters);
 //    return user;
 //}

@@ -157,7 +157,15 @@ public class UserController : Controller
             return responceJson;
         }
 
-        var deleteObjectCounts = _userRepository.DeleteItem(id);
+        var userFromDb = _userRepository.GetItem(id);
+        if (userFromDb == null)
+        {
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
+
+        userFromDb.IsDeleted = true;
+        var deleteObjectCounts = _userRepository.SaveItem(userFromDb);
         if (deleteObjectCounts)
         {
             responceObj.Success = 1;

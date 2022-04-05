@@ -186,11 +186,8 @@ public class SessionController : ControllerBase
         string? login = null;
         string? password = null;
         string? userMail = null;
-        string? confirmationСode = null;
-        var random = new Random();
         // перенести, если пришел код - просто активируй и все. не доставай пароль и емейл
         //активировать можно либо по логину либо по мейлу
-        var activationCode = random.Next(100000, 1000000).ToString();
         var responceObj = new ResponceObject<Session>();
         string responceJson;
 
@@ -204,16 +201,45 @@ public class SessionController : ControllerBase
             userMail = mailElement.GetString();
         }
 
+        if (json.TryGetProperty("activationCode", out var codElement))
+        {
+            User? userFromDb = null;
+            var confirmationСode = codElement.GetString();
+
+            if (!string.IsNullOrEmpty(login))
+            {
+                userFromDb = _userRepository.GetItem(login);
+            }
+
+            if (!string.IsNullOrEmpty(userMail) &&
+                userFromDb == null)
+            {
+                userFromDb = _userRepository.GetItemByEmail(userMail);
+            }
+
+            if (userFromDb != null)
+            {
+                if (!string.IsNullOrEmpty(confirmationСode) &&
+                    !string.IsNullOrEmpty(userFromDb.ActivationCode) &&
+                    confirmationСode.Equals(userFromDb.ActivationCode))
+                {
+                    userFromDb.IsActivated = true;
+                    userFromDb.ActivationCode = null;
+                    _userRepository.UpdateItem(userFromDb);
+
+                    responceObj.Success = 1;
+                }
+            }
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
+        }
+
         if (json.TryGetProperty("password", out var passwordElement))
         {
             password = passwordElement.GetString();
             password = Util.Encode(password);
         }
 
-        if (json.TryGetProperty("activationCode", out var codElement))
-        {
-            confirmationСode = codElement.GetString();
-        }
         //либо логин либо пароль
         if (string.IsNullOrEmpty(login) ||
             string.IsNullOrEmpty(password) ||
@@ -223,29 +249,10 @@ public class SessionController : ControllerBase
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }
-        // проверять логин или емейл одним запросом
-        var userFromDbByLogin = _userRepository.GetItem(login);
-        if (userFromDbByLogin != null)
-        {
-            if (!string.IsNullOrEmpty(confirmationСode) &&
-                !string.IsNullOrEmpty(userFromDbByLogin.ActivationCode) &&
-                confirmationСode.Equals(userFromDbByLogin.ActivationCode))
-            {
-                userFromDbByLogin.IsActivated = true;
-                userFromDbByLogin.ActivationCode = null;
-                _userRepository.UpdateItem(userFromDbByLogin);
-
-                responceObj.Success = 1;
-                responceJson = Utils.Util.SerializeToJson(responceObj);
-                return responceJson;
-            }
-
-            responceJson = Utils.Util.SerializeToJson(responceObj);
-            return responceJson;
-        }
         //сделать чтоб картинки скачивались - получить список всех картинок по id компьютера
         // приходит id картинки и я ее возвращаю result asp net
         // 2 - добавляю ulr картинки и качаю по url
+
 
         // сделать метод гет итемс с фильтрацией у юзера и с лимитом
         //сколько пропустить сколько взять и фильтрация - возвр лист
@@ -253,6 +260,7 @@ public class SessionController : ControllerBase
 
         //удалить нах, сделать это в 205 строке одним запросом и посмотреть что каунт > 0
         //проверка на уникальность емейла
+
         var userFromDbByEmail = _userRepository.GetItemByEmail(userMail);
         if (userFromDbByEmail != null)
         {
@@ -263,6 +271,8 @@ public class SessionController : ControllerBase
         //вынести проверку на уникальный логин и емейл - отдельно
 
         //вынести в шеред кернел
+        var random = new Random();
+        var activationCode = random.Next(100000, 1000000).ToString();
         var user = new User { Login = login, Password = password, EmployerID = 0, Email = userMail, IsActivated = false, ActivationCode = activationCode };
         _userRepository.CreateItem(user);
 

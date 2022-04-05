@@ -1,75 +1,97 @@
 ﻿using DB.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace DB.Repositories.Users
+namespace DB.Repositories.Users;
+
+public class UserEFRepository : IUserRepository
 {
-    public class UserEFRepository : IUserRepository
+    private readonly ApplicationContextEF _db;
+    public UserEFRepository()
     {
-        private readonly ApplicationContextEF _db;
-        public UserEFRepository()
+        var opt = new DbContextOptionsBuilder<ApplicationContextEF>();
+        opt.UseMySql(MySQLDatabaseContext.ConnectionString, ApplicationContextEF.ServerVersion);
+        _db = new ApplicationContextEF(opt.Options);
+    }
+
+    public bool SaveItem(User? item)
+    {
+        if (item == null) return false;
+
+        return item.ID switch
         {
-            var opt = new DbContextOptionsBuilder<ApplicationContextEF>();
-            opt.UseMySql(MySQLDatabaseContext.ConnectionString, ApplicationContextEF.ServerVersion);
-            _db = new ApplicationContextEF(opt.Options);
-        }
+            0 => CreateItem(item),
+            > 0 => UpdateItem(item)
+        };
+    }
 
-        public bool CreateItem(User user)
-        {
-            _db.Users.Add(user);
-            var stateCount = _db.SaveChanges();
-            return stateCount > 0;
-        }
+    public User? GetItem(uint id)
+    {
+        if (id == 0) return null;
 
-        public bool UpdateItem(User user)
-        {
-            _db.Users.Update(user);
-            var stateCount = _db.SaveChanges();
-            return stateCount > 0;
-        }
+        var user = _db.Users.FirstOrDefault(p => p.ID == id && p.IsDeleted == false);
+        return user;
+    }
 
-        public User? GetItem(uint id)
-        {
-            if (id == 0) return null;
+    public List<User> GetItems(string? login, string? email, uint employerID, bool isActivated, string? activationCode, uint skip,
+        uint take)
+    {
+        throw new NotImplementedException();
+    }
 
-            var user = _db.Users.FirstOrDefault(p => p.ID == id && p.IsDeleted == false);
-            return user;
-        }
+    public int GetItemsCount(string? login, string? email, uint employerID, bool isActivated, string? activationCode)
+    {
+        throw new NotImplementedException();
+    }
 
-        public User? GetItem(string? login)
-        {
-            if (string.IsNullOrEmpty(login)) return null;
 
-            var user = _db.Users.FirstOrDefault(p => p.Login != null && p.Login.Equals(login) &&
-                                                     p.IsDeleted == false);
-            return user;
-        }
+    private bool CreateItem(User user)
+    {
+        _db.Users.Add(user);
+        var stateCount = _db.SaveChanges();
+        return stateCount > 0;
+    }
 
-        public User? GetItemByEmail(string? email)
-        {
-            var user = _db.Users.FirstOrDefault(p => p.Email != null && p.Email.Equals(email));
-            return user;
-        }
+    private bool UpdateItem(User user)
+    {
+        _db.Users.Update(user);
+        var stateCount = _db.SaveChanges();
+        return stateCount > 0;
+    }
 
-        public List<User> GetItems()
-        {
-            var users = _db.Users.Where(p => p.IsDeleted == false);
-            return users.ToList();
-        }
-
-        public bool DeleteItem(uint id)
-        {
-            var user = _db.Users.FirstOrDefault(p => p.ID == id);
-            if (user == null) return false;
-
-            user.IsDeleted = true;
-            _db.Users.Update(user);
-            var rowsChanged = _db.SaveChanges();
-            return rowsChanged > 0;
-        }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+    public void Dispose()
+    {
+        throw new NotImplementedException();
     }
 }
+
+//public User? GetItem(string? login)
+//{
+//    if (string.IsNullOrEmpty(login)) return null;
+
+//    var user = _db.Users.FirstOrDefault(p => p.Login != null && p.Login.Equals(login) &&
+//                                             p.IsDeleted == false);
+//    return user;
+//}
+
+//public User? GetItemByEmail(string? email)
+//{
+//    var user = _db.Users.FirstOrDefault(p => p.Email != null && p.Email.Equals(email));
+//    return user;
+//}
+
+//public List<User> GetItems()
+//{
+//    var users = _db.Users.Where(p => p.IsDeleted == false);
+//    return users.ToList();
+//}
+
+//public bool DeleteItem(uint id)
+//{
+//    var user = _db.Users.FirstOrDefault(p => p.ID == id);
+//    if (user == null) return false;
+
+//    user.IsDeleted = true;
+//    _db.Users.Update(user);
+//    var rowsChanged = _db.SaveChanges();
+//    return rowsChanged > 0;
+//}

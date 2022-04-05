@@ -15,8 +15,61 @@ public class MySQLDatabaseContext : IDisposable
         _connection.Open();
     }
 
+    public T? GetByQuery<T>(string sqlExp, DynamicParameters parameters)
+    {
+        return _connection.QueryFirstOrDefault<T>(sqlExp, parameters);
+    }
+
+    public List<T> GetAllByQuery<T>(string sqlExp, DynamicParameters parameters)
+    {
+        return (List<T>) _connection.Query<T>(sqlExp, parameters);
+    }
+
+
+    public uint ExecuteByQuery(string sqlExpression)
+    {
+        return (uint) _connection.Execute(sqlExpression);
+    }
+
+    public uint ExecuteByQuery(string sqlExpression, DynamicParameters dynamicParameters)
+    {
+        return (uint) _connection.Execute(sqlExpression, dynamicParameters);
+    }
+
+    public uint ExecuteScalarByQuery(string sqlExpression)
+    {
+        return _connection.ExecuteScalar<uint>(sqlExpression);
+    }
+
+    public void Dispose()
+    {
+        _connection.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
     //[Obsolete]
-    #region User
+    public Computer? GetComputer(string sqlExpression)
+    {
+        var command = new MySqlCommand(sqlExpression, _connection);
+        var reader = command.ExecuteReader();
+        if (!reader.Read()) return null;
+
+        var computer = new Computer
+        {
+            ID = reader.GetUInt32(0),
+            IsDeleted = reader.GetBoolean(1),
+            Name = reader.GetString(2),
+            StatusID = reader.GetUInt32(3),
+            EmployerID = reader.GetUInt32(4),
+            DateCreated = reader.GetDateTime(5),
+            Cpu = reader.GetString(6),
+            Price = reader.GetDecimal(7)
+        };
+        reader.Close();
+        return computer;
+    }
+
+    //[Obsolete]
     public User? GetUser(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
@@ -69,85 +122,24 @@ public class MySQLDatabaseContext : IDisposable
         return users;
     }
 
-    #endregion
     //[Obsolete]
-    #region Computer
-    public Computer? GetComputer(string sqlExpression)
+    public uint ExecuteScalar(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
-        var reader = command.ExecuteReader();
-        if (!reader.Read()) return null;
-
-        var computer = new Computer
-        {
-            ID = reader.GetUInt32(0),
-            IsDeleted = reader.GetBoolean(1),
-            Name = reader.GetString(2),
-            StatusID = reader.GetUInt32(3),
-            EmployerID = reader.GetUInt32(4),
-            DateCreated = reader.GetDateTime(5),
-            Cpu = reader.GetString(6),
-            Price = reader.GetDecimal(7)
-        };
-        reader.Close();
-        return computer;
-    }
-    //[Obsolete]
-    public List<Computer> GetComputers(string sqlExpression)
-    {
-        var computers = new List<Computer>();
-        var command = new MySqlCommand(sqlExpression, _connection);
-        var reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-            var computer = new Computer
-            {
-                ID = reader.GetUInt32(0),
-                IsDeleted = reader.GetBoolean(1),
-                Name = reader.GetString(2),
-                StatusID = reader.GetUInt32(3),
-                EmployerID = reader.GetUInt32(4),
-                DateCreated = reader.GetDateTime(5),
-                Cpu = reader.GetString(6),
-                Price = reader.GetDecimal(7)
-            };
-            computers.Add(computer);
-        }
-        reader.Close();
-        return computers;
+        return Convert.ToUInt32(command.ExecuteScalar());
     }
 
-
-    #endregion
-
-    #region Employer
     //[Obsolete]
-    public Employer? GetEmployer(string sqlExpression)
+    public uint ExecuteExp(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
-        var reader = command.ExecuteReader();
-        if (!reader.Read()) return null;
-
-        var employer = new Employer
-        {
-            ID = reader.GetUInt32(0),
-            IsDeleted = reader.GetBoolean(1),
-            Name = reader.GetString(2),
-            Position = reader.GetString(3),
-            Tel = reader.GetString(4)
-        };
-        reader.Close();
-        return employer;
+        return (uint)command.ExecuteNonQuery();
     }
 
-    public T? GetByQuery<T>(string sqlExpression)
+    //[Obsolete]
+    public List<T> GetAllByQuery<T>(string sqlExpression)
     {
-        return _connection.QueryFirstOrDefault<T>(sqlExpression);
-    }
-
-    public T? GetByQuery<T>(string sqlExp, DynamicParameters parameters)
-    {
-        return _connection.QueryFirstOrDefault<T>(sqlExp, parameters);
+        return _connection.Query<T>(sqlExpression).ToList();
     }
 
     //[Obsolete]
@@ -172,49 +164,53 @@ public class MySQLDatabaseContext : IDisposable
         return employers;
     }
 
-    public List<T> GetAllByQuery<T>(string sqlExpression)
-    {
-        return _connection.Query<T>(sqlExpression).ToList();
-    }
-
-    public List<T> GetAllByQuery<T>(string sqlExp, DynamicParameters parameters)
-    {
-        return (List<T>) _connection.Query<T>(sqlExp, parameters);
-    }
-
-    #endregion
     //[Obsolete]
-    public uint ExecuteExp(string sqlExpression)
+    public T? GetByQuery<T>(string sqlExpression)
     {
-        var command = new MySqlCommand(sqlExpression, _connection);
-        return (uint) command.ExecuteNonQuery();
-    }
-
-    public uint ExecuteByQuery(string sqlExpression)
-    {
-        return (uint) _connection.Execute(sqlExpression);
-    }
-
-    public uint ExecuteByQuery(string sqlExpression, DynamicParameters dynamicParameters)
-    {
-        return (uint) _connection.Execute(sqlExpression, dynamicParameters);
+        return _connection.QueryFirstOrDefault<T>(sqlExpression);
     }
 
     //[Obsolete]
-    public uint ExecuteScalar(string sqlExpression)
+    public Employer? GetEmployer(string sqlExpression)
     {
         var command = new MySqlCommand(sqlExpression, _connection);
-        return Convert.ToUInt32(command.ExecuteScalar());
+        var reader = command.ExecuteReader();
+        if (!reader.Read()) return null;
+
+        var employer = new Employer
+        {
+            ID = reader.GetUInt32(0),
+            IsDeleted = reader.GetBoolean(1),
+            Name = reader.GetString(2),
+            Position = reader.GetString(3),
+            Tel = reader.GetString(4)
+        };
+        reader.Close();
+        return employer;
     }
 
-    public uint ExecuteScalarByQuery(string sqlExpression)
+    //[Obsolete]
+    public List<Computer> GetComputers(string sqlExpression)
     {
-        return _connection.ExecuteScalar<uint>(sqlExpression);
-    }
-
-    public void Dispose()
-    {
-        _connection.Dispose();
-        GC.SuppressFinalize(this);
+        var computers = new List<Computer>();
+        var command = new MySqlCommand(sqlExpression, _connection);
+        var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            var computer = new Computer
+            {
+                ID = reader.GetUInt32(0),
+                IsDeleted = reader.GetBoolean(1),
+                Name = reader.GetString(2),
+                StatusID = reader.GetUInt32(3),
+                EmployerID = reader.GetUInt32(4),
+                DateCreated = reader.GetDateTime(5),
+                Cpu = reader.GetString(6),
+                Price = reader.GetDecimal(7)
+            };
+            computers.Add(computer);
+        }
+        reader.Close();
+        return computers;
     }
 }
