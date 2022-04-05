@@ -30,6 +30,6 @@ public class SessionEFRepository : ISessionRepository
 
     public Session? GetItem(string token)
     {
-        return _db.Session.FirstOrDefault(p => p != null && p.Token != null && p.Token.Equals(token));
+        return _db.Session.FirstOrDefault(p => p != null && p.Token != null && p.Token.Equals(token) && p.IsDeleted == false);
     }
 }

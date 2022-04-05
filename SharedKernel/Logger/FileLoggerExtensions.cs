@@ -5,10 +5,11 @@ namespace SharedKernel.Logger;
 
 public static class FileLoggerExtensions
 {
-    public static ILoggingBuilder AddFile(this ILoggingBuilder builder,
-        string filePath)
+    public static ILoggingBuilder AddFile(this ILoggingBuilder builder)
     {
-        builder.AddProvider(new FileLoggerProvider(filePath));
+        var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent?.Parent?.Parent?.Parent;
+        var pathForSaveFile = directory + "\\log\\";
+        builder.AddProvider(new FileLoggerProvider(pathForSaveFile));
         return builder;
     }
 

@@ -20,7 +20,7 @@ public class DekstopSave : IFileSave
 
         using var fileStream = new FileStream(pathForSaveFile, FileMode.CreateNew);
         fileStream.Write(fileBytes);
-        file = new FileEntity() { ComputerID = computerID, Name = fileName, Path = pathForSaveFile };
+        file = new FileEntity { ComputerID = computerID, Name = fileName, Path = pathForSaveFile };
         _fileRepository.CreateItem(file);
     }
 }

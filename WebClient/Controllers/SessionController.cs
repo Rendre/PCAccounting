@@ -25,6 +25,29 @@ public class SessionController : ControllerBase
         _projectProperties = Util.GetProjectProperties()!;
     }
 
+    //систему с разными правами пользователь модератор и админ
+    // пользователь может только смотреть
+    //модератор менять
+    //админ может управлять юзерами
+
+    //посмотреть можно ли самим ставить аннотацию на контроллеры и методы -для проверки залогинен ты или нет
+
+    //все контроллеры обернуть в трай кетч и чтоб логер чонить срал про них
+
+    // чем отличаются мои дапер репозитории от ЕФ ? там чот не так с ЕФ // тесты ? xunit // assert equeal
+
+    //репозитории должны заинектится в контроллер
+    //и всякие ай файл сейф - это мои сервисы
+    [HttpGet]
+    [Route("login1")]
+    public string Login1([FromBody] JsonElement json)
+    {
+
+        GC.Collect();
+        return "";
+    }
+
+
     [HttpGet]
     [Route("login")]
     public string Login([FromBody] JsonElement json)
@@ -166,6 +189,8 @@ public class SessionController : ControllerBase
         string? userMail = null;
         string? confirmationСode = null;
         var random = new Random();
+        // перенести, если пришел код - просто активируй и все. не доставай пароль и емейл
+        //активировать можно либо по логину либо по мейлу
         var activationCode = random.Next(100000, 1000000).ToString();
         var responceObj = new ResponceObject<Session>();
         string responceJson;
@@ -190,7 +215,7 @@ public class SessionController : ControllerBase
         {
             confirmationСode = codElement.GetString();
         }
-
+        //либо логин либо пароль
         if (string.IsNullOrEmpty(login) ||
             string.IsNullOrEmpty(password) ||
             string.IsNullOrEmpty(userMail) ||
@@ -199,7 +224,7 @@ public class SessionController : ControllerBase
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }
-
+        // проверять логин или емейл одним запросом
         var userFromDbByLogin = _userRepository.GetItem(login);
         if (userFromDbByLogin != null)
         {
@@ -219,7 +244,15 @@ public class SessionController : ControllerBase
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }
+        //сделать чтоб картинки скачивались - получить список всех картинок по id компьютера
+        // приходит id картинки и я ее возвращаю result asp net
+        // 2 - добавляю ulr картинки и качаю по url
 
+        // сделать метод гет итемс с фильтрацией у юзера и с лимитом
+        //сколько пропустить сколько взять и фильтрация - возвр лист
+        //с фильтрацией - возвр кол-во
+
+        //удалить нах, сделать это в 205 строке одним запросом и посмотреть что каунт > 0
         //проверка на уникальность емейла
         var userFromDbByEmail = _userRepository.GetItemByEmail(userMail);
         if (userFromDbByEmail != null)
@@ -227,7 +260,10 @@ public class SessionController : ControllerBase
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }
+        // вынести в шеред кернел
+        //вынести проверку на уникальный логин и емейл - отдельно
 
+        //вынести в шеред кернел
         var user = new User() { Login = login, Password = password, EmployerID = 0, Email = userMail, IsActivated = false, ActivationCode = activationCode };
         _userRepository.CreateItem(user);
 

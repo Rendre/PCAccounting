@@ -1,4 +1,5 @@
 ﻿using DB.Entities;
+using K4os.Compression.LZ4.Streams;
 using Microsoft.EntityFrameworkCore;
 
 namespace DB.Repositories.Users
@@ -29,13 +30,18 @@ namespace DB.Repositories.Users
 
         public User? GetItem(uint id)
         {
-            var user = _db.Users.FirstOrDefault(p => p.ID == id);
+            if (id == 0) return null;
+
+            var user = _db.Users.FirstOrDefault(p => p.ID == id && p.IsDeleted == false);
             return user;
         }
 
         public User? GetItem(string? login)
         {
-            var user = _db.Users.FirstOrDefault(p => p.Login != null && p.Login.Equals(login));
+            if (string.IsNullOrEmpty(login)) return null;
+
+            var user = _db.Users.FirstOrDefault(p => p.Login != null && p.Login.Equals(login) &&
+                                                     p.IsDeleted == false);
             return user;
         }
 

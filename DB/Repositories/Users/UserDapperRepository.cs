@@ -34,6 +34,8 @@ public class UserDapperRepository : IUserRepository
 
     public User? GetItem(uint id)
     {
+        if (id == 0) return null;
+
         var parameter = new DynamicParameters();
         parameter.Add("@ID", id);
         const string sqlExpression = "SELECT * FROM Users WHERE ID = @ID AND IsDeleted = 0 LIMIT 1";
@@ -50,6 +52,8 @@ public class UserDapperRepository : IUserRepository
 
     public User? GetItem(string? login)
     {
+        if (string.IsNullOrEmpty(login)) return null;
+
         var parameters = new DynamicParameters();
         parameters.Add("@Login", login);
         const string sqlExpression = "SELECT * FROM Users WHERE Login = @Login AND IsDeleted = 0 LIMIT 1";

@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Logging.AddFile("C:\\Users\\user\\Desktop\\log.txt");
+builder.Logging.AddFile();
 //builder.Logging.AddProvider(new FileLoggerProvider("C:\\Users\\user\\Desktop\\log.txt"));
 var app = builder.Build();
 

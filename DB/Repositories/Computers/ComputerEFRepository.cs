@@ -31,7 +31,7 @@ public class ComputerEFRepository : IComputerRepository
     {
         if (id == 0) return null;
 
-        var computer = _db.Computers.FirstOrDefault(p => p.ID == id);
+        var computer = _db.Computers.FirstOrDefault(p => p.ID == id && p.IsDeleted == false);
         return computer;
     }
 
