@@ -12,24 +12,18 @@ public class FileDapperRepository : IFileRepository
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public void CreateItem(FileEntity? file)
+    public bool SaveItem(FileEntity? item)
     {
-        if (file == null) return;
+        if (item == null) return false;
 
-        var parameters = new DynamicParameters();
-        parameters.Add("@ComputerID", file.ComputerID);
-        parameters.Add("@Path", file.Path);
-        parameters.Add("@Name", file.Name);
-
-        const string sqlExpression = "INSERT INTO files (ComputerID, Path, FileName) " +
-                                     "VALUES (@ComputerID, @Path, @Name)";
-        _databaseContext.ExecuteByQuery(sqlExpression, parameters);
-        const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
-        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
-        file.ID = id;
+        return item.ID switch
+        {
+            0 => CreateItem(item),
+            > 0 => UpdateItem(item)
+        };
     }
 
-    public FileEntity? GetItem(uint id)
+ public FileEntity? GetItem(uint id)
     {
         if (id == 0) return null;
 
@@ -37,15 +31,27 @@ public class FileDapperRepository : IFileRepository
         parameters.Add("@ID", id);
 
         const string sqlExpression = "SELECT * FROM files WHERE ID = @ID AND IsDeleted = 0";
-        var fileFromDb = _databaseContext.GetByQuery<FileEntity>(sqlExpression, parameters);
+        var itemFromDb = _databaseContext.GetByQuery<FileEntity>(sqlExpression, parameters);
 
-        return fileFromDb;
+        return itemFromDb;
     }
 
-    public List<FileEntity?> GetItems(uint computerID = 0, string? orderBy = null, bool desc = false, uint limitSkip = 0, uint limitTake = 0)
+    public List<FileEntity> GetItems(string? name, string? path, uint computerID = 0, string? orderBy = null, bool desc = false, uint limitSkip = 0, uint limitTake = 0)
     {
         var parameters = new DynamicParameters();
-        var conditions = new List<string>(2) { "IsDeleted=0" };
+        var conditions = new List<string> { "IsDeleted=0" };
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            conditions.Add("FileName=@FileName");
+            parameters.Add("@FileName", name);
+        }
+
+        if (!string.IsNullOrEmpty(path))
+        {
+            conditions.Add("Path=@Path");
+            parameters.Add("@Path", path);
+        }
 
         if (computerID > 0)
         {
@@ -53,6 +59,7 @@ public class FileDapperRepository : IFileRepository
             parameters.Add("@ComputerID", computerID);
         }
         var sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)}";
+
         if (!string.IsNullOrEmpty(orderBy) )
         {
             sqlExpression += $" ORDER BY {orderBy} {(desc ? "DESC" : "ASC")}";
@@ -64,18 +71,75 @@ public class FileDapperRepository : IFileRepository
             parameters.Add("@limitSkip", limitSkip);
             parameters.Add("@limitTake", limitTake);
         }
-        List<FileEntity?> fileList = _databaseContext.GetAllByQuery<FileEntity>(sqlExpression, parameters);
+        var fileList = _databaseContext.GetAllByQuery<FileEntity>(sqlExpression, parameters);
         return fileList;
     }
 
-    public uint DeleteItem(uint id)
+    public int GetItemsCount(string? name, string? path, uint computerID = 0)
     {
-        if (id == 0) return 0;
-
         var parameters = new DynamicParameters();
-        parameters.Add("@ID", id);
-        const string sqlExpressions = "UPDATE files SET IsDeleted = 1 WHERE ID = @ID";
-        var success = _databaseContext.ExecuteByQuery(sqlExpressions, parameters);
-        return success;
+        var conditions = new List<string> { "IsDeleted=0" };
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            conditions.Add("FileName=@FileName");
+            parameters.Add("@FileName", name);
+        }
+
+        if (!string.IsNullOrEmpty(path))
+        {
+            conditions.Add("Path=@Path");
+            parameters.Add("@Path", path);
+        }
+
+        if (computerID > 0)
+        {
+            conditions.Add("ComputerID=@ComputerID");
+            parameters.Add("@ComputerID", computerID);
+        }
+        var sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)}";
+        var fileList = _databaseContext.GetAllByQuery<FileEntity>(sqlExpression, parameters);
+
+        return fileList.Count;
+    }
+
+    private bool CreateItem(FileEntity item)
+    {
+        var parameters = new DynamicParameters();
+        parameters.Add("@ComputerID", item.ComputerID);
+        parameters.Add("@Path", item.Path);
+        parameters.Add("@Name", item.Name);
+
+        const string sqlExpression = "INSERT INTO files (ComputerID, Path, FileName) " +
+                                     "VALUES (@ComputerID, @Path, @Name)";
+        _databaseContext.ExecuteByQuery(sqlExpression, parameters);
+        const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
+        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
+        item.ID = id;
+
+        return id > 0;
+    }
+
+    private bool UpdateItem(FileEntity item)
+    {
+        var sqlExpression = "UPDATE files SET " +
+                            $"ComputerID = '{item.ComputerID}', " +
+                            $"Path = '{item.Path}', " +
+                            $"FileName = {item.Name}, " +
+                            $"IsDeleted = {item.IsDeleted}" +
+                            $"WHERE ID = {item.ID}";
+        var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
+        return rowsChanged > 0;
     }
 }
+
+//public uint DeleteItem(uint id)
+//{
+//    if (id == 0) return 0;
+
+//    var parameters = new DynamicParameters();
+//    parameters.Add("@ID", id);
+//    const string sqlExpressions = "UPDATE files SET IsDeleted = 1 WHERE ID = @ID";
+//    var success = _databaseContext.ExecuteByQuery(sqlExpressions, parameters);
+//    return success;
+//}

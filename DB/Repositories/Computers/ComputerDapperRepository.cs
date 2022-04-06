@@ -14,27 +14,15 @@ public class ComputerDapperRepository : IComputerRepository
         _databaseContext = new MySQLDatabaseContext();
     }
 
-    public void CreateItem(Computer computer)
+    public bool SaveItem(Computer? item)
     {
-        var sqlExpression = "INSERT INTO computers (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
-                            $"VALUES ('{computer.Name}', {computer.StatusID}, {computer.EmployerID}, '{computer.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
-        const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
-        _databaseContext.ExecuteByQuery(sqlExpression);
-        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
-        computer.ID = id;
-    }
+        if (item == null) return false;
 
-    public bool UpdateItem(Computer computer)
-    {
-        var sqlExpression = $"UPDATE computers SET Name = '{computer.Name}', " +
-                            $"StatusID = {computer.StatusID}, " +
-                            $"EmployerID = {computer.EmployerID}, " +
-                            $"DateCreated = '{computer.DateCreated:yyyy-MM-dd HH:mm:ss}', " +
-                            $"Cpu = '{computer.Cpu}', " +
-                            $"Price = '{computer.Price.ToString(CultureInfo.InvariantCulture)}' " +
-                            $"WHERE ID = {computer.ID}";
-        var success = _databaseContext.ExecuteByQuery(sqlExpression);
-        return success > 0;
+        return item.ID switch
+        {
+            0 => CreateItem(item),
+            > 0 => UpdateItem(item)
+        };
     }
 
     public Computer? GetItem(uint id)
@@ -53,8 +41,7 @@ public class ComputerDapperRepository : IComputerRepository
         return computer;
     }
 
-    //динамич запрос
-    public List<Computer> GetFilterItems(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
+    public List<Computer> GetItems(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
         string? cpu = null, decimal price = 0)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM computers WHERE IsDeleted = 0");
@@ -62,6 +49,16 @@ public class ComputerDapperRepository : IComputerRepository
         var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusID, employerID, date, cpu, price, parameters);
         var computers = _databaseContext.GetAllByQuery<Computer>(sqlExpressionForQuery, parameters);
         return computers;
+    }
+
+    public int GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
+        string? cpu = null, decimal price = 0)
+    {
+        var sqlExpression = new StringBuilder("SELECT * FROM computers WHERE IsDeleted = 0");
+        var parameters = new DynamicParameters();
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusID, employerID, date, cpu, price, parameters);
+        var computers = _databaseContext.GetAllByQuery<Computer>(sqlExpressionForQuery, parameters);
+        return computers.Count;
     }
 
     private static string GetParamForExpression(StringBuilder sqlExpression, string? name, uint statusID, uint employerID, DateTime? date,
@@ -106,13 +103,29 @@ public class ComputerDapperRepository : IComputerRepository
         return sqlExpression.ToString();
     }
 
-    public bool DeleteItem(uint id)
+  private bool CreateItem(Computer computer)
     {
-        var parameters = new DynamicParameters();
-        parameters.Add("@ID", id);
-        const string sqlExpression = "UPDATE computers SET IsDeleted = 1 WHERE ID = @ID";
-        var result = _databaseContext.ExecuteByQuery(sqlExpression, parameters);
-        return result > 0;
+        var sqlExpression = "INSERT INTO computers (Name, StatusID, EmployerID, DateCreated, Cpu, Price) " +
+                            $"VALUES ('{computer.Name}', {computer.StatusID}, {computer.EmployerID}, '{computer.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")}', '{computer.Cpu}', '{computer.Price}')";
+        const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
+        _databaseContext.ExecuteByQuery(sqlExpression);
+        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
+        computer.ID = id;
+        return id > 0;
+    }
+
+    private bool UpdateItem(Computer computer)
+    {
+        var sqlExpression = $"UPDATE computers SET Name = '{computer.Name}', " +
+                            $"StatusID = {computer.StatusID}, " +
+                            $"EmployerID = {computer.EmployerID}, " +
+                            $"DateCreated = '{computer.DateCreated:yyyy-MM-dd HH:mm:ss}', " +
+                            $"Cpu = '{computer.Cpu}', " +
+                            $"IsDeleted = {computer.IsDeleted}" +
+                            $"Price = '{computer.Price.ToString(CultureInfo.InvariantCulture)}' " +
+                            $"WHERE ID = {computer.ID}";
+        var success = _databaseContext.ExecuteByQuery(sqlExpression);
+        return success > 0;
     }
 
     public void Dispose()

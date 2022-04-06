@@ -71,9 +71,14 @@ public class UserDapperRepository : IUserRepository
 
     private bool UpdateItem(User user)
     {
-        var sqlExpression = $"UPDATE users SET Login = '{user.Login}', " +
-                            $"Password = '{user.Password}', EmployerID = {user.EmployerID}," +
-                            $"IsActivated = {user.IsActivated}, ActivationCode = '{user.ActivationCode}', Email = '{user.Email}'" +
+        var sqlExpression = "UPDATE users SET " +
+                            $"Login = '{user.Login}', " +
+                            $"IsDeleted = {user.IsDeleted}" +
+                            $"Password = '{user.Password}', " +
+                            $"EmployerID = {user.EmployerID}," +
+                            $"IsActivated = {user.IsActivated}, " +
+                            $"ActivationCode = '{user.ActivationCode}', " +
+                            $"Email = '{user.Email}'" +
                             $"WHERE ID = {user.ID}";
         var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
         return rowsChanged > 0;
@@ -116,7 +121,6 @@ public class UserDapperRepository : IUserRepository
             sqlExpression.Append(" OFFSET skip = @skip");
             parameters.Add("@skip", skip);
         }
-
 
         return sqlExpression.ToString();
     }

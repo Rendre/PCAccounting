@@ -177,7 +177,7 @@ public partial class MainForm : Form
     private void RefreshDb()
     {
         dataGridView3.DataSource = null;
-        var table = _computerRepository.GetFilterItems();
+        var table = _computerRepository.GetItems();
         dataGridView3.DataSource = table;
         dataGridView3.Columns["ID"]!.DisplayIndex = 0;
         dataGridView3.Columns["IsDeleted"]!.Visible = false;

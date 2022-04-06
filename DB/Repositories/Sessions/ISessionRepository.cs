@@ -4,12 +4,19 @@ namespace DB.Repositories.Sessions;
 
 public interface ISessionRepository
 {
-    public bool CreateItem(Session session);
+    public bool SaveItem(Session? item);
 
-    public bool UpdateItem(Session session);
+    public Session? GetItem(uint id);
 
-    public Session? GetItem(string token);
+    public List<Session?> GetItems(string? token, DateTime time, uint userID, string? userIP);
 
-    // public bool DeleteItem();
-
+    public int GetItemsCount(string? token, DateTime time, uint userID, string? userIP);
 }
+
+//public bool CreateItem(Session session);
+
+//public bool UpdateItem(Session session);
+
+//public Session? GetItem(string token);
+
+// public bool DeleteItem();

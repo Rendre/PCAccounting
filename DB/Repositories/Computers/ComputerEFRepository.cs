@@ -14,17 +14,15 @@ public class ComputerEFRepository : IComputerRepository
         _db = new ApplicationContextEF(opt.Options);
     }
 
-    public void CreateItem(Computer computer)
+    public bool SaveItem(Computer? item)
     {
-        _db.Computers.Add(computer);
-        _db.SaveChanges();
-    }
+        if (item == null) return false;
 
-    public bool UpdateItem(Computer computer)
-    {
-        _db.Computers.Update(computer);
-        var rowsChanges = _db.SaveChanges();
-        return rowsChanges > 0;
+        return item.ID switch
+        {
+            0 => CreateItem(item),
+            > 0 => UpdateItem(item)
+        };
     }
 
     public Computer? GetItem(uint id)
@@ -35,7 +33,21 @@ public class ComputerEFRepository : IComputerRepository
         return computer;
     }
 
-    public List<Computer> GetFilterItems(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
+    public List<Computer> GetItems(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
+        string? cpu = null, decimal price = 0)
+    {
+        var items = GetList(name, statusID, employerID, date, cpu, price);
+        return items;
+    }
+
+    public int GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
+        string? cpu = null, decimal price = 0)
+    {
+        var items = GetList(name, statusID, employerID, date, cpu, price);
+        return items.Count();
+    }
+
+    private List<Computer> GetList(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
         string? cpu = null, decimal price = 0)
     {
         var computers = _db.Computers.Where(p => p.IsDeleted == false);
@@ -72,15 +84,18 @@ public class ComputerEFRepository : IComputerRepository
         return computers.ToList();
     }
 
-    public bool DeleteItem(uint id)
+    private bool CreateItem(Computer computer)
     {
-        var computer = _db.Computers.FirstOrDefault(p => p.ID == id);
-        if (computer == null) return false;
+        _db.Computers.Add(computer);
+        var stateCount = _db.SaveChanges();
+        return stateCount > 0;
+    }
 
-        computer.IsDeleted = true;
+    private bool UpdateItem(Computer computer)
+    {
         _db.Computers.Update(computer);
-        var rowsChanges = _db.SaveChanges();
-        return rowsChanges > 0;
+        var stateCount = _db.SaveChanges();
+        return stateCount > 0;
     }
 
     public void Dispose()

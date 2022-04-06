@@ -14,16 +14,3 @@ public interface IUserRepository : IDisposable
     public int GetItemsCount(string? login, string? email, uint employerID, bool isActivated,
         string? activationCode);
 }
-
-
-//public bool CreateItem(User user);
-
-//public bool UpdateItem(User user);
-
-//public List<User> GetItems();
-
-//public User? GetItem(string? login);
-
-//public User? GetItemByEmail(string? email);
-
-//public bool DeleteItem(uint id);

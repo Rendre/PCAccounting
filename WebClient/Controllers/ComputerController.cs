@@ -105,7 +105,7 @@ public class ComputerController : Controller
             price = priceElement.GetDecimal();
         }
 
-        var computers = _computerRepository.GetFilterItems(name, status, employerID, date, cpu, price);
+        var computers = _computerRepository.GetItems(name, status, employerID, date, cpu, price);
 
         if (computers.Count > 0)
         {
