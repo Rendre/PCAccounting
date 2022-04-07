@@ -31,31 +31,29 @@ public class UserDapperRepository : IUserRepository
         var parameter = new DynamicParameters();
         parameter.Add("@ID", id);
         const string sqlExpression = "SELECT * FROM Users WHERE ID = @ID AND IsDeleted = 0 LIMIT 1";
-        var user = _databaseContext.GetByQuery<User>(sqlExpression, parameter);
-        return user;
+        var item = _databaseContext.GetByQuery<User>(sqlExpression, parameter);
+        return item;
     }
 
-    public List<User> GetItems(string? login, string? email, uint employerID, bool isActivated, string? activationCode,
-                                uint skip, uint take)
+    public List<User> GetItems(string? login, string? email, uint employerID, bool isActivated,
+        string? activationCode, uint skip, uint take)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM users WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
         var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, login, email, employerID,
             isActivated, activationCode, skip, take);
-        var users = _databaseContext.GetAllByQuery<User>(sqlExpressionForQuery, parameters);
-        return users;
+        var items = _databaseContext.GetAllByQuery<User>(sqlExpressionForQuery, parameters);
+        return items;
     }
 
     public int GetItemsCount(string? login, string? email, uint employerID, bool isActivated, string? activationCode)
     {
-        const uint skip = 0;
-        const uint take = 0;
         var sqlExpression = new StringBuilder("SELECT * FROM users WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
         var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, login, email, employerID,
-            isActivated, activationCode, skip, take);
-        var users = _databaseContext.GetAllByQuery<User>(sqlExpressionForQuery, parameters);
-        return users.Count;
+            isActivated, activationCode);
+        var items = _databaseContext.GetAllByQuery<User>(sqlExpressionForQuery, parameters);
+        return items.Count;
     }
 
     private bool CreateItem(User user)
@@ -80,12 +78,12 @@ public class UserDapperRepository : IUserRepository
                             $"ActivationCode = '{user.ActivationCode}', " +
                             $"Email = '{user.Email}'" +
                             $"WHERE ID = {user.ID}";
-        var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
-        return rowsChanged > 0;
+        var countOfChanges = _databaseContext.ExecuteByQuery(sqlExpression);
+        return countOfChanges > 0;
     }
 
     private static string GetParamForExpression(StringBuilder sqlExpression, DynamicParameters parameters, string? login, string? email,
-        uint employerID, bool isActivated, string? activationCode, uint skip, uint take)
+        uint employerID, bool isActivated, string? activationCode, uint skip = 0, uint take = 0)
     {
         if (!string.IsNullOrEmpty(login))
         {

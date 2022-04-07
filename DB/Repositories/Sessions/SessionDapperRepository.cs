@@ -35,11 +35,11 @@ public class SessionDapperRepository : ISessionRepository
         return item;
     }
 
-    public List<Session?> GetItems(string? token, DateTime time, uint userID, string? userIP)
+    public List<Session?> GetItems(string? token, DateTime time, uint userID, string? userIP, uint skip, uint take)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM session WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
-        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, token, time, userID, userIP);
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, token, time, userID, userIP, skip, take);
         var items = _databaseContext.GetAllByQuery<Session>(sqlExpressionForQuery, parameters);
         return items!;
     }
@@ -74,12 +74,12 @@ public class SessionDapperRepository : ISessionRepository
                             $"UserIP = '{item.UserIP}', " +
                             $"IsDeleted = {item.IsDeleted}, " +
                             $"WHERE ID = {item.ID}";
-        var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
-        return rowsChanged > 0;
+        var countOfChanges = _databaseContext.ExecuteByQuery(sqlExpression);
+        return countOfChanges > 0;
     }
 
     private static string GetParamForExpression(StringBuilder sqlExpression, DynamicParameters parameters,
-        string? token, DateTime? time, uint userID, string? userIP)
+        string? token, DateTime? time, uint userID, string? userIP, uint skip = 0, uint take = 0)
     {
         if (!string.IsNullOrEmpty(token))
         {
@@ -95,14 +95,23 @@ public class SessionDapperRepository : ISessionRepository
 
         if (userID > 0)
         {
-            sqlExpression.Append(" AND Time=@Time");
-            parameters.Add("@Time", time);
+            sqlExpression.Append(" AND UserID=@UserID");
+            parameters.Add("@UserID", userID);
         }
 
         if (!string.IsNullOrEmpty(userIP))
         {
             sqlExpression.Append(" AND UserIP=@UserIP");
             parameters.Add("@UserIP", userIP);
+        }
+
+        if (take > 0)
+        {
+            sqlExpression.Append(" LIMIT take = @take");
+            parameters.Add("@take", take);
+
+            sqlExpression.Append(" OFFSET skip = @skip");
+            parameters.Add("@skip", skip);
         }
 
         return sqlExpression.ToString();

@@ -31,12 +31,12 @@ public class FileDapperRepository : IFileRepository
         parameters.Add("@ID", id);
 
         const string sqlExpression = "SELECT * FROM files WHERE ID = @ID AND IsDeleted = 0";
-        var itemFromDb = _databaseContext.GetByQuery<FileEntity>(sqlExpression, parameters);
-
-        return itemFromDb;
+        var item = _databaseContext.GetByQuery<FileEntity>(sqlExpression, parameters);
+        return item;
     }
 
-    public List<FileEntity> GetItems(string? name, string? path, uint computerID = 0, string? orderBy = null, bool desc = false, uint limitSkip = 0, uint limitTake = 0)
+    public List<FileEntity> GetItems(string? name, string? path, uint computerID = 0, string? orderBy = null,
+        bool desc = false, uint skip = 0, uint take = 0)
     {
         var parameters = new DynamicParameters();
         var conditions = new List<string> { "IsDeleted=0" };
@@ -65,14 +65,14 @@ public class FileDapperRepository : IFileRepository
             sqlExpression += $" ORDER BY {orderBy} {(desc ? "DESC" : "ASC")}";
         }
 
-        if (limitTake > 0)
+        if (take > 0)
         {
             sqlExpression += " LIMIT @limitSkip, @limitTake";
-            parameters.Add("@limitSkip", limitSkip);
-            parameters.Add("@limitTake", limitTake);
+            parameters.Add("@limitSkip", skip);
+            parameters.Add("@limitTake", take);
         }
-        var fileList = _databaseContext.GetAllByQuery<FileEntity>(sqlExpression, parameters);
-        return fileList;
+        var items = _databaseContext.GetAllByQuery<FileEntity>(sqlExpression, parameters);
+        return items;
     }
 
     public int GetItemsCount(string? name, string? path, uint computerID = 0)
@@ -98,9 +98,9 @@ public class FileDapperRepository : IFileRepository
             parameters.Add("@ComputerID", computerID);
         }
         var sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)}";
-        var fileList = _databaseContext.GetAllByQuery<FileEntity>(sqlExpression, parameters);
+        var items = _databaseContext.GetAllByQuery<FileEntity>(sqlExpression, parameters);
 
-        return fileList.Count;
+        return items.Count;
     }
 
     private bool CreateItem(FileEntity item)
@@ -116,7 +116,6 @@ public class FileDapperRepository : IFileRepository
         const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
         var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
         item.ID = id;
-
         return id > 0;
     }
 
@@ -128,8 +127,8 @@ public class FileDapperRepository : IFileRepository
                             $"FileName = {item.Name}, " +
                             $"IsDeleted = {item.IsDeleted}" +
                             $"WHERE ID = {item.ID}";
-        var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
-        return rowsChanged > 0;
+        var countOfChanges = _databaseContext.ExecuteByQuery(sqlExpression);
+        return countOfChanges > 0;
     }
 }
 

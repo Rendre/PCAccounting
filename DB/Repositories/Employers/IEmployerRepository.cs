@@ -8,7 +8,8 @@ public interface IEmployerRepository : IDisposable
 
     public Employer? GetItem(uint id);
 
-    public List<Employer> GetItems(string? name = null, string? position = null, string? tel = null);
+    public List<Employer> GetItems(string? name = null, string? position = null, string? tel = null,
+        uint skip = 0, uint take = 0);
 
     public int GetItemsCount(string? name = null, string? position = null, string? tel = null);
 

@@ -33,21 +33,21 @@ public class ComputerEFRepository : IComputerRepository
         return computer;
     }
 
-    public List<Computer> GetItems(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
+    public List<Computer> GetItems(string? name = null, DateTime? date = null, uint statusID = 0, uint employerID = 0,
         string? cpu = null, decimal price = 0)
     {
-        var items = GetList(name, statusID, employerID, date, cpu, price);
+        var items = GetList(name, date, statusID, employerID, cpu, price);
         return items;
     }
 
-    public int GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
+    public int GetItemsCount(string? name = null, DateTime? date = null, uint statusID = 0, uint employerID = 0,
         string? cpu = null, decimal price = 0)
     {
-        var items = GetList(name, statusID, employerID, date, cpu, price);
+        var items = GetList(name, date, statusID, employerID, cpu, price);
         return items.Count();
     }
 
-    private List<Computer> GetList(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
+    private List<Computer> GetList(string? name = null, DateTime? date = null, uint statusID = 0, uint employerID = 0,
         string? cpu = null, decimal price = 0)
     {
         var computers = _db.Computers.Where(p => p.IsDeleted == false);

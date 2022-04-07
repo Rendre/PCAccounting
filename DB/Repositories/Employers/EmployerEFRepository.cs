@@ -32,7 +32,8 @@ public class EmployerEFRepository : IEmployerRepository
         return item;
     }
 
-    public List<Employer> GetItems(string? name = null, string? position = null, string? tel = null)
+    public List<Employer> GetItems(string? name = null, string? position = null, string? tel = null,
+        uint skip = 0, uint take = 0)
     {
         var items = _db.Employer.Where(p => p.IsDeleted == false);
 
@@ -50,6 +51,8 @@ public class EmployerEFRepository : IEmployerRepository
         {
             items = items.Where(p => p.Tel != null && p.Tel.Equals(tel));
         }
+        // если take > 0
+        items = items.Skip((int)skip).Take((int)take);
 
         return items.ToList();
     }
@@ -79,15 +82,15 @@ public class EmployerEFRepository : IEmployerRepository
     private bool CreateItem(Employer item)
     {
         _db.Employer.Add(item);
-        var stateCount = _db.SaveChanges();
-        return stateCount > 0;
+        var countOfChanges = _db.SaveChanges();
+        return countOfChanges > 0;
     }
 
     private bool UpdateItem(Employer item)
     {
         _db.Employer.Update(item);
-        var stateCount = _db.SaveChanges();
-        return stateCount > 0;
+        var countOfChanges = _db.SaveChanges();
+        return countOfChanges > 0;
     }
 
     public void Dispose()

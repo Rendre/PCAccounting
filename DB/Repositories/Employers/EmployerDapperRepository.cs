@@ -25,10 +25,7 @@ public class EmployerDapperRepository : IEmployerRepository
 
     public Employer? GetItem(uint id)
     {
-        if (id == 0)
-        {
-            return null;
-        }
+        if (id == 0) return null;
 
         var parameters = new DynamicParameters();
         var conditions = new List<string>(2)
@@ -40,11 +37,12 @@ public class EmployerDapperRepository : IEmployerRepository
         parameters.Add("@ID", id);
 
         var sqlExpression = $"SELECT * FROM employers WHERE {string.Join(" AND ", conditions)}";
-        var employer = _databaseContext.GetByQuery<Employer>(sqlExpression, parameters);
-        return employer;
+        var item = _databaseContext.GetByQuery<Employer>(sqlExpression, parameters);
+        return item;
     }
 
-    public List<Employer> GetItems(string? name = null, string? position = null, string? tel = null)
+    public List<Employer> GetItems(string? name = null, string? position = null, string? tel = null,
+        uint skip = 0, uint take = 0)
     {
         var parameters = new DynamicParameters();
         var conditions = new List<string>(4) { "IsDeleted = 0" };
@@ -68,8 +66,8 @@ public class EmployerDapperRepository : IEmployerRepository
         }
 
         var sqlExpression = $"SELECT * FROM employers WHERE {string.Join(" AND ", conditions)}";
-        var employers = _databaseContext.GetAllByQuery<Employer>(sqlExpression, parameters);
-        return employers;
+        var items = _databaseContext.GetAllByQuery<Employer>(sqlExpression, parameters);
+        return items;
     }
 
     public int GetItemsCount(string? name = null, string? position = null, string? tel = null)

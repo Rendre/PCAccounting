@@ -25,7 +25,7 @@ public class FileEFRepository : IFileRepository
             > 0 => UpdateItem(item)
         };
     }
-    
+
     public FileEntity? GetItem(uint id)
     {
         if (id == 0) return null;
@@ -34,8 +34,8 @@ public class FileEFRepository : IFileRepository
         return item;
     }
 
-    public List<FileEntity> GetItems(string? name, string? path, uint computerID = 0, string? orderBy = null, bool desc = false,
-        uint skip = 0, uint take = 0)
+    public List<FileEntity> GetItems(string? name, string? path, uint computerID = 0, string? orderBy = null,
+        bool desc = false, uint skip = 0, uint take = 0)
     {
         var items = _db.File.Where(p => p.IsDeleted == false);
 
@@ -92,14 +92,14 @@ public class FileEFRepository : IFileRepository
     private bool CreateItem(FileEntity item)
     {
         _db.File.Add(item);
-        var stateCount = _db.SaveChanges();
-        return stateCount > 0;
+        var countOfChanges = _db.SaveChanges();
+        return countOfChanges > 0;
     }
 
     private bool UpdateItem(FileEntity item)
     {
         _db.File.Update(item);
-        var stateCount = _db.SaveChanges();
-        return stateCount > 0;
+        var countOfChanges = _db.SaveChanges();
+        return countOfChanges > 0;
     }
 }

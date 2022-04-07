@@ -28,66 +28,78 @@ public class SessionEFRepository : ISessionRepository
     {
         if (id == 0) return null;
 
-        return _db.Session.FirstOrDefault(p =>  p != null && p.ID == id && p.IsDeleted == false);
+        var item = _db.Session.FirstOrDefault(p =>  p != null && p.ID == id && p.IsDeleted == false);
+        return item;
     }
 
-    public List<Session?> GetItems(string? token, uint userID, string? userIP, uint skip = 0, uint take = 1)
+    public List<Session?> GetItems(string? token, DateTime? time, uint userID, string? userIP, uint skip = 0,
+        uint take = 1)
     {
-        var sessions = _db.Session.Where(p => p != null && p.IsDeleted == false);
+        var items = _db.Session.Where(p => p != null && p.IsDeleted == false);
 
         if (!string.IsNullOrEmpty(token))
         {
-            sessions = sessions.Where(p => p != null && p.Token != null && p.Token.Equals(token));
+            items = items.Where(p => p != null && p.Token != null && p.Token.Equals(token));
+        }
+
+        if (time != null)
+        {
+            items = items.Where(p => p != null && p.Time.Equals(time));
         }
 
         if (userID > 0)
         {
-            sessions = sessions.Where(p => p != null && p.UserID == userID);
+            items = items.Where(p => p != null && p.UserID == userID);
         }
 
         if (!string.IsNullOrEmpty(userIP))
         {
-            sessions = sessions.Where(p => p != null && p.UserIP != null && p.UserIP.Equals(userIP));
+            items = items.Where(p => p != null && p.UserIP != null && p.UserIP.Equals(userIP));
         }
 
-        sessions = sessions.Skip((int)skip).Take((int)take);
+        items = items.Skip((int)skip).Take((int)take);
 
-        return sessions.ToList();
+        return items.ToList();
     }
 
-    public int GetItemsCount(string? token, uint userID, string? userIP)
+    public int GetItemsCount(string? token, DateTime? time, uint userID, string? userIP)
     {
-        var sessions = _db.Session.Where(p => p != null && p.IsDeleted == false);
+        var items = _db.Session.Where(p => p != null && p.IsDeleted == false);
 
         if (!string.IsNullOrEmpty(token))
         {
-            sessions = sessions.Where(p => p != null && p.Token != null && p.Token.Equals(token));
+            items = items.Where(p => p != null && p.Token != null && p.Token.Equals(token));
+        }
+
+        if (time != null)
+        {
+            items = items.Where(p => p != null && p.Time.Equals(time));
         }
 
         if (userID > 0)
         {
-            sessions = sessions.Where(p => p != null && p.UserID == userID);
+            items = items.Where(p => p != null && p.UserID == userID);
         }
 
         if (!string.IsNullOrEmpty(userIP))
         {
-            sessions = sessions.Where(p => p != null && p.UserIP != null && p.UserIP.Equals(userIP));
+            items = items.Where(p => p != null && p.UserIP != null && p.UserIP.Equals(userIP));
         }
 
-        return sessions.Count();
+        return items.Count();
     }
 
     private bool CreateItem(Session? session)
     {
         _db.Session.Add(session);
-        var stateCount =  _db.SaveChanges();
-        return stateCount > 0;
+        var countOfChanges =  _db.SaveChanges();
+        return countOfChanges > 0;
     }
 
     private bool UpdateItem(Session? session)
     {
         _db.Session.Update(session);
-        var stateCount = _db.SaveChanges();
-        return stateCount > 0;
+        var countOfChanges = _db.SaveChanges();
+        return countOfChanges > 0;
     }
 }
