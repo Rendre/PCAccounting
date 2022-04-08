@@ -67,7 +67,7 @@ public partial class LoginForm : Form
 
     private void RegistrationClick(object sender, EventArgs e)
     {
-        IRegistrationService registrationService = new RegistrationService(new UserDefaultRepository());
+        IRegistrationService registrationService = new RegistrationService(new UserDapperRepository());
         Registration(registrationService);
     }
 

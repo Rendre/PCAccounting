@@ -7,8 +7,9 @@ public static class FileLoggerExtensions
 {
     public static ILoggingBuilder AddFile(this ILoggingBuilder builder)
     {
-        var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent?.Parent?.Parent?.Parent;
-        var pathForSaveFile = directory + "\\log\\";
+        //var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent?.Parent?.Parent?.Parent;
+        var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent;
+        var pathForSaveFile = directory + "\\log.txt";
         builder.AddProvider(new FileLoggerProvider(pathForSaveFile));
         return builder;
     }

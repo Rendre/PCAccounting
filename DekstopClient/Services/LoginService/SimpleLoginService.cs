@@ -5,12 +5,13 @@ namespace DekstopClient.Services.LoginService;
 
 public class SimpleLoginService : ILoginService
 {
-    public User? Login(string? login)
+    public User Login(string? login)
     {
-        var userRepository = new UserDefaultRepository();
+        var userRepository = new UserDapperRepository();
         using (userRepository)
         {
-            return userRepository.GetItem(login);
+            var users = userRepository.GetItems(login, take: 1);
+            return users.First();
         }
     }
 }

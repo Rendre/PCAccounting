@@ -38,7 +38,7 @@ public class UserController : Controller
             var password = userJsn.GetProperty("password").GetString();
             password = Util.Encode(password);
             var employerID = userJsn.GetProperty("employerID").GetUInt32();
-            user = new User() { Login = login, Password = password, EmployerID = employerID };
+            user = new User { Login = login, Password = password, EmployerID = employerID };
         }
         catch (Exception)
         {
@@ -46,7 +46,7 @@ public class UserController : Controller
             return responceJson;
         }
 
-        _userRepository.CreateItem(user);
+        _userRepository.SaveItem(user);
         if (user.ID > 0)
         {
             responceObj.Success = 1;
@@ -75,9 +75,9 @@ public class UserController : Controller
         var password = userJsn.GetProperty("password").GetString();
         password = Util.Encode(password);
         var employerID = userJsn.GetProperty("employerID").GetUInt32();
-        var user = new User() { ID = id, Login = login, Password = password, EmployerID = employerID };
+        var user = new User { ID = id, Login = login, Password = password, EmployerID = employerID };
 
-        var success = _userRepository.UpdateItem(user);
+        var success = _userRepository.SaveItem(user);
 
         if (success)
         {

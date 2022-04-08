@@ -38,7 +38,7 @@ public class EmployerController : ControllerBase
             var position = emp.GetProperty("position").GetString();
             var tel = emp.GetProperty("tel").GetString();
             tel = Util.CheckTelNumber(tel); 
-            employer = new Employer() { Name = name, Position = position, Tel = tel };
+            employer = new Employer { Name = name, Position = position, Tel = tel };
         }
         catch
         {
@@ -46,11 +46,11 @@ public class EmployerController : ControllerBase
             return responceJson;
         }
 
-        _employerRepository.CreateItem(employer);
+        _employerRepository.SaveItem(employer);
         if (employer.ID > 0)
         {
             responceObj.Success = 1;
-            responceObj.Data = new Employer() { ID = employer.ID };
+            responceObj.Data = new Employer { ID = employer.ID };
         }
 
         responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -115,7 +115,7 @@ public class EmployerController : ControllerBase
             }
             if (isChanged)
             {
-                var success = _employerRepository.UpdateItem(employer);
+                var success = _employerRepository.SaveItem(employer);
                 if (success)
                 {
                     responceObj.Success = 1;
@@ -211,8 +211,9 @@ public class EmployerController : ControllerBase
             return responceJson;
         }
 
-        var deleteObjCounts = _employerRepository.DeleteItem(id);
-        if (deleteObjCounts > 0)
+        var employer = _employerRepository.GetItem(id);
+        var success = _employerRepository.SaveItem(employer);
+        if (success)
         {
             responceObj.Success = 1;
         }

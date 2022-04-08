@@ -33,7 +33,7 @@ public partial class NewTechForm : Form
     private void NewTechForm_Load(object sender, EventArgs e)
     {
         comboBox1.Items.AddRange(new object[] { StatusEnum.Defective, StatusEnum.Properly, StatusEnum.UnderRepair, StatusEnum.Null });
-        comboBox2.Items.Add(new Employer() { ID = 0, Name = "null" });
+        comboBox2.Items.Add(new Employer { ID = 0, Name = "null" });
         var employerList = _employerRepository.GetItems(null, null, null);
         comboBox2.Items.AddRange(employerList.ToArray());
 
@@ -68,7 +68,7 @@ public partial class NewTechForm : Form
         textBox6.Text = _computer.Price.ToString();
 
         //вывод картинки при просмотре компа
-        var files = _fileRepository.GetItems(ComputerID, "ID", true, 0, 1);
+        var files = _fileRepository.GetItems(computerID: ComputerID, orderBy: "ID", desc: true, skip: 0, take: 1);
         if (files.Count <= 0) return;
 
         _file = files[0];
@@ -104,7 +104,7 @@ public partial class NewTechForm : Form
                 _computer.Cpu = cpu;
                 _computer.Price = Convert.ToDecimal(price);
 
-                _computerRepository.CreateItem(_computer);
+                _computerRepository.SaveItem(_computer);
 
                 // тут у нового компа появился айди
                 // сохр картинку
@@ -149,7 +149,7 @@ public partial class NewTechForm : Form
                 button5.Show();
             }
 
-            _computerRepository.UpdateItem(currComputer);
+            _computerRepository.SaveItem(currComputer);
         }
 
         _isChanged = true;
@@ -255,9 +255,10 @@ public partial class NewTechForm : Form
 
         if (result == DialogResult.OK)
         {
-            _fileRepository.DeleteItem(_file.ID);
+            _file.IsDeleted = true;
+            _fileRepository.SaveItem(_file);
             // этот код дублируется - потом прибери его
-            var files = _fileRepository.GetItems(ComputerID, "ID", true, 0, 1);
+            var files = _fileRepository.GetItems(computerID: ComputerID, orderBy: "ID", desc: true, skip: 0, take: 1);
             if (files.Count > 0)
             {
                 _file = files[0];
@@ -328,7 +329,7 @@ public partial class NewTechForm : Form
                 if (answer == DialogResult.OK) return;
             }
         }
-        var files = _fileRepository.GetItems(ComputerID, "ID", true, 0, 1);
+        var files = _fileRepository.GetItems(computerID: ComputerID, orderBy: "ID", desc: true, skip: 0, take: 1);
         if (files.Count > 0)
         {
             _file = files[0];

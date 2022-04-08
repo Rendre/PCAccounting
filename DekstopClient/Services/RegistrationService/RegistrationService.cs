@@ -16,10 +16,11 @@ public class RegistrationService : IRegistrationService
     {
         using (_userRepository)
         {
-            var userFromDb = _userRepository.GetItem(user.Login);
+            var users = _userRepository.GetItems(user.Login, take:1);
+            var userFromDb = users.First();
             if (userFromDb != null) return false;
 
-            _userRepository.CreateItem(user);
+            _userRepository.SaveItem(user);
             return true;
         }
     }

@@ -137,7 +137,7 @@ public class ComputerController : Controller
         {
             if (computer != null)
             {
-                var success = _computerRepository.DeleteItem(computer.ID);
+                var success = _computerRepository.SaveItem(computer);
                 if (success)
                 {
                     responceObj.Success = 1;
@@ -176,13 +176,13 @@ public class ComputerController : Controller
 
         if (computer.ID == 0)
         {
-            _computerRepository.CreateItem(computer);
+            _computerRepository.SaveItem(computer);
             responceObj.Success = 1;
             responceObj.Data = computer;
         }
         else
         {
-            var success = _computerRepository.UpdateItem(computer);
+            var success = _computerRepository.SaveItem(computer);
             if (success)
             {
                 responceObj.Success = 1;

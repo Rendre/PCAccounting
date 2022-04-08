@@ -23,7 +23,7 @@ public class FileDapperRepository : IFileRepository
         };
     }
 
- public FileEntity? GetItem(uint id)
+    public FileEntity? GetItem(uint id)
     {
         if (id == 0) return null;
 
@@ -35,7 +35,7 @@ public class FileDapperRepository : IFileRepository
         return item;
     }
 
-    public List<FileEntity> GetItems(string? name, string? path, uint computerID = 0, string? orderBy = null,
+    public List<FileEntity> GetItems(string? name = null, string? path = null, uint computerID = 0, string? orderBy = null,
         bool desc = false, uint skip = 0, uint take = 0)
     {
         var parameters = new DynamicParameters();
@@ -60,7 +60,7 @@ public class FileDapperRepository : IFileRepository
         }
         var sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)}";
 
-        if (!string.IsNullOrEmpty(orderBy) )
+        if (!string.IsNullOrEmpty(orderBy))
         {
             sqlExpression += $" ORDER BY {orderBy} {(desc ? "DESC" : "ASC")}";
         }
@@ -75,7 +75,7 @@ public class FileDapperRepository : IFileRepository
         return items;
     }
 
-    public int GetItemsCount(string? name, string? path, uint computerID = 0)
+    public int GetItemsCount(string? name = null, string? path = null, uint computerID = 0)
     {
         var parameters = new DynamicParameters();
         var conditions = new List<string> { "IsDeleted=0" };

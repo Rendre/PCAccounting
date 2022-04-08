@@ -68,7 +68,8 @@ public class SessionController : ControllerBase
                 return responceJson;
             }
 
-            session = _sessionRepository.GetItem(token);
+            var sessions = _sessionRepository.GetItems(token, take: 1);
+            session = sessions.First();
             if (session != null)
             {
                 var isValid = session.Time.AddMinutes(20) > DateTime.UtcNow &&
@@ -76,7 +77,7 @@ public class SessionController : ControllerBase
                 if (!isValid)
                 {
                     session.IsDeleted = true;
-                    _sessionRepository.UpdateItem(session);
+                    _sessionRepository.SaveItem(session);
                     responceJson = Utils.Util.SerializeToJson(responceObj);
                     return responceJson;
                 }
@@ -102,7 +103,8 @@ public class SessionController : ControllerBase
                 return responceJson;
             }
 
-            var user = _userRepository.GetItem(login);
+            var users = _userRepository.GetItems(login, take: 1);
+            var user = users.First();
 
             if (user is {IsActivated: false})
             {
@@ -120,7 +122,7 @@ public class SessionController : ControllerBase
                     UserIP = HttpContext.Connection.RemoteIpAddress?.ToString()
                 };
 
-                _sessionRepository.CreateItem(session);
+                _sessionRepository.SaveItem(session);
             }
         }
 
@@ -154,7 +156,8 @@ public class SessionController : ControllerBase
             return responceJson;
         }
 
-        var session = _sessionRepository.GetItem(token);
+        var sessions = _sessionRepository.GetItems(token, take: 1);
+        var session = sessions.First();
         if (session == null)
         {
             responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -201,6 +204,7 @@ public class SessionController : ControllerBase
             userMail = mailElement.GetString();
         }
 
+        List<User>? users;
         if (json.TryGetProperty("activationCode", out var codElement))
         {
             User? userFromDb = null;
@@ -208,13 +212,15 @@ public class SessionController : ControllerBase
 
             if (!string.IsNullOrEmpty(login))
             {
-                userFromDb = _userRepository.GetItem(login);
+                users = _userRepository.GetItems(login, take: 1);
+                userFromDb = users.First();
             }
 
             if (!string.IsNullOrEmpty(userMail) &&
                 userFromDb == null)
             {
-                userFromDb = _userRepository.GetItemByEmail(userMail);
+                users = _userRepository.GetItems(userMail, take: 1);
+                userFromDb = users.First();
             }
 
             if (userFromDb != null)
@@ -225,7 +231,7 @@ public class SessionController : ControllerBase
                 {
                     userFromDb.IsActivated = true;
                     userFromDb.ActivationCode = null;
-                    _userRepository.UpdateItem(userFromDb);
+                    _userRepository.SaveItem(userFromDb);
 
                     responceObj.Success = 1;
                 }
@@ -261,8 +267,9 @@ public class SessionController : ControllerBase
         //удалить нах, сделать это в 205 строке одним запросом и посмотреть что каунт > 0
         //проверка на уникальность емейла
 
-        var userFromDbByEmail = _userRepository.GetItemByEmail(userMail);
-        if (userFromDbByEmail != null)
+        users = _userRepository.GetItems(userMail, take: 1);
+        var user = users.First();
+        if (user != null)
         {
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
@@ -273,8 +280,8 @@ public class SessionController : ControllerBase
         //вынести в шеред кернел
         var random = new Random();
         var activationCode = random.Next(100000, 1000000).ToString();
-        var user = new User { Login = login, Password = password, EmployerID = 0, Email = userMail, IsActivated = false, ActivationCode = activationCode };
-        _userRepository.CreateItem(user);
+        user = new User { Login = login, Password = password, EmployerID = 0, Email = userMail, IsActivated = false, ActivationCode = activationCode };
+        _userRepository.SaveItem(user);
 
         var from = new MailAddress(_projectProperties.MyEmail, _projectProperties.SendersName);
         var to = new MailAddress(userMail);
@@ -311,7 +318,8 @@ public class SessionController : ControllerBase
             return responceJson;
         }
 
-        var session = _sessionRepository.GetItem(token);
+        var sessions = _sessionRepository.GetItems(token, take: 1);
+        var session = sessions.First();
         if (session == null)
         {
             responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -319,7 +327,7 @@ public class SessionController : ControllerBase
         }
 
         session.IsDeleted = true;
-        _sessionRepository.UpdateItem(session);
+        _sessionRepository.SaveItem(session);
 
         responceObj.Success = 1;
         responceJson = Utils.Util.SerializeToJson(responceObj);

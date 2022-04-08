@@ -34,7 +34,7 @@ public class FileEFRepository : IFileRepository
         return item;
     }
 
-    public List<FileEntity> GetItems(string? name, string? path, uint computerID = 0, string? orderBy = null,
+    public List<FileEntity> GetItems(string? name = null, string? path = null, uint computerID = 0, string? orderBy = null,
         bool desc = false, uint skip = 0, uint take = 0)
     {
         var items = _db.File.Where(p => p.IsDeleted == false);
@@ -71,7 +71,7 @@ public class FileEFRepository : IFileRepository
         return items.ToList();
     }
 
-    public int GetItemsCount(string? name, string? path, uint computerID = 0)
+    public int GetItemsCount(string? name = null, string? path = null, uint computerID = 0)
     {
         var items = _db.File.Where(p => p.IsDeleted == false);
 
