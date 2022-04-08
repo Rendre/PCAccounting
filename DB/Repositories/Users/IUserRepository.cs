@@ -8,9 +8,9 @@ public interface IUserRepository : IDisposable
 
     public User? GetItem(uint id);
 
-    public List<User> GetItems(string? login, string? email, uint employerID,
-                                bool isActivated, string? activationCode, uint skip, uint take);
+    public List<User> GetItems(string? login = null, string? email = null, uint employerID = 0,
+                                bool isActivated = true, string? activationCode = null, uint skip = 0, uint take = 0);
 
-    public int GetItemsCount(string? login, string? email, uint employerID, bool isActivated,
-        string? activationCode);
+    public int GetItemsCount(string? login = null, string? email = null, uint employerID = 0, bool isActivated = true,
+        string? activationCode = null);
 }

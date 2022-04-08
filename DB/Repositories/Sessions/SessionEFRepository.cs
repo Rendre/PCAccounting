@@ -28,12 +28,12 @@ public class SessionEFRepository : ISessionRepository
     {
         if (id == 0) return null;
 
-        var item = _db.Session.FirstOrDefault(p =>  p != null && p.ID == id && p.IsDeleted == false);
+        var item = _db.Session.FirstOrDefault(p => p != null && p.ID == id && p.IsDeleted == false);
         return item;
     }
 
-    public List<Session?> GetItems(string? token, DateTime? time, uint userID, string? userIP, uint skip = 0,
-        uint take = 1)
+    public List<Session?> GetItems(string? token = null, DateTime? time = null, uint userID = 0,
+        string? userIP = null, uint skip = 0, uint take = 0)
     {
         var items = _db.Session.Where(p => p != null && p.IsDeleted == false);
 
@@ -57,12 +57,16 @@ public class SessionEFRepository : ISessionRepository
             items = items.Where(p => p != null && p.UserIP != null && p.UserIP.Equals(userIP));
         }
 
-        items = items.Skip((int)skip).Take((int)take);
+        if (take > 0)
+        {
+            items = items.Skip((int)skip).Take((int)take);
+        }
 
         return items.ToList();
     }
 
-    public int GetItemsCount(string? token, DateTime? time, uint userID, string? userIP)
+    public int GetItemsCount(string? token = null, DateTime? time = null, uint userID = 0,
+        string? userIP = null)
     {
         var items = _db.Session.Where(p => p != null && p.IsDeleted == false);
 
@@ -92,7 +96,7 @@ public class SessionEFRepository : ISessionRepository
     private bool CreateItem(Session? session)
     {
         _db.Session.Add(session);
-        var countOfChanges =  _db.SaveChanges();
+        var countOfChanges = _db.SaveChanges();
         return countOfChanges > 0;
     }
 

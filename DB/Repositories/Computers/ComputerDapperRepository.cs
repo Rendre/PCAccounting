@@ -41,18 +41,19 @@ public class ComputerDapperRepository : IComputerRepository
         return computer;
     }
 
-    public List<Computer> GetItems(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
-        string? cpu = null, decimal price = 0)
+    public List<Computer> GetItems(string? name = null, uint statusID = 0, uint employerID = 0,
+        DateTime? date = null, string? cpu = null, decimal price = 0, uint skip = 0, uint take = 0)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM computers WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
-        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusID, employerID, date, cpu, price, parameters);
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusID, employerID, 
+            date, cpu, price, parameters, skip, take);
         var computers = _databaseContext.GetAllByQuery<Computer>(sqlExpressionForQuery, parameters);
         return computers;
     }
 
-    public int GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0, DateTime? date = null,
-        string? cpu = null, decimal price = 0)
+    public int GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0,
+        DateTime? date = null, string? cpu = null, decimal price = 0)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM computers WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
@@ -62,7 +63,7 @@ public class ComputerDapperRepository : IComputerRepository
     }
 
     private static string GetParamForExpression(StringBuilder sqlExpression, string? name, uint statusID, uint employerID, DateTime? date,
-        string? cpu, decimal price, DynamicParameters parameters)
+        string? cpu, decimal price, DynamicParameters parameters, uint skip = 0, uint take = 0)
     {
         if (name != null)
         {
@@ -100,6 +101,15 @@ public class ComputerDapperRepository : IComputerRepository
             parameters.Add("@Price", price);
         }
 
+        if (take > 0)
+        {
+            sqlExpression.Append(" LIMIT take = @take");
+            parameters.Add("@take", take);
+
+            sqlExpression.Append(" OFFSET skip = @skip");
+            parameters.Add("@skip", skip);
+        }
+
         return sqlExpression.ToString();
     }
 
@@ -124,8 +134,8 @@ public class ComputerDapperRepository : IComputerRepository
                             $"IsDeleted = {computer.IsDeleted}" +
                             $"Price = '{computer.Price.ToString(CultureInfo.InvariantCulture)}' " +
                             $"WHERE ID = {computer.ID}";
-        var success = _databaseContext.ExecuteByQuery(sqlExpression);
-        return success > 0;
+        var countOfChanges = _databaseContext.ExecuteByQuery(sqlExpression);
+        return countOfChanges > 0;
     }
 
     public void Dispose()

@@ -8,10 +8,11 @@ public interface ISessionRepository
 
     public Session? GetItem(uint id);
 
-    public List<Session?> GetItems(string? token, DateTime time, uint userID, string? userIP,
-        uint skip, uint take);
+    public List<Session?> GetItems(string? token = null, DateTime? time = null, uint userID = 0,
+        string? userIP = null, uint skip = 0, uint take = 0);
 
-    public int GetItemsCount(string? token, DateTime time, uint userID, string? userIP);
+    public int GetItemsCount(string? token = null, DateTime? time = null, uint userID = 0,
+        string? userIP = null);
 }
 
 //public bool CreateItem(Session session);

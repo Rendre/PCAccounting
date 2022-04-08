@@ -51,8 +51,11 @@ public class EmployerEFRepository : IEmployerRepository
         {
             items = items.Where(p => p.Tel != null && p.Tel.Equals(tel));
         }
-        // если take > 0
-        items = items.Skip((int)skip).Take((int)take);
+
+        if (take > 0)
+        {
+            items = items.Skip((int)skip).Take((int)take);
+        }
 
         return items.ToList();
     }

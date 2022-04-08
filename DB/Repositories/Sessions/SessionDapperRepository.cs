@@ -35,7 +35,8 @@ public class SessionDapperRepository : ISessionRepository
         return item;
     }
 
-    public List<Session?> GetItems(string? token, DateTime time, uint userID, string? userIP, uint skip, uint take)
+    public List<Session?> GetItems(string? token = null, DateTime? time = null, uint userID = 0,
+        string? userIP = null, uint skip = 0, uint take = 0)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM session WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
@@ -44,7 +45,8 @@ public class SessionDapperRepository : ISessionRepository
         return items!;
     }
 
-    public int GetItemsCount(string? token, DateTime time, uint userID, string? userIP)
+    public int GetItemsCount(string? token = null, DateTime? time = null, uint userID = 0,
+        string? userIP = null)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM session WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();

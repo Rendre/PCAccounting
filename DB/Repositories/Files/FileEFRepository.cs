@@ -63,7 +63,11 @@ public class FileEFRepository : IFileRepository
             items = desc ? items.OrderByDescending(p => property) : items.OrderBy(p => property);
         }
 
-        items = items.Skip((int)skip).Take((int)take);
+        if (take > 0)
+        {
+            items = items.Skip((int)skip).Take((int)take);
+        }
+
         return items.ToList();
     }
 

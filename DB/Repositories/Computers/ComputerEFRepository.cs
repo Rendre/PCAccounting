@@ -29,73 +29,78 @@ public class ComputerEFRepository : IComputerRepository
     {
         if (id == 0) return null;
 
-        var computer = _db.Computers.FirstOrDefault(p => p.ID == id && p.IsDeleted == false);
-        return computer;
+        var item = _db.Computers.FirstOrDefault(p => p.ID == id && p.IsDeleted == false);
+        return item;
     }
 
-    public List<Computer> GetItems(string? name = null, DateTime? date = null, uint statusID = 0, uint employerID = 0,
-        string? cpu = null, decimal price = 0)
+    public List<Computer> GetItems(string? name = null, uint statusID = 0, uint employerID = 0,
+        DateTime? date = null, string? cpu = null, decimal price = 0, uint skip = 0, uint take = 0)
     {
         var items = GetList(name, date, statusID, employerID, cpu, price);
         return items;
     }
 
-    public int GetItemsCount(string? name = null, DateTime? date = null, uint statusID = 0, uint employerID = 0,
-        string? cpu = null, decimal price = 0)
+    public int GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0,
+        DateTime? date = null, string? cpu = null, decimal price = 0)
     {
         var items = GetList(name, date, statusID, employerID, cpu, price);
         return items.Count();
     }
 
     private List<Computer> GetList(string? name = null, DateTime? date = null, uint statusID = 0, uint employerID = 0,
-        string? cpu = null, decimal price = 0)
+        string? cpu = null, decimal price = 0, uint skip = 0, uint take = 0)
     {
-        var computers = _db.Computers.Where(p => p.IsDeleted == false);
+        var items = _db.Computers.Where(p => p.IsDeleted == false);
         if (!string.IsNullOrEmpty(name))
         {
-            computers = computers.Where(p => p.Name != null && p.Name.Equals(name));
+            items = items.Where(p => p.Name != null && p.Name.Equals(name));
         }
 
         if (statusID > 0)
         {
-            computers = computers.Where(p => p.StatusID == statusID);
+            items = items.Where(p => p.StatusID == statusID);
         }
 
         if (employerID > 0)
         {
-            computers = computers.Where(p => p.EmployerID == employerID);
+            items = items.Where(p => p.EmployerID == employerID);
         }
 
         if (date != null)
         {
-            computers = computers.Where(p => p.DateCreated.Equals(date));
+            items = items.Where(p => p.DateCreated.Equals(date));
         }
 
         if (!string.IsNullOrEmpty(cpu))
         {
-            computers = computers.Where(p => p.Cpu != null && p.Cpu.Equals(cpu));
+            items = items.Where(p => p.Cpu != null && p.Cpu.Equals(cpu));
         }
 
         if (price > 0)
         {
-            computers = computers.Where(p => p.Price == price);
+            items = items.Where(p => p.Price == price);
         }
 
-        return computers.ToList();
+        if (take > 0)
+        {
+            items = items.Skip((int)skip).Take((int)take);
+        }
+
+        return items.ToList();
     }
 
     private bool CreateItem(Computer computer)
     {
         _db.Computers.Add(computer);
-        var stateCount = _db.SaveChanges();
-        return stateCount > 0;
+        var countOfChanges = _db.SaveChanges();
+        return countOfChanges > 0;
     }
 
     private bool UpdateItem(Computer computer)
     {
         _db.Computers.Update(computer);
-        var stateCount = _db.SaveChanges();
-        return stateCount > 0;
+        var countOfChanges = _db.SaveChanges();
+        return countOfChanges > 0;
     }
 
     public void Dispose()

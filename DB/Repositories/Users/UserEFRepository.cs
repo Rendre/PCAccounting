@@ -32,8 +32,8 @@ public class UserEFRepository : IUserRepository
         return item;
     }
 
-    public List<User> GetItems(string? login, string? email, uint employerID,
-        bool isActivated, string? activationCode, uint skip, uint take)
+    public List<User> GetItems(string? login = null, string? email = null, uint employerID = 0,
+        bool isActivated = true, string? activationCode = null, uint skip = 0, uint take = 0)
 
     {
         var items = _db.Users.Where(p => p.IsDeleted == false && p.IsActivated == isActivated);
@@ -58,12 +58,16 @@ public class UserEFRepository : IUserRepository
             items = items.Where(p => p.ActivationCode != null && p.ActivationCode.Equals(activationCode));
         }
 
-        items = items.Skip((int) skip).Take((int) take);
+        if (take > 0)
+        {
+            items = items.Skip((int)skip).Take((int)take);
+        }
 
         return items.ToList();
     }
 
-    public int GetItemsCount(string? login, string? email, uint employerID, bool isActivated, string? activationCode)
+    public int GetItemsCount(string? login = null, string? email = null, uint employerID = 0, bool isActivated = true,
+        string? activationCode = null)
     {
         var items = _db.Users.Where(p => p.IsDeleted == false && p.IsActivated == isActivated);
 
