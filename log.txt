@@ -304,3 +304,8 @@ Now listening on: http://localhost:5204
 Application started. Press Ctrl+C to shut down.
 Hosting environment: Development
 Content root path: C:\Users\user\Desktop\sharp\PCAccounting\WebClient\
+Now listening on: https://localhost:7204
+Now listening on: http://localhost:5204
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\user\Desktop\sharp\PCAccounting\WebClient\

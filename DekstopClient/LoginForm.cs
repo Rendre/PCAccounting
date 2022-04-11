@@ -16,8 +16,8 @@ public partial class LoginForm : Form
         textBox2.PasswordChar = '*';
         textBox1.TextAlign = HorizontalAlignment.Center;
         textBox2.TextAlign = HorizontalAlignment.Center;
-        textBox1.Text = "test";
-        textBox2.Text = "test";
+        textBox1.Text = "jiggaaut";
+        textBox2.Text = "q1w2e3r4";
     }
 
     private void LoginForm_Load(object sender, EventArgs e)
@@ -75,7 +75,7 @@ public partial class LoginForm : Form
     {
         var login = textBox1.Text;
         var password = Util.Encode(textBox2.Text);
-        var user = new User() {Login = login, Password = password};
+        var user = new User {Login = login, Password = password};
         var isSuccess = registrationService.Registration(user);
 
         if (isSuccess)

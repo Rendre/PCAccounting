@@ -122,10 +122,10 @@ public class FileDapperRepository : IFileRepository
     private bool UpdateItem(FileEntity item)
     {
         var sqlExpression = "UPDATE files SET " +
-                            $"ComputerID = '{item.ComputerID}', " +
+                            $"ComputerID = {item.ComputerID}, " +
                             $"Path = '{item.Path}', " +
-                            $"FileName = {item.Name}, " +
-                            $"IsDeleted = {item.IsDeleted}" +
+                            $"FileName = '{item.Name}', " +
+                            $"IsDeleted = {(item.IsDeleted ? 1 : 0)} " +
                             $"WHERE ID = {item.ID}";
         var countOfChanges = _databaseContext.ExecuteByQuery(sqlExpression);
         return countOfChanges > 0;
