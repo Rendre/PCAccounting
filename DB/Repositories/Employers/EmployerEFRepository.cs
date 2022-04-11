@@ -28,14 +28,14 @@ public class EmployerEFRepository : IEmployerRepository
     {
         if (id == 0) return null;
 
-        var item = _db.Employer.FirstOrDefault(p => p.ID == id && p.IsDeleted == false);
+        var item = _db.Employers.FirstOrDefault(p => p.ID == id && p.IsDeleted == false);
         return item;
     }
 
     public List<Employer> GetItems(string? name = null, string? position = null, string? tel = null,
         uint skip = 0, uint take = 0)
     {
-        var items = _db.Employer.Where(p => p.IsDeleted == false);
+        var items = _db.Employers.Where(p => p.IsDeleted == false);
 
         if (!string.IsNullOrEmpty(name))
         {
@@ -62,7 +62,7 @@ public class EmployerEFRepository : IEmployerRepository
 
     public int GetItemsCount(string? name = null, string? position = null, string? tel = null)
     {
-        var items = _db.Employer.Where(p => p.IsDeleted == false);
+        var items = _db.Employers.Where(p => p.IsDeleted == false);
 
         if (!string.IsNullOrEmpty(name))
         {
@@ -84,14 +84,14 @@ public class EmployerEFRepository : IEmployerRepository
 
     private bool CreateItem(Employer item)
     {
-        _db.Employer.Add(item);
+        _db.Employers.Add(item);
         var countOfChanges = _db.SaveChanges();
         return countOfChanges > 0;
     }
 
     private bool UpdateItem(Employer item)
     {
-        _db.Employer.Update(item);
+        _db.Employers.Update(item);
         var countOfChanges = _db.SaveChanges();
         return countOfChanges > 0;
     }

@@ -36,7 +36,7 @@ public class UserDapperRepository : IUserRepository
     }
 
     public List<User> GetItems(string? login = null, string? email = null, uint employerID = 0,
-        bool isActivated = true, string? activationCode = null, uint skip = 0, uint take = 0)
+        EntityStatus isActivated = EntityStatus.None, string? activationCode = null, uint skip = 0, uint take = 0)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM users WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
@@ -46,7 +46,7 @@ public class UserDapperRepository : IUserRepository
         return items;
     }
 
-    public int GetItemsCount(string? login = null, string? email = null, uint employerID = 0, bool isActivated = true,
+    public int GetItemsCount(string? login = null, string? email = null, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
         string? activationCode = null)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM users WHERE IsDeleted = 0");
@@ -72,7 +72,7 @@ public class UserDapperRepository : IUserRepository
     {
         var sqlExpression = "UPDATE users SET " +
                             $"Login = '{user.Login}', " +
-                            $"IsDeleted = {user.IsDeleted}" +
+                            $"IsDeleted = {user.IsDeleted}, " +
                             $"Password = '{user.Password}', " +
                             $"EmployerID = {user.EmployerID}," +
                             $"IsActivated = {user.IsActivated}, " +
@@ -84,7 +84,7 @@ public class UserDapperRepository : IUserRepository
     }
 
     private static string GetParamForExpression(StringBuilder sqlExpression, DynamicParameters parameters, string? login, string? email,
-        uint employerID, bool isActivated, string? activationCode, uint skip = 0, uint take = 0)
+        uint employerID, EntityStatus isActivated, string? activationCode, uint skip = 0, uint take = 0)
     {
         if (!string.IsNullOrEmpty(login))
         {
@@ -103,8 +103,11 @@ public class UserDapperRepository : IUserRepository
             parameters.Add("@EmployerID", employerID);
         }
 
-        sqlExpression.Append(" AND IsActivated = @IsActivated");
-        parameters.Add("@IsActivated", isActivated);
+        if (isActivated != EntityStatus.None)
+        {
+            sqlExpression.Append(" AND IsActivated = @IsActivated");
+            parameters.Add("@IsActivated", isActivated == EntityStatus.OnlyActive ? 1 : 0);
+        }
 
         if (!string.IsNullOrEmpty(activationCode))
         {
@@ -114,10 +117,10 @@ public class UserDapperRepository : IUserRepository
 
         if (take > 0)
         {
-            sqlExpression.Append(" LIMIT take = @take");
+            sqlExpression.Append(" LIMIT @take");
             parameters.Add("@take", take);
 
-            sqlExpression.Append(" OFFSET skip = @skip");
+            sqlExpression.Append(" OFFSET @skip");
             parameters.Add("@skip", skip);
         }
 

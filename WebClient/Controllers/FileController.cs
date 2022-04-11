@@ -1,6 +1,5 @@
 ﻿using DB.Entities;
 using Microsoft.AspNetCore.Mvc;
-using SharedKernel.Logger;
 using SharedKernel.Services;
 using WebClient.Models;
 
@@ -23,7 +22,6 @@ public class FileController : Controller
         var responceObj = new ResponceObject<FileEntity>();
         string responceJson;
 
-        FileEntity? file;
         try
         {
             byte[]? fileBytes;
@@ -66,7 +64,7 @@ public class FileController : Controller
 
             var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent;
             var pathForSaveFile = directory + "\\Images\\";
-            _fileSave.SaveItem(computerID, fileBytes, fileName, pathForSaveFile, fileID, out file);
+            _fileSave.SaveItem(computerID, fileBytes, fileName, pathForSaveFile, fileID, out var file);
             if (file.ID > 0)
             {
                 responceObj.Data = file;

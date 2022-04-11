@@ -9,8 +9,8 @@ public interface IUserRepository : IDisposable
     public User? GetItem(uint id);
 
     public List<User> GetItems(string? login = null, string? email = null, uint employerID = 0,
-                                bool isActivated = true, string? activationCode = null, uint skip = 0, uint take = 0);
+                                EntityStatus isActivated = EntityStatus.None, string? activationCode = null, uint skip = 0, uint take = 0);
 
-    public int GetItemsCount(string? login = null, string? email = null, uint employerID = 0, bool isActivated = true,
+    public int GetItemsCount(string? login = null, string? email = null, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
         string? activationCode = null);
 }

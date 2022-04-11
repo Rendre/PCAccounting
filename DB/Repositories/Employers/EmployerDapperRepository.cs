@@ -111,7 +111,7 @@ public class EmployerDapperRepository : IEmployerRepository
 
     private bool UpdateItem(Employer employer)
     {
-        var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}'" +
+        var sqlExpression = $"UPDATE employers SET Name = '{employer.Name}', Position = '{employer.Position}', Tel = '{employer.Tel}', IsDeleted = {employer.IsDeleted}" +
                             $" WHERE ID = {employer.ID}";
         var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
         return rowsChanged > 0;

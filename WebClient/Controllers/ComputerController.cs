@@ -9,12 +9,13 @@ namespace WebClient.Controllers;
 public class ComputerController : Controller
 {
     private readonly IComputerRepository _computerRepository;
+    private readonly ILogger<FileController> _logger;
 
-    public ComputerController()
+    public ComputerController(ILogger<FileController> logger)
     {
-        _computerRepository = new ComputerEFRepository();
-        //_computerRepository = new ComputerDapperRepository();
-        //_computerRepository = new ComputerDefaultRepository();
+        _logger = logger;
+        //_computerRepository = new ComputerEFRepository();
+        _computerRepository = new ComputerDapperRepository();
     }
 
     [HttpPost]
@@ -24,30 +25,38 @@ public class ComputerController : Controller
         var responceObj = new ResponceObject<Computer>();
         string responceJson;
 
-        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid)
+        try
         {
-            responceObj.Access = 1;
+            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            if (!isValid)
+            {
+                responceObj.Access = 1;
+                responceJson = Utils.Util.SerializeToJson(responceObj);
+                return responceJson;
+            }
+
+            if (json.TryGetProperty("id", out var jsonElementID))
+            {
+                var id = jsonElementID.GetUInt32();
+                return GetComputer(id);
+            }
+
+            if (json.TryGetProperty("list", out _))
+            {
+                return GetComputers(json);
+            }
+
+            if (json.TryGetProperty("comp", out var jsonElementComp))
+            {
+                return ParseComp(jsonElementComp, responceObj);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
         }
-
-        if (json.TryGetProperty("id", out var jsonElementID))
-        {
-            var id = jsonElementID.GetUInt32();
-            return GetComputer(id);
-        }
-
-        if (json.TryGetProperty("list", out _))
-        {
-            return GetComputers(json);
-        }
-
-        if (json.TryGetProperty("comp", out var jsonElementComp))
-        {
-            return ParseComp(jsonElementComp, responceObj);
-        }
-
         responceJson = Utils.Util.SerializeToJson(responceObj);
         return responceJson;
     }
@@ -55,16 +64,12 @@ public class ComputerController : Controller
     private string GetComputer(uint id)
     {
         var responceObj = new ResponceObject<Computer>();
-        string responceJson;
 
         var computer = _computerRepository.GetItem(id);
-        if (computer != null)
-        {
-            responceObj.Success = 1;
-            responceObj.Data = computer;
-        }
+        responceObj.Success = 1;
+        responceObj.Data = computer;
 
-        responceJson = Utils.Util.SerializeToJson(responceObj);
+        var responceJson = Utils.Util.SerializeToJson(responceObj);
         return responceJson;
     }
 
@@ -78,7 +83,6 @@ public class ComputerController : Controller
         decimal price = 0;
 
         var responceObj = new ResponceObject<Computer>();
-        string responceJson;
 
         if (json.TryGetProperty("name", out var nameElement))
         {
@@ -107,13 +111,10 @@ public class ComputerController : Controller
 
         var computers = _computerRepository.GetItems(name, status, employerID, date, cpu, price);
 
-        if (computers.Count > 0)
-        {
-            responceObj.Success = 1;
-            responceObj.DataList = computers;
-        }
+        responceObj.Success = 1;
+        responceObj.DataList = computers;
 
-        responceJson = Utils.Util.SerializeToJson(responceObj);
+        var responceJson = Utils.Util.SerializeToJson(responceObj);
         return responceJson;
     }
 
@@ -137,6 +138,7 @@ public class ComputerController : Controller
         {
             if (computer != null)
             {
+                computer.IsDeleted = true;
                 var success = _computerRepository.SaveItem(computer);
                 if (success)
                 {

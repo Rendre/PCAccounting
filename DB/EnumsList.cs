@@ -21,3 +21,10 @@ public enum TaskStatus
     Active = 2,
     Done = 3,
 }
+
+public enum EntityStatus
+{
+    None,
+    OnlyActive,
+    OnlyInactive
+}

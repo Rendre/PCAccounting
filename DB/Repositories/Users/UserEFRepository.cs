@@ -33,10 +33,16 @@ public class UserEFRepository : IUserRepository
     }
 
     public List<User> GetItems(string? login = null, string? email = null, uint employerID = 0,
-        bool isActivated = true, string? activationCode = null, uint skip = 0, uint take = 0)
+        EntityStatus isActivated = EntityStatus.None, string? activationCode = null, uint skip = 0, uint take = 0)
 
     {
-        var items = _db.Users.Where(p => p.IsDeleted == false && p.IsActivated == isActivated);
+        var items = _db.Users.Where(p => p.IsDeleted == false);
+
+        if (isActivated != EntityStatus.None)
+        {
+            var check = isActivated == EntityStatus.OnlyActive;
+            items = _db.Users.Where(p => p.IsActivated == check);
+        }
 
         if (!string.IsNullOrEmpty(login))
         {
@@ -66,10 +72,16 @@ public class UserEFRepository : IUserRepository
         return items.ToList();
     }
 
-    public int GetItemsCount(string? login = null, string? email = null, uint employerID = 0, bool isActivated = true,
+    public int GetItemsCount(string? login = null, string? email = null, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
         string? activationCode = null)
     {
-        var items = _db.Users.Where(p => p.IsDeleted == false && p.IsActivated == isActivated);
+        var items = _db.Users.Where(p => p.IsDeleted == false);
+
+        if (isActivated != EntityStatus.None)
+        {
+            var check = isActivated == EntityStatus.OnlyActive;
+            items = _db.Users.Where(p => p.IsActivated == check);
+        }
 
         if (!string.IsNullOrEmpty(login))
         {

@@ -11,46 +11,49 @@ namespace WebClient.Controllers;
 public class EmployerController : ControllerBase
 {
     private readonly IEmployerRepository _employerRepository;
+    private readonly ILogger<FileController> _logger;
 
-    public EmployerController()
+    public EmployerController(ILogger<FileController> logger)
     {
-        _employerRepository = new EmployerDapperRepository();
+        _logger = logger;
+        //_employerRepository = new EmployerDapperRepository();
+        _employerRepository = new EmployerEFRepository();
     }
 
     [HttpPost]
     public string CreateEmployer([FromBody] JsonElement emp)
     {
-        Employer employer;
         var responceObj = new ResponceObject<Employer>();
         string responceJson;
 
-        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid)
-        {
-            responceObj.Access = 1;
-            responceJson = Utils.Util.SerializeToJson(responceObj);
-            return responceJson;
-        }
-
         try
         {
+            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            if (!isValid)
+            {
+                responceObj.Access = 1;
+                responceJson = Utils.Util.SerializeToJson(responceObj);
+                return responceJson;
+            }
+
             var name = emp.GetProperty("name").GetString();
             var position = emp.GetProperty("position").GetString();
             var tel = emp.GetProperty("tel").GetString();
-            tel = Util.CheckTelNumber(tel); 
-            employer = new Employer { Name = name, Position = position, Tel = tel };
+            tel = Util.CheckTelNumber(tel);
+            var employer = new Employer { Name = name, Position = position, Tel = tel };
+
+            _employerRepository.SaveItem(employer);
+            if (employer.ID > 0)
+            {
+                responceObj.Success = 1;
+                responceObj.Data = new Employer { ID = employer.ID };
+            }
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, ex.Message);
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
-        }
-
-        _employerRepository.SaveItem(employer);
-        if (employer.ID > 0)
-        {
-            responceObj.Success = 1;
-            responceObj.Data = new Employer { ID = employer.ID };
         }
 
         responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -64,64 +67,74 @@ public class EmployerController : ControllerBase
         var responceObj = new ResponceObject<Employer>();
         string responceJson;
 
-        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid)
+        try
         {
-            responceObj.Access = 1;
-            responceJson = Utils.Util.SerializeToJson(responceObj);
-            return responceJson;
-        }
-
-        if (json.TryGetProperty("id", out var idElement))
-        {
-            var id = idElement.GetUInt32();
-            if (id == 0) return Utils.Util.SerializeToJson(responceObj);
-
-            var employer = _employerRepository.GetItem(id);
-            if (employer == null) return Utils.Util.SerializeToJson(responceObj);
-
-            if (json.TryGetProperty("name", out var nameElement))
+            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            if (!isValid)
             {
-                var name = nameElement.GetString();
-                if (employer.Name != name)
-                {
-                    employer.Name = name;
-                    isChanged = true;
-                }
+                responceObj.Access = 1;
+                responceJson = Utils.Util.SerializeToJson(responceObj);
+                return responceJson;
             }
 
-            if (json.TryGetProperty("position", out var positionElement))
+            if (json.TryGetProperty("id", out var idElement))
             {
-                var position = positionElement.GetString();
-                if (employer.Position != position)
-                {
-                    employer.Position = position;
-                    isChanged = true;
-                }
-            }
+                var id = idElement.GetUInt32();
+                if (id == 0) return Utils.Util.SerializeToJson(responceObj);
 
-            if (json.TryGetProperty("tel", out var telElement))
-            {
-                var tel = telElement.GetString();
-                tel = Util.CheckTelNumber(tel);
-                if (!string.IsNullOrEmpty(tel))
+                var employer = _employerRepository.GetItem(id);
+                if (employer == null) return Utils.Util.SerializeToJson(responceObj);
+
+                if (json.TryGetProperty("name", out var nameElement))
                 {
-                    if (employer.Tel != tel)
+                    var name = nameElement.GetString();
+                    if (employer.Name != name)
                     {
-                        employer.Tel = tel;
+                        employer.Name = name;
                         isChanged = true;
                     }
                 }
-            }
-            if (isChanged)
-            {
-                var success = _employerRepository.SaveItem(employer);
-                if (success)
+
+                if (json.TryGetProperty("position", out var positionElement))
                 {
-                    responceObj.Success = 1;
-                    responceObj.Data = employer;
+                    var position = positionElement.GetString();
+                    if (employer.Position != position)
+                    {
+                        employer.Position = position;
+                        isChanged = true;
+                    }
+                }
+
+                if (json.TryGetProperty("tel", out var telElement))
+                {
+                    var tel = telElement.GetString();
+                    tel = Util.CheckTelNumber(tel);
+                    if (!string.IsNullOrEmpty(tel))
+                    {
+                        if (employer.Tel != tel)
+                        {
+                            employer.Tel = tel;
+                            isChanged = true;
+                        }
+                    }
+                }
+
+                if (isChanged)
+                {
+                    var success = _employerRepository.SaveItem(employer);
+                    if (success)
+                    {
+                        responceObj.Success = 1;
+                        responceObj.Data = employer;
+                    }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
         }
 
         responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -137,35 +150,42 @@ public class EmployerController : ControllerBase
 
         var responceObj = new ResponceObject<Employer>();
         string responceJson;
-
-        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid)
+        
+        try
         {
-            responceObj.Access = 1;
-            responceJson = Utils.Util.SerializeToJson(responceObj);
-            return responceJson;
-        }
+            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            if (!isValid)
+            {
+                responceObj.Access = 1;
+                responceJson = Utils.Util.SerializeToJson(responceObj);
+                return responceJson;
+            }
 
-        if (json.TryGetProperty("name", out var nameElement))
-        {
-            name = nameElement.GetString();
-        }
+            if (json.TryGetProperty("name", out var nameElement))
+            {
+                name = nameElement.GetString();
+            }
 
-        if (json.TryGetProperty("position", out var positionElement))
-        {
-            position = positionElement.GetString();
-        }
+            if (json.TryGetProperty("position", out var positionElement))
+            {
+                position = positionElement.GetString();
+            }
 
-        if (json.TryGetProperty("tel", out var telElement))
-        {
-            tel = telElement.GetString();
-        }
+            if (json.TryGetProperty("tel", out var telElement))
+            {
+                tel = telElement.GetString();
+            }
 
-        var employerList = _employerRepository.GetItems(name, position, tel);
-        if (employerList.Count > 0)
-        {
+            var employerList = _employerRepository.GetItems(name, position, tel);
+
             responceObj.Success = 1;
             responceObj.DataList = employerList;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
         }
 
         responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -178,19 +198,27 @@ public class EmployerController : ControllerBase
         var responceObj = new ResponceObject<Employer>();
         string responceJson;
 
-        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid)
+        try
         {
-            responceObj.Access = 1;
-            responceJson = Utils.Util.SerializeToJson(responceObj);
-            return responceJson;
-        }
+            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            if (!isValid)
+            {
+                responceObj.Access = 1;
+                responceJson = Utils.Util.SerializeToJson(responceObj);
+                return responceJson;
+            }
 
-        var employer = _employerRepository.GetItem(id);
-        if (employer != null)
-        {
+            var employer = _employerRepository.GetItem(id);
+
             responceObj.Success = 1;
             responceObj.Data = employer;
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+            responceJson = Utils.Util.SerializeToJson(responceObj);
+            return responceJson;
         }
 
         responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -203,19 +231,35 @@ public class EmployerController : ControllerBase
         var responceObj = new ResponceObject<Employer>();
         string responceJson;
 
-        var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
-        if (!isValid)
+        try
         {
-            responceObj.Access = 1;
+            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            if (!isValid)
+            {
+                responceObj.Access = 1;
+                responceJson = Utils.Util.SerializeToJson(responceObj);
+                return responceJson;
+            }
+
+            var employer = _employerRepository.GetItem(id);
+            if (employer == null)
+            {
+                responceJson = Utils.Util.SerializeToJson(responceObj);
+                return responceJson;
+            }
+
+            employer.IsDeleted = true;
+            var success = _employerRepository.SaveItem(employer);
+            if (success)
+            {
+                responceObj.Success = 1;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
             responceJson = Utils.Util.SerializeToJson(responceObj);
             return responceJson;
-        }
-
-        var employer = _employerRepository.GetItem(id);
-        var success = _employerRepository.SaveItem(employer);
-        if (success)
-        {
-            responceObj.Success = 1;
         }
 
         responceJson = Utils.Util.SerializeToJson(responceObj);

@@ -103,10 +103,10 @@ public class ComputerDapperRepository : IComputerRepository
 
         if (take > 0)
         {
-            sqlExpression.Append(" LIMIT take = @take");
+            sqlExpression.Append(" LIMIT @take");
             parameters.Add("@take", take);
 
-            sqlExpression.Append(" OFFSET skip = @skip");
+            sqlExpression.Append(" OFFSET @skip");
             parameters.Add("@skip", skip);
         }
 
@@ -131,7 +131,7 @@ public class ComputerDapperRepository : IComputerRepository
                             $"EmployerID = {computer.EmployerID}, " +
                             $"DateCreated = '{computer.DateCreated:yyyy-MM-dd HH:mm:ss}', " +
                             $"Cpu = '{computer.Cpu}', " +
-                            $"IsDeleted = {computer.IsDeleted}" +
+                            $"IsDeleted = {computer.IsDeleted}, " +
                             $"Price = '{computer.Price.ToString(CultureInfo.InvariantCulture)}' " +
                             $"WHERE ID = {computer.ID}";
         var countOfChanges = _databaseContext.ExecuteByQuery(sqlExpression);

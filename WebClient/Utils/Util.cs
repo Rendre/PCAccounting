@@ -10,8 +10,8 @@ public class Util
     public static bool CheckToken(JsonElement? json, IRequestCookieCollection? cookieCollection)
     {
         // это должно инжектится черз диай
-    ILoginService loginService = new LoginService();
-    string? token = null;
+        ILoginService loginService = new LoginService();
+        string? token = null;
         if (json != null && json.Value.TryGetProperty("token", out var tokenElement))
         {
             token = tokenElement.GetString();

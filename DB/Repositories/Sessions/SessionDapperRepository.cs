@@ -59,7 +59,7 @@ public class SessionDapperRepository : ISessionRepository
     {
         // проверить записывается ли время
         var sqlExpression = "INSERT INTO session (Token, Time, UserID, UserIP)" +
-                            $"VALUES ('{item.Token}', {item.Time}, {item.UserID}, '{item.UserIP}') ";
+                            $"VALUES ('{item.Token}', '{item.Time:yyyy-MM-dd HH:mm:ss}', {item.UserID}, '{item.UserIP}') ";
         const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
         _databaseContext.ExecuteByQuery(sqlExpression);
         var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
@@ -71,7 +71,7 @@ public class SessionDapperRepository : ISessionRepository
     {
         var sqlExpression = "UPDATE users SET " +
                             $"Token = '{item.Token}', " +
-                            $"Time = {item.Time} " +
+                            $"Time = '{item.Time:yyyy-MM-dd HH:mm:ss}', " +
                             $"UserID = {item.UserID}, " +
                             $"UserIP = '{item.UserIP}', " +
                             $"IsDeleted = {item.IsDeleted}, " +
@@ -109,10 +109,10 @@ public class SessionDapperRepository : ISessionRepository
 
         if (take > 0)
         {
-            sqlExpression.Append(" LIMIT take = @take");
+            sqlExpression.Append(" LIMIT @take");
             parameters.Add("@take", take);
 
-            sqlExpression.Append(" OFFSET skip = @skip");
+            sqlExpression.Append(" OFFSET @skip");
             parameters.Add("@skip", skip);
         }
 
