@@ -312,7 +312,7 @@ public partial class NewTechForm : Form
         };
         while (fileStream.Read(buffer, 0, _count) != 0)
         {
-            var fileID = (result.Data != null && result.Data.ID > 0) ? result.Data.ID.ToString() : "";
+            var fileID = result.Data is {ID: > 0} ? result.Data.ID.ToString() : "";
             var resultJson = Utils.Util.RequestHelper(buffer, connectionAddress, fName, ComputerID.ToString(), fileID);
             var strResult = await resultJson.ConfigureAwait(false);
             result = JsonSerializer.Deserialize<ResultClass>(strResult, jsonDeserializeOptions);

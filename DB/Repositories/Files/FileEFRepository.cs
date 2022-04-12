@@ -41,7 +41,7 @@ public class FileEFRepository : IFileRepository
 
         if (!string.IsNullOrEmpty(name))
         {
-            items = items.Where(p => p.Name != null && p.Name.Equals(name));
+            items = items.Where(p => p.FileName != null && p.FileName.Equals(name));
         }
 
         if (!string.IsNullOrEmpty(path))
@@ -77,7 +77,7 @@ public class FileEFRepository : IFileRepository
 
         if (!string.IsNullOrEmpty(name))
         {
-            items = items.Where(p => p.Name != null && p.Name.Equals(name));
+            items = items.Where(p => p.FileName != null && p.FileName.Equals(name));
         }
 
         if (!string.IsNullOrEmpty(path))

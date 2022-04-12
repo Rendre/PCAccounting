@@ -1,6 +1,9 @@
-﻿using DB.Entities;
+﻿using System.Text.Json;
+using DB.Entities;
+using DB.Repositories.Files;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Services;
+using SharedKernel.Services.DownloadService;
 using WebClient.Models;
 
 namespace WebClient.Controllers;
@@ -9,6 +12,7 @@ namespace WebClient.Controllers;
 public class FileController : Controller
 {
     private readonly IFileSave _fileSave = new WebSave();
+    private readonly IFileDownload _fileDownload = new WebDownload();
     private readonly ILogger<FileController> _logger;
 
     public FileController(ILogger<FileController> logger)
@@ -82,7 +86,33 @@ public class FileController : Controller
             return responceJson;
         }
     }
+
+    [HttpGet]
+    public IActionResult GetPucture([FromBody] JsonElement json)
+    {
+        byte[]? pictureBytes = null;
+        string? fileType = null;
+        string? fileName = null;
+
+        try
+        {
+            uint id = 0;
+            if (json.TryGetProperty("id", out var idElement))
+            {
+                id = idElement.GetUInt32();
+            }
+            if (id == 0) return NotFound();
+
+            _fileDownload.GetItem(id, out pictureBytes, out fileType, out fileName);
+            if (pictureBytes == null ||
+                fileType == null ||
+                fileName == null) return NotFound();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+        }
+
+        return File(pictureBytes!, fileType!, fileName!);
+    }
 }
-
-
-

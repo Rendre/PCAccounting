@@ -108,7 +108,7 @@ public class FileDapperRepository : IFileRepository
         var parameters = new DynamicParameters();
         parameters.Add("@ComputerID", item.ComputerID);
         parameters.Add("@Path", item.Path);
-        parameters.Add("@Name", item.Name);
+        parameters.Add("@Name", item.FileName);
 
         const string sqlExpression = "INSERT INTO files (ComputerID, Path, FileName) " +
                                      "VALUES (@ComputerID, @Path, @Name)";
@@ -124,7 +124,7 @@ public class FileDapperRepository : IFileRepository
         var sqlExpression = "UPDATE files SET " +
                             $"ComputerID = {item.ComputerID}, " +
                             $"Path = '{item.Path}', " +
-                            $"FileName = '{item.Name}', " +
+                            $"FileName = '{item.FileName}', " +
                             $"IsDeleted = {(item.IsDeleted ? 1 : 0)} " +
                             $"WHERE ID = {item.ID}";
         var countOfChanges = _databaseContext.ExecuteByQuery(sqlExpression);

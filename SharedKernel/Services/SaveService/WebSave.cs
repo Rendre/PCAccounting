@@ -34,7 +34,7 @@ public class WebSave : IFileSave
         fileStream.Write(fileBytes);
         if (file == null)
         {
-            file = new FileEntity { ComputerID = computerID, Name = fileName, Path = pathForSaveFile };
+            file = new FileEntity { ComputerID = computerID, FileName = fileName, Path = pathForSaveFile };
             _fileRepository.SaveItem(file);
         }
     }
