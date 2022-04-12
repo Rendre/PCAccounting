@@ -75,7 +75,7 @@ public class FileDapperRepository : IFileRepository
         return items;
     }
 
-    public int GetItemsCount(string? name = null, string? path = null, uint computerID = 0)
+    public uint GetItemsCount(string? name = null, string? path = null, uint computerID = 0)
     {
         var parameters = new DynamicParameters();
         var conditions = new List<string> { "IsDeleted=0" };
@@ -98,9 +98,9 @@ public class FileDapperRepository : IFileRepository
             parameters.Add("@ComputerID", computerID);
         }
         var sqlExpression = $"SELECT COUNT(*) FROM files WHERE {string.Join(" AND ", conditions)}";
-        var items = _databaseContext.GetAllByQuery<FileEntity>(sqlExpression, parameters);
+        var itemsCount = _databaseContext.ExecuteByQuery(sqlExpression, parameters);
 
-        return items.Count;
+        return itemsCount;
     }
 
     private bool CreateItem(FileEntity item)

@@ -40,11 +40,11 @@ public class ComputerEFRepository : IComputerRepository
         return items;
     }
 
-    public int GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0,
+    public uint GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0,
         DateTime? date = null, string? cpu = null, decimal price = 0)
     {
         var items = GetList(name, date, statusID, employerID, cpu, price);
-        return items.Count();
+        return (uint)items.Count();
     }
 
     private List<Computer> GetList(string? name = null, DateTime? date = null, uint statusID = 0, uint employerID = 0,

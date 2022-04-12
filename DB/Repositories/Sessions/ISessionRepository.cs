@@ -11,7 +11,7 @@ public interface ISessionRepository
     public List<Session?> GetItems(string? token = null, DateTime? time = null, uint userID = 0,
         string? userIP = null, uint skip = 0, uint take = 0);
 
-    public int GetItemsCount(string? token = null, DateTime? time = null, uint userID = 0,
+    public uint GetItemsCount(string? token = null, DateTime? time = null, uint userID = 0,
         string? userIP = null);
 }
 

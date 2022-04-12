@@ -37,8 +37,8 @@ public class ComputerDapperRepository : IComputerRepository
         };
         parameters.Add("@ID", id);
         var sqlExpression = $"SELECT * FROM computers WHERE {string.Join(" AND ", conditions)}";
-        var computer = _databaseContext.GetByQuery<Computer>(sqlExpression, parameters);
-        return computer;
+        var item = _databaseContext.GetByQuery<Computer>(sqlExpression, parameters);
+        return item;
     }
 
     public List<Computer> GetItems(string? name = null, uint statusID = 0, uint employerID = 0,
@@ -48,18 +48,18 @@ public class ComputerDapperRepository : IComputerRepository
         var parameters = new DynamicParameters();
         var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusID, employerID, 
             date, cpu, price, parameters, skip, take);
-        var computers = _databaseContext.GetAllByQuery<Computer>(sqlExpressionForQuery, parameters);
-        return computers;
+        var items = _databaseContext.GetAllByQuery<Computer>(sqlExpressionForQuery, parameters);
+        return items;
     }
 
-    public int GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0,
+    public uint GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0,
         DateTime? date = null, string? cpu = null, decimal price = 0)
     {
         var sqlExpression = new StringBuilder("SELECT COUNT(*) FROM computers WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
         var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusID, employerID, date, cpu, price, parameters);
-        var computers = _databaseContext.GetAllByQuery<Computer>(sqlExpressionForQuery, parameters);
-        return computers.Count;
+        var itemsCount = _databaseContext.ExecuteByQuery(sqlExpressionForQuery, parameters);
+        return itemsCount;
     }
 
     private static string GetParamForExpression(StringBuilder sqlExpression, string? name, uint statusID, uint employerID, DateTime? date,

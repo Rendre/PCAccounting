@@ -46,15 +46,15 @@ public class UserDapperRepository : IUserRepository
         return items;
     }
 
-    public int GetItemsCount(string? login = null, string? email = null, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
+    public uint GetItemsCount(string? login = null, string? email = null, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
         string? activationCode = null)
     {
         var sqlExpression = new StringBuilder("SELECT COUNT(*) FROM users WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
         var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, login, email, employerID,
             isActivated, activationCode);
-        var items = _databaseContext.GetAllByQuery<User>(sqlExpressionForQuery, parameters);
-        return items.Count;
+        var itemsCount = _databaseContext.ExecuteByQuery(sqlExpressionForQuery, parameters);
+        return itemsCount;
     }
 
     private bool CreateItem(User user)

@@ -71,7 +71,7 @@ public class FileEFRepository : IFileRepository
         return items.ToList();
     }
 
-    public int GetItemsCount(string? name = null, string? path = null, uint computerID = 0)
+    public uint GetItemsCount(string? name = null, string? path = null, uint computerID = 0)
     {
         var items = _db.File.Where(p => p.IsDeleted == false);
 
@@ -90,7 +90,7 @@ public class FileEFRepository : IFileRepository
             items = items.Where(p => p.ComputerID == computerID);
         }
 
-        return items.Count();
+        return (uint)items.Count();
     }
 
     private bool CreateItem(FileEntity item)

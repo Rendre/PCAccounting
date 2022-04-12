@@ -65,7 +65,7 @@ public class SessionEFRepository : ISessionRepository
         return items.ToList();
     }
 
-    public int GetItemsCount(string? token = null, DateTime? time = null, uint userID = 0,
+    public uint GetItemsCount(string? token = null, DateTime? time = null, uint userID = 0,
         string? userIP = null)
     {
         var items = _db.Session.Where(p => p != null && p.IsDeleted == false);
@@ -90,7 +90,7 @@ public class SessionEFRepository : ISessionRepository
             items = items.Where(p => p != null && p.UserIP != null && p.UserIP.Equals(userIP));
         }
 
-        return items.Count();
+        return (uint)items.Count();
     }
 
     private bool CreateItem(Session? session)

@@ -70,7 +70,7 @@ public class EmployerDapperRepository : IEmployerRepository
         return items;
     }
 
-    public int GetItemsCount(string? name = null, string? position = null, string? tel = null)
+    public uint GetItemsCount(string? name = null, string? position = null, string? tel = null)
     {
         var parameters = new DynamicParameters();
         var conditions = new List<string>(4) { "IsDeleted = 0" };
@@ -94,8 +94,8 @@ public class EmployerDapperRepository : IEmployerRepository
         }
 
         var sqlExpression = $"SELECT COUNT(*) FROM employers WHERE {string.Join(" AND ", conditions)}";
-        var employers = _databaseContext.GetAllByQuery<Employer>(sqlExpression, parameters);
-        return employers.Count;
+        var itemsCount = _databaseContext.ExecuteByQuery(sqlExpression, parameters);
+        return itemsCount;
     }
 
     private bool CreateItem(Employer employer)

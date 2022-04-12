@@ -60,7 +60,7 @@ public class EmployerEFRepository : IEmployerRepository
         return items.ToList();
     }
 
-    public int GetItemsCount(string? name = null, string? position = null, string? tel = null)
+    public uint GetItemsCount(string? name = null, string? position = null, string? tel = null)
     {
         var items = _db.Employers.Where(p => p.IsDeleted == false);
 
@@ -79,7 +79,7 @@ public class EmployerEFRepository : IEmployerRepository
             items = items.Where(p => p.Tel != null && p.Tel.Equals(tel));
         }
 
-        return items.Count();
+        return (uint)items.Count();
     }
 
     private bool CreateItem(Employer item)

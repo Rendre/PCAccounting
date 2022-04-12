@@ -72,7 +72,7 @@ public class UserEFRepository : IUserRepository
         return items.ToList();
     }
 
-    public int GetItemsCount(string? login = null, string? email = null, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
+    public uint GetItemsCount(string? login = null, string? email = null, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
         string? activationCode = null)
     {
         var items = _db.Users.Where(p => p.IsDeleted == false);
@@ -103,7 +103,7 @@ public class UserEFRepository : IUserRepository
             items = items.Where(p => p.ActivationCode != null && p.ActivationCode.Equals(activationCode));
         }
 
-        return items.Count();
+        return (uint)items.Count();
     }
 
     private bool CreateItem(User user)

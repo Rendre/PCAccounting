@@ -11,5 +11,5 @@ public interface IFileRepository
     public List<FileEntity> GetItems(string? name = null, string? path = null, uint computerID = 0, string? orderBy = null,
         bool desc = false, uint skip = 0, uint take = 0);
 
-    public int GetItemsCount(string? name, string? path, uint computerID = 0);
+    public uint GetItemsCount(string? name, string? path, uint computerID = 0);
 }
