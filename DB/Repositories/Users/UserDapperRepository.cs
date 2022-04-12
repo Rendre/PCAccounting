@@ -49,7 +49,7 @@ public class UserDapperRepository : IUserRepository
     public int GetItemsCount(string? login = null, string? email = null, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
         string? activationCode = null)
     {
-        var sqlExpression = new StringBuilder("SELECT * FROM users WHERE IsDeleted = 0");
+        var sqlExpression = new StringBuilder("SELECT COUNT(*) FROM users WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
         var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, login, email, employerID,
             isActivated, activationCode);

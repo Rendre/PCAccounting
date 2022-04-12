@@ -48,7 +48,7 @@ public class SessionDapperRepository : ISessionRepository
     public int GetItemsCount(string? token = null, DateTime? time = null, uint userID = 0,
         string? userIP = null)
     {
-        var sqlExpression = new StringBuilder("SELECT * FROM session WHERE IsDeleted = 0");
+        var sqlExpression = new StringBuilder("SELECT COUNT(*) FROM session WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
         var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, token, time, userID, userIP);
         var items = _databaseContext.GetAllByQuery<Session>(sqlExpressionForQuery, parameters);

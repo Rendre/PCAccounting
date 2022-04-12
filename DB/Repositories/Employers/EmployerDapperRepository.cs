@@ -93,7 +93,7 @@ public class EmployerDapperRepository : IEmployerRepository
             parameters.Add("@Tel", tel);
         }
 
-        var sqlExpression = $"SELECT * FROM employers WHERE {string.Join(" AND ", conditions)}";
+        var sqlExpression = $"SELECT COUNT(*) FROM employers WHERE {string.Join(" AND ", conditions)}";
         var employers = _databaseContext.GetAllByQuery<Employer>(sqlExpression, parameters);
         return employers.Count;
     }

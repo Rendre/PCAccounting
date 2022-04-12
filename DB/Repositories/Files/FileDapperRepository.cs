@@ -97,7 +97,7 @@ public class FileDapperRepository : IFileRepository
             conditions.Add("ComputerID=@ComputerID");
             parameters.Add("@ComputerID", computerID);
         }
-        var sqlExpression = $"SELECT * FROM files WHERE {string.Join(" AND ", conditions)}";
+        var sqlExpression = $"SELECT COUNT(*) FROM files WHERE {string.Join(" AND ", conditions)}";
         var items = _databaseContext.GetAllByQuery<FileEntity>(sqlExpression, parameters);
 
         return items.Count;

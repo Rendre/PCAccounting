@@ -55,7 +55,7 @@ public class ComputerDapperRepository : IComputerRepository
     public int GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0,
         DateTime? date = null, string? cpu = null, decimal price = 0)
     {
-        var sqlExpression = new StringBuilder("SELECT * FROM computers WHERE IsDeleted = 0");
+        var sqlExpression = new StringBuilder("SELECT COUNT(*) FROM computers WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
         var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusID, employerID, date, cpu, price, parameters);
         var computers = _databaseContext.GetAllByQuery<Computer>(sqlExpressionForQuery, parameters);
