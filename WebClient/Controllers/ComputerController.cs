@@ -6,7 +6,7 @@ using WebClient.Models;
 
 namespace WebClient.Controllers;
 
-public class ComputerController : Controller
+public class ComputerController : ControllerBase
 {
     private readonly IComputerRepository _computerRepository;
     private readonly ILogger<FileController> _logger;

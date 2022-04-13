@@ -1,14 +1,16 @@
+using DB.Repositories.Sessions;
+using DB.Repositories.Users;
 using SharedKernel.Logger;
-using WebClient.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Logging.AddFile();
-//builder.Logging.AddProvider(new FileLoggerProvider("C:\\Users\\user\\Desktop\\log.txt"));
-var app = builder.Build();
+builder.Services.AddScoped<ISessionRepository, SessionEFRepository>();
+builder.Services.AddScoped<IUserRepository, UserEFRepository>();
 
+builder.Logging.AddFile();
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -28,5 +30,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-

@@ -8,7 +8,7 @@ using WebClient.Models;
 namespace WebClient.Controllers;
 
 [Route("[controller]")]
-public class FileController : Controller
+public class FileController : ControllerBase
 {
     private readonly IFileSave _fileSave = new WebSave();
     private readonly IFileDownload _fileDownload = new WebDownload();

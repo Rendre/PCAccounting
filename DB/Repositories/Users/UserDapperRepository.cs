@@ -35,23 +35,23 @@ public class UserDapperRepository : IUserRepository
         return item;
     }
 
-    public List<User> GetItems(string? login = null, string? email = null, uint employerID = 0,
+    public List<User> GetItems(string? login = null, string? email = null, bool search = false, uint employerID = 0,
         EntityStatus isActivated = EntityStatus.None, string? activationCode = null, uint skip = 0, uint take = 0)
     {
         var sqlExpression = new StringBuilder("SELECT * FROM users WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
-        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, login, email, employerID,
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, login, email, search, employerID,
             isActivated, activationCode, skip, take);
         var items = _databaseContext.GetAllByQuery<User>(sqlExpressionForQuery, parameters);
         return items;
     }
 
-    public uint GetItemsCount(string? login = null, string? email = null, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
+    public uint GetItemsCount(string? login = null, string? email = null, bool search = false, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
         string? activationCode = null)
     {
         var sqlExpression = new StringBuilder("SELECT COUNT(*) FROM users WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
-        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, login, email, employerID,
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, login, email, search, employerID,
             isActivated, activationCode);
         var itemsCount = _databaseContext.ExecuteByQuery(sqlExpressionForQuery, parameters);
         return itemsCount;
@@ -84,24 +84,35 @@ public class UserDapperRepository : IUserRepository
     }
 
     private static string GetParamForExpression(StringBuilder sqlExpression, DynamicParameters parameters, string? login, string? email,
-        uint employerID, EntityStatus isActivated, string? activationCode, uint skip = 0, uint take = 0)
+        bool search, uint employerID, EntityStatus isActivated, string? activationCode, uint skip = 0, uint take = 0)
     {
-        if (!string.IsNullOrEmpty(login))
+        if (search)
         {
-            sqlExpression.Append(" AND Login = @Login");
+            sqlExpression.Append(" AND (Login=@Login OR Email=@Email)");
             parameters.Add("@Login", login);
-        }
-
-        if (!string.IsNullOrEmpty(email))
-        {
-            sqlExpression.Append(" AND Email = @Email");
             parameters.Add("@Email", email);
         }
+        else
+        {
+            if (!string.IsNullOrEmpty(login))
+            {
+                sqlExpression.Append(" AND Login = @Login");
+                parameters.Add("@Login", login);
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                sqlExpression.Append(" AND Email = @Email");
+                parameters.Add("@Email", email);
+            }
+        }
+
         if (employerID > 0)
         {
             sqlExpression.Append(" AND EmployerID = @EmployerID");
             parameters.Add("@EmployerID", employerID);
         }
+
 
         if (isActivated != EntityStatus.None)
         {

@@ -32,7 +32,7 @@ public class UserEFRepository : IUserRepository
         return item;
     }
 
-    public List<User> GetItems(string? login = null, string? email = null, uint employerID = 0,
+    public List<User> GetItems(string? login = null, string? email = null, bool search = false, uint employerID = 0,
         EntityStatus isActivated = EntityStatus.None, string? activationCode = null, uint skip = 0, uint take = 0)
 
     {
@@ -71,8 +71,8 @@ public class UserEFRepository : IUserRepository
 
         return items.ToList();
     }
-
-    public uint GetItemsCount(string? login = null, string? email = null, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
+    //todo:
+    public uint GetItemsCount(string? login = null, string? email = null, bool search = false, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
         string? activationCode = null)
     {
         var items = _db.Users.Where(p => p.IsDeleted == false);

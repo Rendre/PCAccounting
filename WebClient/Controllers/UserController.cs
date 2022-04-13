@@ -9,7 +9,7 @@ using WebClient.Models;
 namespace WebClient.Controllers;
 
 [Route("[controller]")]
-public class UserController : Controller
+public class UserController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
     private readonly ILogger<FileController> _logger;
@@ -179,7 +179,7 @@ public class UserController : Controller
                 email = emailElement.GetString();
             }
 
-            var userList = _userRepository.GetItems(login, email, employerID, entityStatus);
+            var userList = _userRepository.GetItems(login, email, false, employerID, entityStatus);
             foreach (var user in userList)
             {
                 user.Password = null;
