@@ -36,73 +36,15 @@ public class UserEFRepository : IUserRepository
         EntityStatus isActivated = EntityStatus.None, string? activationCode = null, uint skip = 0, uint take = 0)
 
     {
-        var items = _db.Users.Where(p => p.IsDeleted == false);
-
-        if (isActivated != EntityStatus.None)
-        {
-            var check = isActivated == EntityStatus.OnlyActive;
-            items = _db.Users.Where(p => p.IsActivated == check);
-        }
-
-        if (!string.IsNullOrEmpty(login))
-        {
-            items = items.Where(p => p.Login != null && p.Login.Equals(login));
-        }
-
-        if (!string.IsNullOrEmpty(email))
-        {
-            items = items.Where(p => p.Email != null && p.Email.Equals(email));
-        }
-
-        if (employerID > 0)
-        {
-            items = items.Where(p => p.EmployerID == employerID);
-        }
-
-        if (!string.IsNullOrEmpty(activationCode))
-        {
-            items = items.Where(p => p.ActivationCode != null && p.ActivationCode.Equals(activationCode));
-        }
-
-        if (take > 0)
-        {
-            items = items.Skip((int)skip).Take((int)take);
-        }
-
+        var items = GetCollection(login, email, search, employerID, isActivated, activationCode, skip, take);
         return items.ToList();
     }
+
     //todo:
     public uint GetItemsCount(string? login = null, string? email = null, bool search = false, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
         string? activationCode = null)
     {
-        var items = _db.Users.Where(p => p.IsDeleted == false);
-
-        if (isActivated != EntityStatus.None)
-        {
-            var check = isActivated == EntityStatus.OnlyActive;
-            items = _db.Users.Where(p => p.IsActivated == check);
-        }
-
-        if (!string.IsNullOrEmpty(login))
-        {
-            items = items.Where(p => p.Login != null && p.Login.Equals(login));
-        }
-
-        if (!string.IsNullOrEmpty(email))
-        {
-            items = items.Where(p => p.Email != null && p.Email.Equals(email));
-        }
-
-        if (employerID > 0)
-        {
-            items = items.Where(p => p.EmployerID == employerID);
-        }
-
-        if (!string.IsNullOrEmpty(activationCode))
-        {
-            items = items.Where(p => p.ActivationCode != null && p.ActivationCode.Equals(activationCode));
-        }
-
+        var items = GetCollection(login, email, search, employerID, isActivated, activationCode);
         return (uint)items.Count();
     }
 
@@ -120,40 +62,55 @@ public class UserEFRepository : IUserRepository
         return countOfChanges > 0;
     }
 
+    private IEnumerable<User> GetCollection(string? login = null, string? email = null, bool search = false, uint employerID = 0,
+        EntityStatus isActivated = EntityStatus.None, string? activationCode = null, uint skip = 0, uint take = 0)
+    {
+        var items = _db.Users.Where(p => p.IsDeleted == false);
+
+        if (isActivated != EntityStatus.None)
+        {
+            var check = isActivated == EntityStatus.OnlyActive;
+            items = _db.Users.Where(p => p.IsActivated == check);
+        }
+
+        if (search)
+        {
+            items = items.Where(p => p.Login != null && p.Login.Equals(login) ||
+                                     p.Email != null && p.Email.Equals(email));
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(login))
+            {
+                items = items.Where(p => p.Login != null && p.Login.Equals(login));
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                items = items.Where(p => p.Email != null && p.Email.Equals(email));
+            }
+        }
+
+        if (employerID > 0)
+        {
+            items = items.Where(p => p.EmployerID == employerID);
+        }
+
+        if (!string.IsNullOrEmpty(activationCode))
+        {
+            items = items.Where(p => p.ActivationCode != null && p.ActivationCode.Equals(activationCode));
+        }
+
+        if (take > 0)
+        {
+            items = items.Skip((int)skip).Take((int)take);
+        }
+
+        return items;
+    }
+
     public void Dispose()
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
 }
-
-//public User? GetItem(string? login)
-//{
-//    if (string.IsNullOrEmpty(login)) return null;
-
-//    var user = _db.Users.FirstOrDefault(p => p.Login != null && p.Login.Equals(login) &&
-//                                             p.IsDeleted == false);
-//    return user;
-//}
-
-//public User? GetItemByEmail(string? email)
-//{
-//    var user = _db.Users.FirstOrDefault(p => p.Email != null && p.Email.Equals(email));
-//    return user;
-//}
-
-//public List<User> GetItems()
-//{
-//    var users = _db.Users.Where(p => p.IsDeleted == false);
-//    return users.ToList();
-//}
-
-//public bool DeleteItem(uint id)
-//{
-//    var user = _db.Users.FirstOrDefault(p => p.ID == id);
-//    if (user == null) return false;
-
-//    user.IsDeleted = true;
-//    _db.Users.Update(user);
-//    var rowsChanged = _db.SaveChanges();
-//    return rowsChanged > 0;
-//}

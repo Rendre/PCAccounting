@@ -1,16 +1,14 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using SharedKernel.Services;
 using WebClient.Models;
 
 namespace WebClient.Utils;
 
 public class Util
 {
-    public static bool CheckToken(JsonElement? json, IRequestCookieCollection? cookieCollection)
+    public static string GetToken(JsonElement? json, IRequestCookieCollection? cookieCollection)
     {
-        ILoginService loginService = new LoginService();
-        string? token = null;
+        string ? token = null;
         if (json != null && json.Value.TryGetProperty("token", out var tokenElement))
         {
             token = tokenElement.GetString();
@@ -22,8 +20,7 @@ public class Util
                 cookieCollection.TryGetValue("token", out token);
             }
         }
-        var isValid = loginService.IsSessionValid(token);
-        return isValid;
+        return token;
     }
 
     public static string SerializeToJson<T>(ResponceObject<T> responceObject)

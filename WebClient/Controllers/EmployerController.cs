@@ -1,7 +1,10 @@
 ﻿using System.Text.Json;
 using DB.Entities;
 using DB.Repositories.Employers;
+using DB.Repositories.Sessions;
+using DB.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Services.LoginService;
 using SharedKernel.Utils;
 using WebClient.Models;
 
@@ -12,12 +15,18 @@ public class EmployerController : ControllerBase
 {
     private readonly IEmployerRepository _employerRepository;
     private readonly ILogger<FileController> _logger;
+    private readonly ILoginService _loginService;
+    private readonly ISessionRepository _sessionRepository;
+    private readonly IUserRepository _userRepository;
 
-    public EmployerController(ILogger<FileController> logger)
+    public EmployerController(ILogger<FileController> logger, ISessionRepository sessionRepository, IUserRepository userRepository)
     {
         _logger = logger;
         //_employerRepository = new EmployerDapperRepository();
         _employerRepository = new EmployerEFRepository();
+        _sessionRepository = sessionRepository;
+        _userRepository = userRepository;
+        _loginService = new LoginService(_sessionRepository, _userRepository);
     }
 
     [HttpPost]
@@ -28,7 +37,8 @@ public class EmployerController : ControllerBase
 
         try
         {
-            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
+            var isValid = _loginService.IsSessionValid(token).isValid;
             if (!isValid)
             {
                 responceObj.Access = 1;
@@ -69,7 +79,8 @@ public class EmployerController : ControllerBase
 
         try
         {
-            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
+            var isValid = _loginService.IsSessionValid(token).isValid;
             if (!isValid)
             {
                 responceObj.Access = 1;
@@ -153,7 +164,8 @@ public class EmployerController : ControllerBase
         
         try
         {
-            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
+            var isValid = _loginService.IsSessionValid(token).isValid;
             if (!isValid)
             {
                 responceObj.Access = 1;
@@ -200,7 +212,8 @@ public class EmployerController : ControllerBase
 
         try
         {
-            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
+            var isValid = _loginService.IsSessionValid(token).isValid;
             if (!isValid)
             {
                 responceObj.Access = 1;
@@ -233,7 +246,8 @@ public class EmployerController : ControllerBase
 
         try
         {
-            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
+            var isValid = _loginService.IsSessionValid(token).isValid;
             if (!isValid)
             {
                 responceObj.Access = 1;

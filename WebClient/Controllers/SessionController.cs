@@ -1,11 +1,9 @@
-﻿using System.Net;
-using System.Net.Mail;
-using System.Text.Json;
-using DB;
+﻿using System.Text.Json;
 using DB.Entities;
 using DB.Repositories.Sessions;
 using DB.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Services.LoginService;
 using SharedKernel.Utils;
 using WebClient.Models;
 
@@ -15,57 +13,15 @@ public class SessionController : ControllerBase
 {
     private readonly ISessionRepository _sessionRepository;
     private readonly IUserRepository _userRepository;
-    private readonly ProjectProperties _projectProperties;
     private readonly ILogger<FileController> _logger;
+    private readonly ILoginService _loginService;
 
     public SessionController(ILogger<FileController> logger, ISessionRepository sessionRepository, IUserRepository userRepository)
     {
         _logger = logger;
         _sessionRepository = sessionRepository;
         _userRepository = userRepository;
-        _projectProperties = Util.GetProjectProperties()!;
-    }
-
-    public Session? Kek(string? token)
-    {
-        if (string.IsNullOrEmpty(token)) return null;
-
-        var session = _sessionRepository.GetItems(token, take: 1).FirstOrDefault();
-        if (session == null) return null;
-
-        var isValid = session.Time.AddMinutes(20) > DateTime.UtcNow &&
-                      !session.IsDeleted;
-        if (isValid) return session;
-
-        session.IsDeleted = true;
-        _sessionRepository.SaveItem(session);
-        return null;
-    }
-
-    public Session? Kekw(string? login, string? password)
-    {
-        if (string.IsNullOrEmpty(login) ||
-            string.IsNullOrEmpty(password)) return null;
-
-        password = Util.Encode(password);
-        var user = _userRepository.GetItems(login, isActivated: EntityStatus.OnlyActive, take: 1).FirstOrDefault();
-        if (user is { IsActivated: false }) return null;
-
-        if (user is { Password: { } } &&
-            (user.Password.Equals(password)))
-        {
-            var session = new Session
-            {
-                Token = Guid.NewGuid().ToString("D"),
-                Time = DateTime.UtcNow,
-                UserID = user.ID,
-                UserIP = HttpContext.Connection.RemoteIpAddress?.ToString()
-            };
-            _sessionRepository.SaveItem(session);
-            return session;
-        }
-
-        return null;
+        _loginService = new LoginService(_sessionRepository, _userRepository);
     }
 
     [HttpGet]
@@ -83,7 +39,7 @@ public class SessionController : ControllerBase
             if (json.TryGetProperty("token", out var tokenElement))
             {
                 var token = tokenElement.GetString();
-                session = Kek(token);
+                session = _loginService.GetSession(token);
             }
             else
             {
@@ -97,7 +53,8 @@ public class SessionController : ControllerBase
                     password = passwordElement.GetString();
                 }
 
-                session = Kekw(login, password);
+                var userIP = HttpContext.Connection.RemoteIpAddress?.ToString();
+                session = _loginService.GetNewSession(login, password, userIP!);
             }
 
             if (session != null)
@@ -109,8 +66,6 @@ public class SessionController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-            responceJson = Utils.Util.SerializeToJson(responceObj);
-            return responceJson;
         }
 
         responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -122,7 +77,6 @@ public class SessionController : ControllerBase
     public string GetMe([FromBody] JsonElement json)
     {
         string? token = null;
-        var responceObj = new ResponceObject<Session>();
         var responceUserObj = new ResponceObject<User>();
         string responceJson;
 
@@ -133,93 +87,23 @@ public class SessionController : ControllerBase
                 token = tokenElement.GetString();
             }
 
-            var sessions = _sessionRepository.GetItems(token, take: 1);
-            var session = sessions.FirstOrDefault();
-            if (session == null)
+            var user = _loginService.GetUser(token);
+            if (user != null)
             {
-                responceJson = Utils.Util.SerializeToJson(responceObj);
-                return responceJson;
+                responceUserObj = new ResponceObject<User>
+                {
+                    Success = 1,
+                    Data = user
+                };
             }
-
-            var user = _userRepository.GetItem(session.UserID);
-            if (user == null)
-            {
-                responceJson = Utils.Util.SerializeToJson(responceObj);
-                return responceJson;
-            }
-
-            user.Password = null;
-            responceUserObj = new ResponceObject<User>
-            {
-                Success = 1,
-                Data = user
-            };
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-            responceJson = Utils.Util.SerializeToJson(responceUserObj);
-            return responceJson;
         }
 
         responceJson = Utils.Util.SerializeToJson(responceUserObj);
         return responceJson;
-    }
-
-    public bool Qwe(string? login, string? userMail, string? confirmationСode, User? user)
-    {
-        if (string.IsNullOrEmpty(confirmationСode)) return false;
-
-        user = _userRepository.GetItems(login, userMail, true).FirstOrDefault();
-        if (user != null &&
-            !string.IsNullOrEmpty(user.ActivationCode) &&
-            confirmationСode.Equals(user.ActivationCode))
-        {
-            user.IsActivated = true;
-            user.ActivationCode = null;
-            _userRepository.SaveItem(user);
-            return true;
-        }
-
-        return false;
-    }
-
-    public bool Ewq(string? login, string? password, string? userMail, User? user)
-    {
-        if (string.IsNullOrEmpty(login) ||
-            string.IsNullOrEmpty(password) ||
-            string.IsNullOrEmpty(userMail) ||
-            !Util.CheckEmail(userMail)) return false;
-
-        user = _userRepository.GetItems(userMail, take: 1).FirstOrDefault();
-        if (user != null) return false;
-
-        var random = new Random();
-        var activationCode = random.Next(100000, 1000000).ToString();
-        user = new User
-        {
-            Login = login,
-            Password = password,
-            EmployerID = 0,
-            Email = userMail,
-            IsActivated = false,
-            ActivationCode = activationCode
-        };
-        _userRepository.SaveItem(user);
-
-        var from = new MailAddress(_projectProperties.MyEmail, _projectProperties.SendersName);
-        var to = new MailAddress(userMail);
-        var mailMessage = new MailMessage(from, to);
-        mailMessage.Subject = "Регистрация";
-        mailMessage.Body = $"<h2>Код подтверждения регистрации: {activationCode}</h2>";
-        mailMessage.IsBodyHtml = true;
-        var smtpClient = new SmtpClient(_projectProperties.AddressSMTP, _projectProperties.PortSMTP);
-        smtpClient.Credentials =
-            new NetworkCredential(_projectProperties.MyEmail, _projectProperties.PasswordForMyEmail);
-        smtpClient.EnableSsl = true;
-        smtpClient.Send(mailMessage);
-
-        return true;
     }
 
     [HttpPost]
@@ -229,11 +113,8 @@ public class SessionController : ControllerBase
         string? login = null;
         string? password = null;
         string? userMail = null;
-        // перенести, если пришел код - просто активируй и все. не доставай пароль и емейл
-        //активировать можно либо по логину либо по мейлу
         var responceObj = new ResponceObject<Session>();
         string responceJson;
-        User? user = null;
 
         try
         {
@@ -252,7 +133,7 @@ public class SessionController : ControllerBase
             {
                 var confirmationСode = codElement.GetString();
 
-                isSuccess = Qwe(login, userMail, confirmationСode, user);
+                isSuccess = _loginService.AccountActivation(login, userMail, confirmationСode);
                 if (isSuccess)
                 {
                     responceObj.Success = 1;
@@ -267,7 +148,7 @@ public class SessionController : ControllerBase
                 password = Util.Encode(password);
             }
 
-            isSuccess = Ewq(login, password, userMail, user);
+            isSuccess = _loginService.CreateNewAccount(login, password, userMail);
             if (isSuccess)
             {
                 responceObj.Success = 1;
@@ -276,8 +157,6 @@ public class SessionController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-            responceJson = Utils.Util.SerializeToJson(responceObj);
-            return responceJson;
         }
 
         responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -290,7 +169,6 @@ public class SessionController : ControllerBase
     {
         string? token = null;
         var responceObj = new ResponceObject<Session>();
-        string responceJson;
 
         try
         {
@@ -299,33 +177,21 @@ public class SessionController : ControllerBase
                 token = tokenElement.GetString();
             }
 
-            if (string.IsNullOrEmpty(token))
+            var session = _loginService.GetSession(token);
+            if (session != null)
             {
-                responceJson = Utils.Util.SerializeToJson(responceObj);
-                return responceJson;
+                session.IsDeleted = true;
+                _sessionRepository.SaveItem(session);
             }
-
-            var sessions = _sessionRepository.GetItems(token, take: 1);
-            var session = sessions.FirstOrDefault();
-            if (session == null)
-            {
-                responceJson = Utils.Util.SerializeToJson(responceObj);
-                return responceJson;
-            }
-
-            session.IsDeleted = true;
-            _sessionRepository.SaveItem(session);
 
             responceObj.Success = 1;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-            responceJson = Utils.Util.SerializeToJson(responceObj);
-            return responceJson;
         }
 
-        responceJson = Utils.Util.SerializeToJson(responceObj);
+        var responceJson = Utils.Util.SerializeToJson(responceObj);
         return responceJson;
     }
 }

@@ -1,27 +1,142 @@
-﻿using DB;
+﻿using System.Net;
+using System.Net.Mail;
+using DB;
+using DB.Entities;
+using DB.Repositories.Sessions;
+using DB.Repositories.Users;
 using Microsoft.EntityFrameworkCore;
-namespace SharedKernel.Services;
+using SharedKernel.Utils;
+
+namespace SharedKernel.Services.LoginService;
 
 public class LoginService : ILoginService
 {
-    private readonly ApplicationContextEF _db;
     private const int TokenLifeTime = 100;
+    private readonly ProjectProperties _projectProperties;
+    private readonly ISessionRepository _sessionRepository;
+    private readonly IUserRepository _userRepository;
 
-    public LoginService()
+    public LoginService(ISessionRepository sessionRepository, IUserRepository userRepository)
     {
-        var opt = new DbContextOptionsBuilder<ApplicationContextEF>();
-        opt.UseMySql(MySQLDatabaseContext.ConnectionString, ApplicationContextEF.ServerVersion);
-        _db = new ApplicationContextEF(opt.Options);
+        _projectProperties = Util.GetProjectProperties()!;
+        _sessionRepository = sessionRepository;
+        _userRepository = userRepository;
     }
 
-    public bool IsSessionValid(string? token)
+    public (bool isValid, Session? session) IsSessionValid(string? token)
     {
-        if (string.IsNullOrEmpty(token)) return false;
+        if (string.IsNullOrEmpty(token)) return (false, null);
 
-        var session = _db.Session.FirstOrDefault(p => p != null && p.Token != null && p.Token.Equals(token));
-        if (session == null ||
-            session.IsDeleted) return false;
+        var session = _sessionRepository.GetItems(token).FirstOrDefault();
+        return session == null ? (false, null) : (session.Time.AddMinutes(TokenLifeTime) >= DateTime.UtcNow, session);
+    }
 
-        return session.Time.AddMinutes(TokenLifeTime) >= DateTime.UtcNow;
+    public Session? GetSession(string? token)
+    {
+        var (isValid, session) = IsSessionValid(token);
+        switch (isValid)
+        {
+            case true:
+                return session;
+            case false when session != null:
+                session.IsDeleted = true;
+                _sessionRepository.SaveItem(session);
+                return null;
+            default:
+                return null;
+        }
+    }
+
+    public Session? GetNewSession(string? login, string? password, string userIP)
+    {
+        if (string.IsNullOrEmpty(login) ||
+            string.IsNullOrEmpty(password)) return null;
+
+        password = Util.Encode(password);
+        var user = _userRepository.GetItems(login, isActivated: EntityStatus.OnlyActive, take: 1).FirstOrDefault();
+
+        if (user is not { Password: { } } ||
+            (!user.Password.Equals(password))) return null;
+
+        var session = new Session
+        {
+            Token = Guid.NewGuid().ToString("D"),
+            Time = DateTime.UtcNow,
+            UserID = user.ID,
+            UserIP = userIP
+        };
+        _sessionRepository.SaveItem(session);
+        return session;
+    }
+
+    public User? GetUser(string? token)
+    {
+        if (string.IsNullOrEmpty(token)) return null;
+
+        var session = _sessionRepository.GetItems(token, take: 1).FirstOrDefault();
+        if (session == null) return null;
+
+        var user = _userRepository.GetItem(session.UserID);
+        if (user == null) return null;
+
+        user.Password = null;
+        return user;
+    }
+
+    public bool AccountActivation(string? login, string? userMail, string? confirmationСode)
+    {
+        if (string.IsNullOrEmpty(confirmationСode)) return false;
+
+        var user = _userRepository.GetItems(login, userMail, true).FirstOrDefault();
+        // если учетка новая (не подтвержденная)
+        if (user != null &&
+            !string.IsNullOrEmpty(user.ActivationCode) &&
+            confirmationСode.Equals(user.ActivationCode))
+        {
+            user.IsActivated = true;
+            user.ActivationCode = null;
+            _userRepository.SaveItem(user);
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool CreateNewAccount(string? login, string? password, string? userMail)
+    {
+        if (string.IsNullOrEmpty(login) ||
+            string.IsNullOrEmpty(password) ||
+            string.IsNullOrEmpty(userMail) ||
+            !Util.CheckEmail(userMail)) return false;
+
+        var user = _userRepository.GetItems(login, userMail, true).FirstOrDefault();
+        if (user != null) return false;
+
+        var random = new Random();
+        var activationCode = random.Next(100000, 1000000).ToString();
+        user = new User
+        {
+            Login = login,
+            Password = password,
+            EmployerID = 0,
+            Email = userMail,
+            IsActivated = false,
+            ActivationCode = activationCode
+        };
+        _userRepository.SaveItem(user);
+
+        var from = new MailAddress(_projectProperties.MyEmail, _projectProperties.SendersName);
+        var to = new MailAddress(userMail);
+        var mailMessage = new MailMessage(from, to);
+        mailMessage.Subject = "Регистрация";
+        mailMessage.Body = $"<h2>Код подтверждения регистрации: {activationCode}</h2>";
+        mailMessage.IsBodyHtml = true;
+        var smtpClient = new SmtpClient(_projectProperties.AddressSMTP, _projectProperties.PortSMTP);
+        smtpClient.Credentials =
+            new NetworkCredential(_projectProperties.MyEmail, _projectProperties.PasswordForMyEmail);
+        smtpClient.EnableSsl = true;
+        smtpClient.Send(mailMessage);
+
+        return true;
     }
 }

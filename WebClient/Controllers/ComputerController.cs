@@ -1,7 +1,10 @@
 ﻿using System.Text.Json;
 using DB.Entities;
 using DB.Repositories.Computers;
+using DB.Repositories.Sessions;
+using DB.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Services.LoginService;
 using WebClient.Models;
 
 namespace WebClient.Controllers;
@@ -10,12 +13,18 @@ public class ComputerController : ControllerBase
 {
     private readonly IComputerRepository _computerRepository;
     private readonly ILogger<FileController> _logger;
+    private readonly ILoginService _loginService;
+    private readonly ISessionRepository _sessionRepository;
+    private readonly IUserRepository _userRepository;
 
-    public ComputerController(ILogger<FileController> logger)
+    public ComputerController(ILogger<FileController> logger, ISessionRepository sessionRepository, IUserRepository userRepository)
     {
         _logger = logger;
         //_computerRepository = new ComputerEFRepository();
         _computerRepository = new ComputerDapperRepository();
+        _sessionRepository = sessionRepository;
+        _userRepository = userRepository;
+        _loginService = new LoginService(_sessionRepository, _userRepository);
     }
 
     [HttpPost]
@@ -27,7 +36,8 @@ public class ComputerController : ControllerBase
 
         try
         {
-            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
+            var isValid = _loginService.IsSessionValid(token).isValid;
             if (!isValid)
             {
                 responceObj.Access = 1;

@@ -1,8 +1,10 @@
 ﻿using System.Text.Json;
 using DB;
 using DB.Entities;
+using DB.Repositories.Sessions;
 using DB.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Services.LoginService;
 using SharedKernel.Utils;
 using WebClient.Models;
 
@@ -11,13 +13,17 @@ namespace WebClient.Controllers;
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly IUserRepository _userRepository;
     private readonly ILogger<FileController> _logger;
+    private readonly ILoginService _loginService;
+    private readonly ISessionRepository _sessionRepository;
+    private readonly IUserRepository _userRepository;
 
-    public UserController(ILogger<FileController> logger)
+    public UserController(ILogger<FileController> logger, ISessionRepository sessionRepository, IUserRepository userRepository)
     {
         _logger = logger;
-        _userRepository = new UserEFRepository();
+        _sessionRepository = sessionRepository;
+        _userRepository = userRepository;
+        _loginService = new LoginService(_sessionRepository, _userRepository);
         //_userRepository = new UserDapperRepository();
     }
 
@@ -29,7 +35,8 @@ public class UserController : ControllerBase
 
         try
         {
-            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
+            var isValid = _loginService.IsSessionValid(token).isValid;
             if (!isValid)
             {
                 responceObj.Access = 1;
@@ -68,7 +75,8 @@ public class UserController : ControllerBase
 
         try
         {
-            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
+            var isValid = _loginService.IsSessionValid(token).isValid;
             if (!isValid)
             {
                 responceObj.Access = 1;
@@ -110,7 +118,8 @@ public class UserController : ControllerBase
 
         try
         {
-            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
+            var isValid = _loginService.IsSessionValid(token).isValid;
             if (!isValid)
             {
                 responceObj.Access = 1;
@@ -151,7 +160,8 @@ public class UserController : ControllerBase
 
         try
         {
-            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
+            var isValid = _loginService.IsSessionValid(token).isValid;
             if (!isValid)
             {
                 responceObj.Access = 1;
@@ -209,7 +219,8 @@ public class UserController : ControllerBase
 
         try
         {
-            var isValid = Utils.Util.CheckToken(null, HttpContext.Request.Cookies);
+            var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
+            var isValid = _loginService.IsSessionValid(token).isValid;
             if (!isValid)
             {
                 responceObj.Access = 1;
