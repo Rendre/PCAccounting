@@ -4,7 +4,12 @@ namespace SharedKernel.Services.DownloadService;
 
 public class WebDownload : IFileDownload
 {
-    private readonly IFileRepository _fileRepository = new FileDapperRepository();
+    private readonly IFileRepository _fileRepository;
+
+    public WebDownload(IFileRepository fileRepository)
+    {
+        _fileRepository = fileRepository;
+    }
 
     public void GetItem(uint id, out byte[]? pictureBytes, out string? fileType, out string? fileName)
     {

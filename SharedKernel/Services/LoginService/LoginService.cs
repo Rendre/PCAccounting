@@ -4,7 +4,6 @@ using DB;
 using DB.Entities;
 using DB.Repositories.Sessions;
 using DB.Repositories.Users;
-using Microsoft.EntityFrameworkCore;
 using SharedKernel.Utils;
 
 namespace SharedKernel.Services.LoginService;
@@ -56,7 +55,7 @@ public class LoginService : ILoginService
         var user = _userRepository.GetItems(login, isActivated: EntityStatus.OnlyActive, take: 1).FirstOrDefault();
 
         if (user is not { Password: { } } ||
-            (!user.Password.Equals(password))) return null;
+            !user.Password.Equals(password)) return null;
 
         var session = new Session
         {

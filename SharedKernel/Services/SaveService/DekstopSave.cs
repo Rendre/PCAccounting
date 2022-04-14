@@ -5,7 +5,11 @@ namespace SharedKernel.Services;
 
 public class DekstopSave : IFileSave
 {
-    private readonly IFileRepository _fileRepository = new FileDapperRepository();
+    private readonly IFileRepository _fileRepository;
+    public DekstopSave(IFileRepository fileRepository)
+    {
+        _fileRepository = fileRepository;
+    }
 
     public void SaveItem(uint computerID, byte[] fileBytes, string filePath, string pathForSaveFile, string fileID, out FileEntity? file)
     {

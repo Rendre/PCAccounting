@@ -5,7 +5,11 @@ namespace SharedKernel.Services;
 
 public class WebSave : IFileSave
 {
-    private readonly IFileRepository _fileRepository = new FileDapperRepository();
+    private readonly IFileRepository _fileRepository;
+    public WebSave(IFileRepository fileRepository)
+    {
+        _fileRepository = fileRepository;
+    }
     //todo:
     public void SaveItem(uint computerID, byte[] fileBytes, string fileName, string pathForSaveFile, string fileID,out FileEntity? file)
     {

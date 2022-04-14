@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using DB.Entities;
 using DB.Repositories.Sessions;
-using DB.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Services.LoginService;
 using SharedKernel.Utils;
@@ -12,16 +11,14 @@ namespace WebClient.Controllers;
 public class SessionController : ControllerBase
 {
     private readonly ISessionRepository _sessionRepository;
-    private readonly IUserRepository _userRepository;
     private readonly ILogger<FileController> _logger;
     private readonly ILoginService _loginService;
 
-    public SessionController(ILogger<FileController> logger, ISessionRepository sessionRepository, IUserRepository userRepository)
+    public SessionController(ILogger<FileController> logger, ISessionRepository sessionRepository, ILoginService loginService)
     {
         _logger = logger;
         _sessionRepository = sessionRepository;
-        _userRepository = userRepository;
-        _loginService = new LoginService(_sessionRepository, _userRepository);
+        _loginService = loginService;
     }
 
     [HttpGet]
@@ -31,7 +28,6 @@ public class SessionController : ControllerBase
         string? login = null;
         string? password = null;
         var responceObj = new ResponceObject<Session>();
-        string responceJson;
 
         try
         {
@@ -68,7 +64,7 @@ public class SessionController : ControllerBase
             _logger.LogError(ex, ex.Message);
         }
 
-        responceJson = Utils.Util.SerializeToJson(responceObj);
+        var responceJson = Utils.Util.SerializeToJson(responceObj);
         return responceJson;
     }
 
@@ -78,7 +74,6 @@ public class SessionController : ControllerBase
     {
         string? token = null;
         var responceUserObj = new ResponceObject<User>();
-        string responceJson;
 
         try
         {
@@ -102,7 +97,7 @@ public class SessionController : ControllerBase
             _logger.LogError(ex, ex.Message);
         }
 
-        responceJson = Utils.Util.SerializeToJson(responceUserObj);
+        var responceJson = Utils.Util.SerializeToJson(responceUserObj);
         return responceJson;
     }
 

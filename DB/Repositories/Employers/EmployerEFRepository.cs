@@ -98,7 +98,7 @@ public class EmployerEFRepository : IEmployerRepository
 
     public void Dispose()
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
 }
 

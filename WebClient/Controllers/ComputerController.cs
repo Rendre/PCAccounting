@@ -1,8 +1,6 @@
 ﻿using System.Text.Json;
 using DB.Entities;
 using DB.Repositories.Computers;
-using DB.Repositories.Sessions;
-using DB.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Services.LoginService;
 using WebClient.Models;
@@ -14,17 +12,12 @@ public class ComputerController : ControllerBase
     private readonly IComputerRepository _computerRepository;
     private readonly ILogger<FileController> _logger;
     private readonly ILoginService _loginService;
-    private readonly ISessionRepository _sessionRepository;
-    private readonly IUserRepository _userRepository;
 
-    public ComputerController(ILogger<FileController> logger, ISessionRepository sessionRepository, IUserRepository userRepository)
+    public ComputerController(ILogger<FileController> logger, IComputerRepository computerRepository, ILoginService loginService)
     {
         _logger = logger;
-        //_computerRepository = new ComputerEFRepository();
-        _computerRepository = new ComputerDapperRepository();
-        _sessionRepository = sessionRepository;
-        _userRepository = userRepository;
-        _loginService = new LoginService(_sessionRepository, _userRepository);
+        _computerRepository = computerRepository;
+        _loginService = loginService;
     }
 
     [HttpPost]

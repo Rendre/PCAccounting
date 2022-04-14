@@ -10,13 +10,15 @@ namespace WebClient.Controllers;
 [Route("[controller]")]
 public class FileController : ControllerBase
 {
-    private readonly IFileSave _fileSave = new WebSave();
-    private readonly IFileDownload _fileDownload = new WebDownload();
+    private readonly IFileSave _fileSave;
+    private readonly IFileDownload _fileDownload;
     private readonly ILogger<FileController> _logger;
 
-    public FileController(ILogger<FileController> logger)
+    public FileController(ILogger<FileController> logger, IFileSave fileSave, IFileDownload fileDownload)
     {
         _logger = logger;
+        _fileSave = fileSave;
+        _fileDownload = fileDownload;
     }
 
     [HttpPost]
@@ -87,7 +89,7 @@ public class FileController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetPucture([FromBody] JsonElement json)
+    public IActionResult GetFile([FromBody] JsonElement json)
     {
         byte[]? pictureBytes = null;
         string? fileType = null;

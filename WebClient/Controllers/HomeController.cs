@@ -1,8 +1,4 @@
-﻿using System.Text.Json;
-using DB.Entities;
-using Microsoft.AspNetCore.Mvc;
-using SharedKernel.Logger;
-using WebClient.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace WebClient.Controllers;
 

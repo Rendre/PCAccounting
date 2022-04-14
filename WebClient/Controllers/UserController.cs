@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using DB;
 using DB.Entities;
-using DB.Repositories.Sessions;
 using DB.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Services.LoginService;
@@ -15,16 +14,13 @@ public class UserController : ControllerBase
 {
     private readonly ILogger<FileController> _logger;
     private readonly ILoginService _loginService;
-    private readonly ISessionRepository _sessionRepository;
     private readonly IUserRepository _userRepository;
 
-    public UserController(ILogger<FileController> logger, ISessionRepository sessionRepository, IUserRepository userRepository)
+    public UserController(ILogger<FileController> logger, IUserRepository userRepository, ILoginService loginService)
     {
         _logger = logger;
-        _sessionRepository = sessionRepository;
         _userRepository = userRepository;
-        _loginService = new LoginService(_sessionRepository, _userRepository);
-        //_userRepository = new UserDapperRepository();
+        _loginService = loginService;
     }
 
     [HttpPost]

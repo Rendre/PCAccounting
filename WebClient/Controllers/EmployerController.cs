@@ -1,8 +1,6 @@
 ﻿using System.Text.Json;
 using DB.Entities;
 using DB.Repositories.Employers;
-using DB.Repositories.Sessions;
-using DB.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Services.LoginService;
 using SharedKernel.Utils;
@@ -16,17 +14,12 @@ public class EmployerController : ControllerBase
     private readonly IEmployerRepository _employerRepository;
     private readonly ILogger<FileController> _logger;
     private readonly ILoginService _loginService;
-    private readonly ISessionRepository _sessionRepository;
-    private readonly IUserRepository _userRepository;
 
-    public EmployerController(ILogger<FileController> logger, ISessionRepository sessionRepository, IUserRepository userRepository)
+    public EmployerController(ILogger<FileController> logger, IEmployerRepository employerRepository, ILoginService loginService)
     {
         _logger = logger;
-        //_employerRepository = new EmployerDapperRepository();
-        _employerRepository = new EmployerEFRepository();
-        _sessionRepository = sessionRepository;
-        _userRepository = userRepository;
-        _loginService = new LoginService(_sessionRepository, _userRepository);
+        _employerRepository = employerRepository;
+        _loginService = loginService;
     }
 
     [HttpPost]

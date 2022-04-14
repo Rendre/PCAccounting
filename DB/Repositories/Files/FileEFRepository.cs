@@ -30,14 +30,14 @@ public class FileEFRepository : IFileRepository
     {
         if (id == 0) return null;
 
-        var item = _db.File.FirstOrDefault(p => p.ID == id && p.IsDeleted == false);
+        var item = _db.Files.FirstOrDefault(p => p.ID == id && p.IsDeleted == false);
         return item;
     }
 
     public List<FileEntity> GetItems(string? name = null, string? path = null, uint computerID = 0, string? orderBy = null,
         bool desc = false, uint skip = 0, uint take = 0)
     {
-        var items = _db.File.Where(p => p.IsDeleted == false);
+        var items = _db.Files.Where(p => p.IsDeleted == false);
 
         if (!string.IsNullOrEmpty(name))
         {
@@ -73,7 +73,7 @@ public class FileEFRepository : IFileRepository
 
     public uint GetItemsCount(string? name = null, string? path = null, uint computerID = 0)
     {
-        var items = _db.File.Where(p => p.IsDeleted == false);
+        var items = _db.Files.Where(p => p.IsDeleted == false);
 
         if (!string.IsNullOrEmpty(name))
         {
@@ -95,14 +95,14 @@ public class FileEFRepository : IFileRepository
 
     private bool CreateItem(FileEntity item)
     {
-        _db.File.Add(item);
+        _db.Files.Add(item);
         var countOfChanges = _db.SaveChanges();
         return countOfChanges > 0;
     }
 
     private bool UpdateItem(FileEntity item)
     {
-        _db.File.Update(item);
+        _db.Files.Update(item);
         var countOfChanges = _db.SaveChanges();
         return countOfChanges > 0;
     }
