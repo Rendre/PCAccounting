@@ -9,9 +9,9 @@ public class ComputerDapperRepository : IComputerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public ComputerDapperRepository()
+    public ComputerDapperRepository(MySQLDatabaseContext mySQLDatabaseContext)
     {
-        _databaseContext = new MySQLDatabaseContext();
+        _databaseContext = mySQLDatabaseContext;
     }
 
     public bool SaveItem(Computer? item)

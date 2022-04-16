@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using DB.Entities;
+using DB.Repositories;
 using DB.Repositories.Employers;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Services.LoginService;
@@ -11,15 +12,15 @@ namespace WebClient.Controllers;
 [Route("[controller]")]
 public class EmployerController : ControllerBase
 {
-    private readonly IEmployerRepository _employerRepository;
     private readonly ILogger<FileController> _logger;
     private readonly ILoginService _loginService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public EmployerController(ILogger<FileController> logger, IEmployerRepository employerRepository, ILoginService loginService)
+    public EmployerController(ILogger<FileController> logger, ILoginService loginService, IUnitOfWork unitOfWork)
     {
         _logger = logger;
-        _employerRepository = employerRepository;
         _loginService = loginService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpPost]
@@ -45,7 +46,7 @@ public class EmployerController : ControllerBase
             tel = Util.CheckTelNumber(tel);
             var employer = new Employer { Name = name, Position = position, Tel = tel };
 
-            _employerRepository.SaveItem(employer);
+            _unitOfWork.EmployeeRepository.SaveItem(employer);
             if (employer.ID > 0)
             {
                 responceObj.Success = 1;
@@ -86,7 +87,7 @@ public class EmployerController : ControllerBase
                 var id = idElement.GetUInt32();
                 if (id == 0) return Utils.Util.SerializeToJson(responceObj);
 
-                var employer = _employerRepository.GetItem(id);
+                var employer = _unitOfWork.EmployeeRepository.GetItem(id);
                 if (employer == null) return Utils.Util.SerializeToJson(responceObj);
 
                 if (json.TryGetProperty("name", out var nameElement))
@@ -125,7 +126,7 @@ public class EmployerController : ControllerBase
 
                 if (isChanged)
                 {
-                    var success = _employerRepository.SaveItem(employer);
+                    var success = _unitOfWork.EmployeeRepository.SaveItem(employer);
                     if (success)
                     {
                         responceObj.Success = 1;
@@ -154,7 +155,7 @@ public class EmployerController : ControllerBase
 
         var responceObj = new ResponceObject<Employer>();
         string responceJson;
-        
+
         try
         {
             var token = Utils.Util.GetToken(null, HttpContext.Request.Cookies);
@@ -181,7 +182,7 @@ public class EmployerController : ControllerBase
                 tel = telElement.GetString();
             }
 
-            var employerList = _employerRepository.GetItems(name, position, tel);
+            var employerList = _unitOfWork.EmployeeRepository.GetItems(name, position, tel);
 
             responceObj.Success = 1;
             responceObj.DataList = employerList;
@@ -214,7 +215,7 @@ public class EmployerController : ControllerBase
                 return responceJson;
             }
 
-            var employer = _employerRepository.GetItem(id);
+            var employer = _unitOfWork.EmployeeRepository.GetItem(id);
 
             responceObj.Success = 1;
             responceObj.Data = employer;
@@ -248,7 +249,7 @@ public class EmployerController : ControllerBase
                 return responceJson;
             }
 
-            var employer = _employerRepository.GetItem(id);
+            var employer = _unitOfWork.EmployeeRepository.GetItem(id);
             if (employer == null)
             {
                 responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -256,7 +257,7 @@ public class EmployerController : ControllerBase
             }
 
             employer.IsDeleted = true;
-            var success = _employerRepository.SaveItem(employer);
+            var success = _unitOfWork.EmployeeRepository.SaveItem(employer);
             if (success)
             {
                 responceObj.Success = 1;

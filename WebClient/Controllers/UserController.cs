@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using DB;
 using DB.Entities;
+using DB.Repositories;
 using DB.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Services.LoginService;
@@ -14,13 +15,13 @@ public class UserController : ControllerBase
 {
     private readonly ILogger<FileController> _logger;
     private readonly ILoginService _loginService;
-    private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UserController(ILogger<FileController> logger, IUserRepository userRepository, ILoginService loginService)
+    public UserController(ILogger<FileController> logger, ILoginService loginService, IUnitOfWork unitOfWork)
     {
         _logger = logger;
-        _userRepository = userRepository;
         _loginService = loginService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpPost]
@@ -46,7 +47,7 @@ public class UserController : ControllerBase
             var employerID = userJsn.GetProperty("employerID").GetUInt32();
             var user = new User { Login = login, Password = password, EmployerID = employerID };
 
-            _userRepository.SaveItem(user);
+            _unitOfWork.UserRepository.SaveItem(user);
             if (user.ID > 0)
             {
                 responceObj.Success = 1;
@@ -88,7 +89,7 @@ public class UserController : ControllerBase
             var employerID = userJsn.GetProperty("employerID").GetUInt32();
             var user = new User { ID = id, Login = login, Password = password, EmployerID = employerID };
 
-            var success = _userRepository.SaveItem(user);
+            var success = _unitOfWork.UserRepository.SaveItem(user);
 
             if (success)
             {
@@ -123,7 +124,7 @@ public class UserController : ControllerBase
                 return responceJson;
             }
 
-            var user = _userRepository.GetItem(id);
+            var user = _unitOfWork.UserRepository.GetItem(id);
             if (user != null)
             {
                 user.Password = null;
@@ -185,7 +186,7 @@ public class UserController : ControllerBase
                 email = emailElement.GetString();
             }
 
-            var userList = _userRepository.GetItems(login, email, false, employerID, entityStatus);
+            var userList = _unitOfWork.UserRepository.GetItems(login, email, false, employerID, entityStatus);
             foreach (var user in userList)
             {
                 user.Password = null;
@@ -224,7 +225,7 @@ public class UserController : ControllerBase
                 return responceJson;
             }
 
-            var userFromDb = _userRepository.GetItem(id);
+            var userFromDb = _unitOfWork.UserRepository.GetItem(id);
             if (userFromDb == null)
             {
                 responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -232,7 +233,7 @@ public class UserController : ControllerBase
             }
 
             userFromDb.IsDeleted = true;
-            var success = _userRepository.SaveItem(userFromDb);
+            var success = _unitOfWork.UserRepository.SaveItem(userFromDb);
             if (success)
             {
                 responceObj.Success = 1;

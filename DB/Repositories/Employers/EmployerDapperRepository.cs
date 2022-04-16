@@ -7,9 +7,9 @@ public class EmployerDapperRepository : IEmployerRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public EmployerDapperRepository()
+    public EmployerDapperRepository(MySQLDatabaseContext mySQLDatabaseContext)
     {
-        _databaseContext = new MySQLDatabaseContext();
+        _databaseContext = mySQLDatabaseContext;
     }
 
     public bool SaveItem(Employer? item)

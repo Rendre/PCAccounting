@@ -11,11 +11,8 @@ public class ApplicationContextEF : DbContext
     public DbSet<FileEntity> Files { get; set; }
     public DbSet<Employer> Employers { get; set; }
 
-    public static MySqlServerVersion ServerVersion = new(new Version(8, 0, 26));
-
-    public ApplicationContextEF(DbContextOptions<ApplicationContextEF> options)
-        : base(options)
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-
+        optionsBuilder.UseMySql(MySQLDatabaseContext.ConnectionString, new MySqlServerVersion(new Version(8, 0, 26)));
     }
 }

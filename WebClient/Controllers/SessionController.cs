@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using DB.Entities;
+using DB.Repositories;
 using DB.Repositories.Sessions;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Services.LoginService;
@@ -10,15 +11,15 @@ namespace WebClient.Controllers;
 
 public class SessionController : ControllerBase
 {
-    private readonly ISessionRepository _sessionRepository;
     private readonly ILogger<FileController> _logger;
     private readonly ILoginService _loginService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public SessionController(ILogger<FileController> logger, ISessionRepository sessionRepository, ILoginService loginService)
+    public SessionController(ILogger<FileController> logger, ILoginService loginService, IUnitOfWork unitOfWork)
     {
         _logger = logger;
-        _sessionRepository = sessionRepository;
         _loginService = loginService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet]
@@ -176,7 +177,7 @@ public class SessionController : ControllerBase
             if (session != null)
             {
                 session.IsDeleted = true;
-                _sessionRepository.SaveItem(session);
+                _unitOfWork.SessionRepository.SaveItem(session);
             }
 
             responceObj.Success = 1;

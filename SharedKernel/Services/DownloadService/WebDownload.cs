@@ -1,19 +1,18 @@
-﻿using DB.Repositories.Files;
+﻿using DB.Repositories;
 
 namespace SharedKernel.Services.DownloadService;
 
 public class WebDownload : IFileDownload
 {
-    private readonly IFileRepository _fileRepository;
-
-    public WebDownload(IFileRepository fileRepository)
+    private readonly IUnitOfWork _unitOfWork;
+    public WebDownload(IUnitOfWork unitOfWork)
     {
-        _fileRepository = fileRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public void GetItem(uint id, out byte[]? pictureBytes, out string? fileType, out string? fileName)
     {
-        var item = _fileRepository.GetItem(id);
+        var item = _unitOfWork.FileRepository.GetItem(id);
         if (item == null)
         {
             pictureBytes = null;

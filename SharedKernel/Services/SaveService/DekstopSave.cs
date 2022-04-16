@@ -1,14 +1,14 @@
 ﻿using DB.Entities;
-using DB.Repositories.Files;
+using DB.Repositories;
 
-namespace SharedKernel.Services;
+namespace SharedKernel.Services.SaveService;
 
 public class DekstopSave : IFileSave
 {
-    private readonly IFileRepository _fileRepository;
-    public DekstopSave(IFileRepository fileRepository)
+    private readonly IUnitOfWork _unitOfWork;
+    public DekstopSave(IUnitOfWork unitOfWork)
     {
-        _fileRepository = fileRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public void SaveItem(uint computerID, byte[] fileBytes, string filePath, string pathForSaveFile, string fileID, out FileEntity? file)
@@ -25,6 +25,6 @@ public class DekstopSave : IFileSave
         using var fileStream = new FileStream(pathForSaveFile, FileMode.CreateNew);
         fileStream.Write(fileBytes);
         file = new FileEntity { ComputerID = computerID, FileName = fileName, Path = pathForSaveFile };
-        _fileRepository.SaveItem(file);
+        _unitOfWork.FileRepository.SaveItem(file);
     }
 }

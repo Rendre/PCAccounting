@@ -1,16 +1,13 @@
-﻿using DB;
-using DB.Entities;
-using DB.Repositories.Employers;
-using Microsoft.EntityFrameworkCore;
+﻿using DB.Entities;
+
+namespace DB.Repositories.Employers;
 
 public class EmployerEFRepository : IEmployerRepository
 {
     private readonly ApplicationContextEF _db;
-    public EmployerEFRepository()
+    public EmployerEFRepository(ApplicationContextEF applicationContextEF)
     {
-        var opt = new DbContextOptionsBuilder<ApplicationContextEF>();
-        opt.UseMySql(MySQLDatabaseContext.ConnectionString, ApplicationContextEF.ServerVersion);
-        _db = new ApplicationContextEF(opt.Options);
+        _db = applicationContextEF;
     }
 
     public bool SaveItem(Employer? item)
@@ -101,4 +98,3 @@ public class EmployerEFRepository : IEmployerRepository
         //throw new NotImplementedException();
     }
 }
-

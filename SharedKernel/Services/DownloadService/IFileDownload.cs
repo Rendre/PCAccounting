@@ -1,6 +1,4 @@
-﻿using DB.Entities;
-
-namespace SharedKernel.Services.DownloadService;
+﻿namespace SharedKernel.Services.DownloadService;
 
 public interface IFileDownload
 {

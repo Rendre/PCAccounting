@@ -8,9 +8,9 @@ public class SessionDapperRepository : ISessionRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public SessionDapperRepository()
+    public SessionDapperRepository(MySQLDatabaseContext mySQLDatabaseContext)
     {
-        _databaseContext = new MySQLDatabaseContext();
+        _databaseContext = mySQLDatabaseContext;
     }
 
     public bool SaveItem(Session? item)

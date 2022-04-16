@@ -1,16 +1,13 @@
 ﻿using DB.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace DB.Repositories.Sessions;
 
 public class SessionEFRepository : ISessionRepository
 {
     private readonly ApplicationContextEF _db;
-    public SessionEFRepository()
+    public SessionEFRepository(ApplicationContextEF applicationContextEF)
     {
-        var opt = new DbContextOptionsBuilder<ApplicationContextEF>();
-        opt.UseMySql(MySQLDatabaseContext.ConnectionString, ApplicationContextEF.ServerVersion);
-        _db = new ApplicationContextEF(opt.Options);
+        _db = applicationContextEF;
     }
 
     public bool SaveItem(Session? item)

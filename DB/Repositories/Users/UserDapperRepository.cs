@@ -8,9 +8,9 @@ public class UserDapperRepository : IUserRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public UserDapperRepository()
+    public UserDapperRepository(MySQLDatabaseContext mySQLDatabaseContext)
     {
-        _databaseContext = new MySQLDatabaseContext();
+        _databaseContext = mySQLDatabaseContext;
     }
 
     public bool SaveItem(User? item)

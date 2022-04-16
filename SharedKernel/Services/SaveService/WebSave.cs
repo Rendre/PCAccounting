@@ -1,14 +1,14 @@
 ﻿using DB.Entities;
-using DB.Repositories.Files;
+using DB.Repositories;
 
-namespace SharedKernel.Services;
+namespace SharedKernel.Services.SaveService;
 
 public class WebSave : IFileSave
 {
-    private readonly IFileRepository _fileRepository;
-    public WebSave(IFileRepository fileRepository)
+    private readonly IUnitOfWork _unitOfWork;
+    public WebSave(IUnitOfWork unitOfWork)
     {
-        _fileRepository = fileRepository;
+        _unitOfWork = unitOfWork;
     }
     //todo:
     public void SaveItem(uint computerID, byte[] fileBytes, string fileName, string pathForSaveFile, string fileID,out FileEntity? file)
@@ -28,7 +28,7 @@ public class WebSave : IFileSave
         else
         {
             var kekID = Convert.ToUInt32(fileID);
-            file = _fileRepository.GetItem(kekID);
+            file = _unitOfWork.FileRepository.GetItem(kekID);
             if (file == null) return;
 
             pathForSaveFile = file.Path!;
@@ -39,7 +39,7 @@ public class WebSave : IFileSave
         if (file == null)
         {
             file = new FileEntity { ComputerID = computerID, FileName = fileName, Path = pathForSaveFile };
-            _fileRepository.SaveItem(file);
+            _unitOfWork.FileRepository.SaveItem(file);
         }
     }
 }

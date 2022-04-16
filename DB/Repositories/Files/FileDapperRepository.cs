@@ -7,9 +7,9 @@ public class FileDapperRepository : IFileRepository
 {
     private readonly MySQLDatabaseContext _databaseContext;
 
-    public FileDapperRepository()
+    public FileDapperRepository(MySQLDatabaseContext mySQLDatabaseContext)
     {
-        _databaseContext = new MySQLDatabaseContext();
+        _databaseContext = mySQLDatabaseContext;
     }
 
     public bool SaveItem(FileEntity? item)

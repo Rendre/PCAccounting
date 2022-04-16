@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using DB.Entities;
-using DB.Repositories.Computers;
+using DB.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Services.LoginService;
 using WebClient.Models;
@@ -9,15 +9,15 @@ namespace WebClient.Controllers;
 
 public class ComputerController : ControllerBase
 {
-    private readonly IComputerRepository _computerRepository;
     private readonly ILogger<FileController> _logger;
     private readonly ILoginService _loginService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ComputerController(ILogger<FileController> logger, IComputerRepository computerRepository, ILoginService loginService)
+    public ComputerController(ILogger<FileController> logger, ILoginService loginService, IUnitOfWork unitOfWork)
     {
         _logger = logger;
-        _computerRepository = computerRepository;
         _loginService = loginService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpPost]
@@ -68,7 +68,7 @@ public class ComputerController : ControllerBase
     {
         var responceObj = new ResponceObject<Computer>();
 
-        var computer = _computerRepository.GetItem(id);
+        var computer = _unitOfWork.ComputerRepository.GetItem(id);
         responceObj.Success = 1;
         responceObj.Data = computer;
 
@@ -112,7 +112,7 @@ public class ComputerController : ControllerBase
             price = priceElement.GetDecimal();
         }
 
-        var computers = _computerRepository.GetItems(name, status, employerID, date, cpu, price);
+        var computers = _unitOfWork.ComputerRepository.GetItems(name, status, employerID, date, cpu, price);
 
         responceObj.Success = 1;
         responceObj.DataList = computers;
@@ -129,7 +129,7 @@ public class ComputerController : ControllerBase
         if (jsonElementComp.TryGetProperty("id", out var idElement))
         {
             var id = idElement.GetUInt32();
-            computer = _computerRepository.GetItem(id);
+            computer = _unitOfWork.ComputerRepository.GetItem(id);
             if (computer == null)
             {
                 responceJson = Utils.Util.SerializeToJson(responceObj);
@@ -142,7 +142,7 @@ public class ComputerController : ControllerBase
             if (computer != null)
             {
                 computer.IsDeleted = true;
-                var success = _computerRepository.SaveItem(computer);
+                var success = _unitOfWork.ComputerRepository.SaveItem(computer);
                 if (success)
                 {
                     responceObj.Success = 1;
@@ -181,13 +181,13 @@ public class ComputerController : ControllerBase
 
         if (computer.ID == 0)
         {
-            _computerRepository.SaveItem(computer);
+            _unitOfWork.ComputerRepository.SaveItem(computer);
             responceObj.Success = 1;
             responceObj.Data = computer;
         }
         else
         {
-            var success = _computerRepository.SaveItem(computer);
+            var success = _unitOfWork.ComputerRepository.SaveItem(computer);
             if (success)
             {
                 responceObj.Success = 1;

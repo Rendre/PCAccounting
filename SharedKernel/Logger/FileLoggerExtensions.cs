@@ -1,17 +1,15 @@
-﻿using DB.Entities;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace SharedKernel.Logger;
 
 public static class FileLoggerExtensions
 {
-    public static ILoggingBuilder AddFile(this ILoggingBuilder builder)
+    public static void AddFile(this ILoggingBuilder builder)
     {
         //var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent?.Parent?.Parent?.Parent;
         var directory = new DirectoryInfo(Environment.CurrentDirectory).Parent;
         var pathForSaveFile = directory + "\\log.txt";
         builder.AddProvider(new FileLoggerProvider(pathForSaveFile));
-        return builder;
     }
 
     //public static Computer KEK(this Computer computer)

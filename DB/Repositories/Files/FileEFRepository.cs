@@ -1,6 +1,4 @@
-﻿
-using DB.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using DB.Entities;
 
 namespace DB.Repositories.Files;
 
@@ -8,11 +6,9 @@ public class FileEFRepository : IFileRepository
 {
     private readonly ApplicationContextEF _db;
 
-    public FileEFRepository()
+    public FileEFRepository(ApplicationContextEF applicationContextEF)
     {
-        var opt = new DbContextOptionsBuilder<ApplicationContextEF>();
-        opt.UseMySql(MySQLDatabaseContext.ConnectionString, ApplicationContextEF.ServerVersion);
-        _db = new ApplicationContextEF(opt.Options);
+        _db = applicationContextEF;
     }
 
     public bool SaveItem(FileEntity? item)

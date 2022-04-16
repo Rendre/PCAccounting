@@ -1,16 +1,13 @@
 ﻿using DB.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace DB.Repositories.Users;
 
 public class UserEFRepository : IUserRepository
 {
     private readonly ApplicationContextEF _db;
-    public UserEFRepository()
+    public UserEFRepository(ApplicationContextEF applicationContextEF)
     {
-        var opt = new DbContextOptionsBuilder<ApplicationContextEF>();
-        opt.UseMySql(MySQLDatabaseContext.ConnectionString, ApplicationContextEF.ServerVersion);
-        _db = new ApplicationContextEF(opt.Options);
+        _db = applicationContextEF;
     }
 
     public bool SaveItem(User? item)

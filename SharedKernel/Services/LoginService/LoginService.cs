@@ -2,8 +2,7 @@
 using System.Net.Mail;
 using DB;
 using DB.Entities;
-using DB.Repositories.Sessions;
-using DB.Repositories.Users;
+using DB.Repositories;
 using SharedKernel.Utils;
 
 namespace SharedKernel.Services.LoginService;
@@ -12,21 +11,19 @@ public class LoginService : ILoginService
 {
     private const int TokenLifeTime = 100;
     private readonly ProjectProperties _projectProperties;
-    private readonly ISessionRepository _sessionRepository;
-    private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public LoginService(ISessionRepository sessionRepository, IUserRepository userRepository)
+    public LoginService(IUnitOfWork unitOfWork)
     {
         _projectProperties = Util.GetProjectProperties()!;
-        _sessionRepository = sessionRepository;
-        _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public (bool isValid, Session? session) IsSessionValid(string? token)
     {
         if (string.IsNullOrEmpty(token)) return (false, null);
 
-        var session = _sessionRepository.GetItems(token).FirstOrDefault();
+        var session = _unitOfWork.SessionRepository.GetItems(token).FirstOrDefault();
         return session == null ? (false, null) : (session.Time.AddMinutes(TokenLifeTime) >= DateTime.UtcNow, session);
     }
 
@@ -39,7 +36,7 @@ public class LoginService : ILoginService
                 return session;
             case false when session != null:
                 session.IsDeleted = true;
-                _sessionRepository.SaveItem(session);
+                _unitOfWork.SessionRepository.SaveItem(session);
                 return null;
             default:
                 return null;
@@ -52,7 +49,7 @@ public class LoginService : ILoginService
             string.IsNullOrEmpty(password)) return null;
 
         password = Util.Encode(password);
-        var user = _userRepository.GetItems(login, isActivated: EntityStatus.OnlyActive, take: 1).FirstOrDefault();
+        var user = _unitOfWork.UserRepository.GetItems(login, isActivated: EntityStatus.OnlyActive, take: 1).FirstOrDefault();
 
         if (user is not { Password: { } } ||
             !user.Password.Equals(password)) return null;
@@ -64,7 +61,7 @@ public class LoginService : ILoginService
             UserID = user.ID,
             UserIP = userIP
         };
-        _sessionRepository.SaveItem(session);
+        _unitOfWork.SessionRepository.SaveItem(session);
         return session;
     }
 
@@ -72,10 +69,10 @@ public class LoginService : ILoginService
     {
         if (string.IsNullOrEmpty(token)) return null;
 
-        var session = _sessionRepository.GetItems(token, take: 1).FirstOrDefault();
+        var session = _unitOfWork.SessionRepository.GetItems(token, take: 1).FirstOrDefault();
         if (session == null) return null;
 
-        var user = _userRepository.GetItem(session.UserID);
+        var user = _unitOfWork.UserRepository.GetItem(session.UserID);
         if (user == null) return null;
 
         user.Password = null;
@@ -86,7 +83,7 @@ public class LoginService : ILoginService
     {
         if (string.IsNullOrEmpty(confirmationСode)) return false;
 
-        var user = _userRepository.GetItems(login, userMail, true).FirstOrDefault();
+        var user = _unitOfWork.UserRepository.GetItems(login, userMail, true).FirstOrDefault();
         // если учетка новая (не подтвержденная)
         if (user != null &&
             !string.IsNullOrEmpty(user.ActivationCode) &&
@@ -94,7 +91,7 @@ public class LoginService : ILoginService
         {
             user.IsActivated = true;
             user.ActivationCode = null;
-            _userRepository.SaveItem(user);
+            _unitOfWork.UserRepository.SaveItem(user);
             return true;
         }
 
@@ -108,7 +105,7 @@ public class LoginService : ILoginService
             string.IsNullOrEmpty(userMail) ||
             !Util.CheckEmail(userMail)) return false;
 
-        var user = _userRepository.GetItems(login, userMail, true).FirstOrDefault();
+        var user = _unitOfWork.UserRepository.GetItems(login, userMail, true).FirstOrDefault();
         if (user != null) return false;
 
         var random = new Random();
@@ -122,7 +119,7 @@ public class LoginService : ILoginService
             IsActivated = false,
             ActivationCode = activationCode
         };
-        _userRepository.SaveItem(user);
+        _unitOfWork.UserRepository.SaveItem(user);
 
         var from = new MailAddress(_projectProperties.MyEmail, _projectProperties.SendersName);
         var to = new MailAddress(userMail);

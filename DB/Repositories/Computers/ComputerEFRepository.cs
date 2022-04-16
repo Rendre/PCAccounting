@@ -1,5 +1,4 @@
 ﻿using DB.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace DB.Repositories.Computers;
 
@@ -7,11 +6,9 @@ public class ComputerEFRepository : IComputerRepository
 {
     private readonly ApplicationContextEF _db;
 
-    public ComputerEFRepository()
+    public ComputerEFRepository(ApplicationContextEF applicationContextEF)
     {
-        var opt = new DbContextOptionsBuilder<ApplicationContextEF>();
-        opt.UseMySql(MySQLDatabaseContext.ConnectionString, ApplicationContextEF.ServerVersion);
-        _db = new ApplicationContextEF(opt.Options);
+        _db = applicationContextEF;
     }
 
     public bool SaveItem(Computer? item)
