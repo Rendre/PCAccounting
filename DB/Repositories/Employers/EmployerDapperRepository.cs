@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Text;
+using Dapper;
 using DB.Entities;
 
 namespace DB.Repositories.Employers;
@@ -44,58 +45,53 @@ public class EmployerDapperRepository : IEmployerRepository
     public List<Employer> GetItems(string? name = null, string? position = null, string? tel = null,
         uint skip = 0, uint take = 0)
     {
+        var sqlExpression = new StringBuilder("SELECT * FROM employers WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
-        var conditions = new List<string>(4) { "IsDeleted = 0" };
-
-        if (!string.IsNullOrEmpty(name))
-        {
-            conditions.Add("Name = @Name");
-            parameters.Add("@Name", name);
-        }
-
-        if (!string.IsNullOrEmpty(position))
-        {
-            conditions.Add("Position = @Position");
-            parameters.Add("@Position", position);
-        }
-
-        if (!string.IsNullOrEmpty(tel))
-        {
-            conditions.Add("Tel = @Tel");
-            parameters.Add("@Tel", tel);
-        }
-
-        var sqlExpression = $"SELECT * FROM employers WHERE {string.Join(" AND ", conditions)}";
-        var items = _databaseContext.GetAllByQuery<Employer>(sqlExpression, parameters);
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, name, position, tel, skip, take);
+        var items = _databaseContext.GetAllByQuery<Employer>(sqlExpressionForQuery, parameters);
         return items;
     }
 
     public uint GetItemsCount(string? name = null, string? position = null, string? tel = null)
     {
+        var sqlExpression = new StringBuilder("SELECT COUNT(*) FROM employers WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
-        var conditions = new List<string>(4) { "IsDeleted = 0" };
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, name, position, tel);
+        var itemsCount = _databaseContext.ExecuteByQuery(sqlExpressionForQuery, parameters);
+        return itemsCount;
+    }
 
-        if (!string.IsNullOrEmpty(name))
+    private static string GetParamForExpression(StringBuilder sqlExpression, DynamicParameters parameters, string? name, string? position, string? tel,
+                                                    uint skip = 0, uint take = 0)
+    {
+        if (name != null)
         {
-            conditions.Add("Name = @Name");
+            sqlExpression.Append(" AND Name = @Name");
             parameters.Add("@Name", name);
         }
 
-        if (!string.IsNullOrEmpty(position))
+        if (position != null)
         {
-            conditions.Add("Position = @Position");
-            parameters.Add("@Position", position);
+            sqlExpression.Append(" AND Position = @Position");
+            parameters.Add("@StatusID", position);
         }
 
-        if (!string.IsNullOrEmpty(tel))
+        if (tel != null)
         {
-            conditions.Add("Tel = @Tel");
+            sqlExpression.Append(" AND Tel = @Tel");
             parameters.Add("@Tel", tel);
         }
 
-        var sqlExpression = $"SELECT COUNT(*) FROM employers WHERE {string.Join(" AND ", conditions)}";
-        var itemsCount = _databaseContext.ExecuteByQuery(sqlExpression, parameters);
-        return itemsCount;
+        if (take > 0)
+        {
+            sqlExpression.Append(" LIMIT @take");
+            parameters.Add("@take", take);
+
+            sqlExpression.Append(" OFFSET @skip");
+            parameters.Add("@skip", skip);
+        }
+
+        return sqlExpression.ToString();
     }
 
     private bool CreateItem(Employer employer)
@@ -116,11 +112,4 @@ public class EmployerDapperRepository : IEmployerRepository
         var rowsChanged = _databaseContext.ExecuteByQuery(sqlExpression);
         return rowsChanged > 0;
     }
-
-    public void Dispose()
-    {
-        _databaseContext.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
 }

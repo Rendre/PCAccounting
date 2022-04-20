@@ -2,7 +2,7 @@
 
 namespace DB.Repositories.Users;
 
-public interface IUserRepository : IDisposable
+public interface IUserRepository
 {
     public bool SaveItem(User? item);
 

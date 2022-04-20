@@ -3,7 +3,6 @@ using DB.Repositories.Employers;
 using DB.Repositories.Files;
 using DB.Repositories.Sessions;
 using DB.Repositories.Users;
-using Microsoft.EntityFrameworkCore;
 
 namespace DB.Repositories;
 

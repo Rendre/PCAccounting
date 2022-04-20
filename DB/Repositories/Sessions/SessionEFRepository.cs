@@ -32,6 +32,20 @@ public class SessionEFRepository : ISessionRepository
     public List<Session?> GetItems(string? token = null, DateTime? time = null, uint userID = 0,
         string? userIP = null, uint skip = 0, uint take = 0)
     {
+        var items = GetList(token, time, userID, userIP, skip, take);
+        return items.ToList();
+    }
+
+    public uint GetItemsCount(string? token = null, DateTime? time = null, uint userID = 0,
+        string? userIP = null)
+    {
+        var items = GetList(token, time, userID, userIP);
+        return (uint)items.Count();
+    }
+
+    private IQueryable<Session?> GetList(string? token = null, DateTime? time = null, uint userID = 0,
+        string? userIP = null, uint skip = 0, uint take = 0)
+    {
         var items = _db.Session.Where(p => p != null && p.IsDeleted == false);
 
         if (!string.IsNullOrEmpty(token))
@@ -59,35 +73,7 @@ public class SessionEFRepository : ISessionRepository
             items = items.Skip((int)skip).Take((int)take);
         }
 
-        return items.ToList();
-    }
-
-    public uint GetItemsCount(string? token = null, DateTime? time = null, uint userID = 0,
-        string? userIP = null)
-    {
-        var items = _db.Session.Where(p => p != null && p.IsDeleted == false);
-
-        if (!string.IsNullOrEmpty(token))
-        {
-            items = items.Where(p => p != null && p.Token != null && p.Token.Equals(token));
-        }
-
-        if (time != null)
-        {
-            items = items.Where(p => p != null && p.Time.Equals(time));
-        }
-
-        if (userID > 0)
-        {
-            items = items.Where(p => p != null && p.UserID == userID);
-        }
-
-        if (!string.IsNullOrEmpty(userIP))
-        {
-            items = items.Where(p => p != null && p.UserIP != null && p.UserIP.Equals(userIP));
-        }
-
-        return (uint)items.Count();
+        return items;
     }
 
     private bool CreateItem(Session? session)

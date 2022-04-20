@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Reflection;
+using System.Text.Json;
 using DB.Entities;
 using DB.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +37,27 @@ public class ComputerController : ControllerBase
                 responceObj.Access = 1;
                 responceJson = Utils.Util.SerializeToJson(responceObj);
                 return responceJson;
+            }
+
+            if (json.TryGetProperty("id", out var jsonElementKek))
+            {
+                var id = jsonElementKek.GetUInt32();
+                var comp = _unitOfWork.ComputerRepository.GetItem(id);
+
+                json.TryGetProperty("data", out var kekDataElement);
+
+                kekDataElement.TryGetProperty("field", out var fieldElement);
+                var field = fieldElement.GetString();
+                kekDataElement.TryGetProperty("value", out var valueElement);
+                var value = valueElement.GetString();
+
+                // reflection
+                var type = typeof(Computer);
+                var namefield = type.GetProperty(field!);
+                namefield!.SetValue(comp, value);
+
+                _unitOfWork.ComputerRepository.SaveItem(comp!);
+                return "";
             }
 
             if (json.TryGetProperty("id", out var jsonElementID))

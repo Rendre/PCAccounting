@@ -14,11 +14,3 @@ public interface ISessionRepository
     public uint GetItemsCount(string? token = null, DateTime? time = null, uint userID = 0,
         string? userIP = null);
 }
-
-//public bool CreateItem(Session session);
-
-//public bool UpdateItem(Session session);
-
-//public Session? GetItem(string token);
-
-// public bool DeleteItem();

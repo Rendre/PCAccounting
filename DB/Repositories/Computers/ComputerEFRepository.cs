@@ -34,7 +34,7 @@ public class ComputerEFRepository : IComputerRepository
         DateTime? date = null, string? cpu = null, decimal price = 0, uint skip = 0, uint take = 0)
     {
         var items = GetList(name, date, statusID, employerID, cpu, price);
-        return items;
+        return items.ToList();
     }
 
     public uint GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0,
@@ -44,7 +44,7 @@ public class ComputerEFRepository : IComputerRepository
         return (uint)items.Count();
     }
 
-    private List<Computer> GetList(string? name = null, DateTime? date = null, uint statusID = 0, uint employerID = 0,
+    private IQueryable<Computer> GetList(string? name = null, DateTime? date = null, uint statusID = 0, uint employerID = 0,
         string? cpu = null, decimal price = 0, uint skip = 0, uint take = 0)
     {
         var items = _db.Computers.Where(p => p.IsDeleted == false);
@@ -83,7 +83,7 @@ public class ComputerEFRepository : IComputerRepository
             items = items.Skip((int)skip).Take((int)take);
         }
 
-        return items.ToList();
+        return items;
     }
 
     private bool CreateItem(Computer computer)
@@ -98,10 +98,5 @@ public class ComputerEFRepository : IComputerRepository
         _db.Computers.Update(computer);
         var countOfChanges = _db.SaveChanges();
         return countOfChanges > 0;
-    }
-
-    public void Dispose()
-    {
-        throw new NotImplementedException();
     }
 }

@@ -46,8 +46,8 @@ public class ComputerDapperRepository : IComputerRepository
     {
         var sqlExpression = new StringBuilder("SELECT * FROM computers WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
-        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusID, employerID, 
-            date, cpu, price, parameters, skip, take);
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, name, statusID, employerID, 
+            date, cpu, price, skip, take);
         var items = _databaseContext.GetAllByQuery<Computer>(sqlExpressionForQuery, parameters);
         return items;
     }
@@ -57,13 +57,13 @@ public class ComputerDapperRepository : IComputerRepository
     {
         var sqlExpression = new StringBuilder("SELECT COUNT(*) FROM computers WHERE IsDeleted = 0");
         var parameters = new DynamicParameters();
-        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, name, statusID, employerID, date, cpu, price, parameters);
+        var sqlExpressionForQuery = GetParamForExpression(sqlExpression, parameters, name, statusID, employerID, date, cpu, price);
         var itemsCount = _databaseContext.ExecuteByQuery(sqlExpressionForQuery, parameters);
         return itemsCount;
     }
 
-    private static string GetParamForExpression(StringBuilder sqlExpression, string? name, uint statusID, uint employerID, DateTime? date,
-        string? cpu, decimal price, DynamicParameters parameters, uint skip = 0, uint take = 0)
+    private static string GetParamForExpression(StringBuilder sqlExpression, DynamicParameters parameters, string? name, uint statusID, uint employerID, DateTime? date,
+        string? cpu, decimal price, uint skip = 0, uint take = 0)
     {
         if (name != null)
         {
@@ -136,11 +136,5 @@ public class ComputerDapperRepository : IComputerRepository
                             $"WHERE ID = {computer.ID}";
         var countOfChanges = _databaseContext.ExecuteByQuery(sqlExpression);
         return countOfChanges > 0;
-    }
-
-    public void Dispose()
-    {
-        _databaseContext.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

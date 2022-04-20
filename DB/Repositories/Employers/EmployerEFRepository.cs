@@ -32,6 +32,19 @@ public class EmployerEFRepository : IEmployerRepository
     public List<Employer> GetItems(string? name = null, string? position = null, string? tel = null,
         uint skip = 0, uint take = 0)
     {
+        var items = GetList(name, position, tel, skip, take);
+        return items.ToList();
+    }
+
+    public uint GetItemsCount(string? name = null, string? position = null, string? tel = null)
+    {
+        var items = GetList(name, position, tel);
+        return (uint)items.Count();
+    }
+
+    private IQueryable<Employer> GetList(string? name = null, string? position = null, string? tel = null,
+                                            uint skip = 0, uint take = 0)
+    {
         var items = _db.Employers.Where(p => p.IsDeleted == false);
 
         if (!string.IsNullOrEmpty(name))
@@ -54,29 +67,7 @@ public class EmployerEFRepository : IEmployerRepository
             items = items.Skip((int)skip).Take((int)take);
         }
 
-        return items.ToList();
-    }
-
-    public uint GetItemsCount(string? name = null, string? position = null, string? tel = null)
-    {
-        var items = _db.Employers.Where(p => p.IsDeleted == false);
-
-        if (!string.IsNullOrEmpty(name))
-        {
-            items = items.Where(p => p.Name != null && p.Name.Equals(name));
-        }
-
-        if (!string.IsNullOrEmpty(position))
-        {
-            items = items.Where(p => p.Position != null && p.Position.Equals(position));
-        }
-
-        if (!string.IsNullOrEmpty(tel))
-        {
-            items = items.Where(p => p.Tel != null && p.Tel.Equals(tel));
-        }
-
-        return (uint)items.Count();
+        return items;
     }
 
     private bool CreateItem(Employer item)
@@ -91,10 +82,5 @@ public class EmployerEFRepository : IEmployerRepository
         _db.Employers.Update(item);
         var countOfChanges = _db.SaveChanges();
         return countOfChanges > 0;
-    }
-
-    public void Dispose()
-    {
-        //throw new NotImplementedException();
     }
 }

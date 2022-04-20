@@ -2,7 +2,7 @@
 
 namespace DB.Repositories.Computers;
 
-public interface IComputerRepository : IDisposable
+public interface IComputerRepository
 {
     public bool SaveItem(Computer item);
 
@@ -13,5 +13,4 @@ public interface IComputerRepository : IDisposable
 
     public uint GetItemsCount(string? name = null, uint statusID = 0, uint employerID = 0,
         DateTime? date = null, string? cpu = null, decimal price = 0);
-
 }

@@ -33,7 +33,7 @@ public class UserEFRepository : IUserRepository
         EntityStatus isActivated = EntityStatus.None, string? activationCode = null, uint skip = 0, uint take = 0)
 
     {
-        var items = GetCollection(login, email, search, employerID, isActivated, activationCode, skip, take);
+        var items = GetList(login, email, search, employerID, isActivated, activationCode, skip, take);
         return items.ToList();
     }
 
@@ -41,25 +41,11 @@ public class UserEFRepository : IUserRepository
     public uint GetItemsCount(string? login = null, string? email = null, bool search = false, uint employerID = 0, EntityStatus isActivated = EntityStatus.None,
         string? activationCode = null)
     {
-        var items = GetCollection(login, email, search, employerID, isActivated, activationCode);
+        var items = GetList(login, email, search, employerID, isActivated, activationCode);
         return (uint)items.Count();
     }
 
-    private bool CreateItem(User user)
-    {
-        _db.Users.Add(user);
-        var countOfChanges = _db.SaveChanges();
-        return countOfChanges > 0;
-    }
-
-    private bool UpdateItem(User user)
-    {
-        _db.Users.Update(user);
-        var countOfChanges = _db.SaveChanges();
-        return countOfChanges > 0;
-    }
-
-    private IEnumerable<User> GetCollection(string? login = null, string? email = null, bool search = false, uint employerID = 0,
+    private IQueryable<User> GetList(string? login = null, string? email = null, bool search = false, uint employerID = 0,
         EntityStatus isActivated = EntityStatus.None, string? activationCode = null, uint skip = 0, uint take = 0)
     {
         var items = _db.Users.Where(p => p.IsDeleted == false);
@@ -106,8 +92,17 @@ public class UserEFRepository : IUserRepository
         return items;
     }
 
-    public void Dispose()
+    private bool CreateItem(User user)
     {
-        //throw new NotImplementedException();
+        _db.Users.Add(user);
+        var countOfChanges = _db.SaveChanges();
+        return countOfChanges > 0;
+    }
+
+    private bool UpdateItem(User user)
+    {
+        _db.Users.Update(user);
+        var countOfChanges = _db.SaveChanges();
+        return countOfChanges > 0;
     }
 }

@@ -33,8 +33,20 @@ public class FileEFRepository : IFileRepository
     public List<FileEntity> GetItems(string? name = null, string? path = null, uint computerID = 0, string? orderBy = null,
         bool desc = false, uint skip = 0, uint take = 0)
     {
-        var items = _db.Files.Where(p => p.IsDeleted == false);
+        var items = GetList(name, path, computerID, orderBy, desc ,skip, take);
+        return items.ToList();
+    }
 
+    public uint GetItemsCount(string? name = null, string? path = null, uint computerID = 0)
+    {
+        var items = GetList(name, path, computerID);
+        return (uint)items.Count();
+    }
+
+    private IQueryable<FileEntity> GetList(string? name = null, string? path = null, uint computerID = 0, string? orderBy = null,
+        bool desc = false, uint skip = 0, uint take = 0)
+    {
+        var items = _db.Files.Where(p => p.IsDeleted == false);
         if (!string.IsNullOrEmpty(name))
         {
             items = items.Where(p => p.FileName != null && p.FileName.Equals(name));
@@ -64,29 +76,7 @@ public class FileEFRepository : IFileRepository
             items = items.Skip((int)skip).Take((int)take);
         }
 
-        return items.ToList();
-    }
-
-    public uint GetItemsCount(string? name = null, string? path = null, uint computerID = 0)
-    {
-        var items = _db.Files.Where(p => p.IsDeleted == false);
-
-        if (!string.IsNullOrEmpty(name))
-        {
-            items = items.Where(p => p.FileName != null && p.FileName.Equals(name));
-        }
-
-        if (!string.IsNullOrEmpty(path))
-        {
-            items = items.Where(p => p.Path != null && p.Path.Equals(path));
-        }
-
-        if (computerID > 0)
-        {
-            items = items.Where(p => p.ComputerID == computerID);
-        }
-
-        return (uint)items.Count();
+        return items;
     }
 
     private bool CreateItem(FileEntity item)

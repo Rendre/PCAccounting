@@ -55,31 +55,6 @@ public class SessionDapperRepository : ISessionRepository
         return itemsCount;
     }
 
-    private bool CreateItem(Session item)
-    {
-        // проверить записывается ли время
-        var sqlExpression = "INSERT INTO session (Token, Time, UserID, UserIP)" +
-                            $"VALUES ('{item.Token}', '{item.Time:yyyy-MM-dd HH:mm:ss}', {item.UserID}, '{item.UserIP}') ";
-        const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
-        _databaseContext.ExecuteByQuery(sqlExpression);
-        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
-        item.ID = id;
-        return id > 0;
-    }
-
-    private bool UpdateItem(Session item)
-    {
-        var sqlExpression = "UPDATE users SET " +
-                            $"Token = '{item.Token}', " +
-                            $"Time = '{item.Time:yyyy-MM-dd HH:mm:ss}', " +
-                            $"UserID = {item.UserID}, " +
-                            $"UserIP = '{item.UserIP}', " +
-                            $"IsDeleted = {item.IsDeleted}, " +
-                            $"WHERE ID = {item.ID}";
-        var countOfChanges = _databaseContext.ExecuteByQuery(sqlExpression);
-        return countOfChanges > 0;
-    }
-
     private static string GetParamForExpression(StringBuilder sqlExpression, DynamicParameters parameters,
         string? token, DateTime? time, uint userID, string? userIP, uint skip = 0, uint take = 0)
     {
@@ -117,5 +92,30 @@ public class SessionDapperRepository : ISessionRepository
         }
 
         return sqlExpression.ToString();
+    }
+
+    private bool CreateItem(Session item)
+    {
+        // проверить записывается ли время
+        var sqlExpression = "INSERT INTO session (Token, Time, UserID, UserIP)" +
+                            $"VALUES ('{item.Token}', '{item.Time:yyyy-MM-dd HH:mm:ss}', {item.UserID}, '{item.UserIP}') ";
+        const string sqlExpressionForID = "SELECT LAST_INSERT_ID()";
+        _databaseContext.ExecuteByQuery(sqlExpression);
+        var id = _databaseContext.ExecuteScalarByQuery(sqlExpressionForID);
+        item.ID = id;
+        return id > 0;
+    }
+
+    private bool UpdateItem(Session item)
+    {
+        var sqlExpression = "UPDATE users SET " +
+                            $"Token = '{item.Token}', " +
+                            $"Time = '{item.Time:yyyy-MM-dd HH:mm:ss}', " +
+                            $"UserID = {item.UserID}, " +
+                            $"UserIP = '{item.UserIP}', " +
+                            $"IsDeleted = {item.IsDeleted}, " +
+                            $"WHERE ID = {item.ID}";
+        var countOfChanges = _databaseContext.ExecuteByQuery(sqlExpression);
+        return countOfChanges > 0;
     }
 }
