@@ -17,6 +17,7 @@ public static class ServiceCollectionExtations
 {
     public static void UseServices(this IServiceCollection collection)
     {
+        //AddScoped - сервис создается 1 раз для каждого запроса
         collection.AddScoped<IFileSave, WebSave>();
         collection.AddScoped<IFileDownload, WebDownload>();
         collection.AddScoped<ILoginService, LoginService>();

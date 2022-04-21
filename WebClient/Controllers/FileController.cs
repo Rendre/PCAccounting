@@ -105,17 +105,16 @@ public class FileController : ControllerBase
             if (id == 0) return NotFound();
 
             _fileDownload.GetItem(id, out pictureBytes, out fileType, out fileName);
-            if (pictureBytes == null ||
-                fileType == null ||
-                fileName == null) return NotFound();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
         }
 
-        return File(pictureBytes!, fileType!, fileName!);
+        if (pictureBytes == null ||
+            fileType == null ||
+            fileName == null) return NotFound();
+
+        return File(pictureBytes, fileType, fileName);
     }
-
-
 }
